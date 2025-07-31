@@ -1,0 +1,72 @@
+{
+  "collectionName": "components_experience_experiences",
+  "info": {
+    "displayName": "Experience"
+  },
+  "options": {},
+  "attributes": {
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Former",
+        "Partner",
+        "Customer",
+        "Competitor"
+      ]
+    },
+    "start_date": {
+      "type": "date"
+    },
+    "end_date": {
+      "type": "date"
+    },
+    "designation": {
+      "type": "string"
+    },
+    "upload_file_details": {
+      "type": "string"
+    },
+    "target_company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "original_quote": {
+      "type": "integer"
+    },
+    "engagement_status": {
+      "type": "enumeration",
+      "enum": [
+        "Uncontacted",
+        "No response",
+        "Contacted but not screened",
+        "Contacted & screened",
+        "Sent to client",
+        "Negotiation",
+        "Contacted but ghosting",
+        "Six month rule",
+        "Out of budget",
+        "NDA",
+        "Not interested at all",
+        "Not interested in project",
+        "Call scheduled",
+        "Call done"
+      ]
+    },
+    "source_of_response": {
+      "type": "enumeration",
+      "enum": [
+        "Cold calling",
+        "Email",
+        "Linkedin",
+        "Others"
+      ]
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,25 @@
+# Node modules
+**/node_modules/
+
+# Build files (optional)
+**/.cache/
+**/build/
+**/dist/
+
+# Environment files
+**/.env
+**/.env.*
+
+# Log files
+**/logs/
+**/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Strapi specific
+**/.tmp/
+
+# Next.js (if your frontend uses it)
+.next/

@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "experiences",
+  "info": {
+    "singularName": "experience",
+    "pluralName": "experiences",
+    "displayName": "Experience"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "designation": {
+      "type": "string"
+    },
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Former",
+        "Competitor",
+        "Customer",
+        "Partner",
+        "Industry Expert"
+      ]
+    },
+    "start_date": {
+      "type": "date"
+    },
+    "end_date": {
+      "type": "date"
+    },
+    "target_company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "original_quote": {
+      "type": "integer"
+    },
+    "engagement_status": {
+      "type": "enumeration",
+      "enum": [
+        "Uncontacted",
+        "No response",
+        "Contacted but not screened",
+        "Contacted & screened",
+        "Sent to client",
+        "Negotiation",
+        "Contacted but ghosting",
+        "Six mos rule",
+        "Out of budget",
+        "NDA",
+        "Not Interested at all",
+        "Not interested in project",
+        "Call Scheduled",
+        "Call Done"
+      ]
+    },
+    "upload_file_details": {
+      "type": "string"
+    },
+    "expert": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::expert.expert",
+      "inversedBy": "expert_experiences"
+    }
+  }
+}

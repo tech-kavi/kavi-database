@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_related_project_related_projects",
+  "info": {
+    "displayName": "related_project"
+  },
+  "options": {},
+  "attributes": {
+    "project_code": {
+      "type": "string"
+    },
+    "final_amount": {
+      "type": "integer"
+    },
+    "ca": {
+      "type": "string"
+    },
+    "investor": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer",
+      "min": 1,
+      "max": 5
+    }
+  },
+  "config": {}
+}

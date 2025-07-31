@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projects",
+  "info": {
+    "singularName": "project",
+    "pluralName": "projects",
+    "displayName": "Project"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "final_amount": {
+      "type": "integer"
+    },
+    "ca": {
+      "type": "string"
+    },
+    "investor": {
+      "type": "string"
+    },
+    "call_rating": {
+      "type": "integer",
+      "max": 5
+    },
+    "expert": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::expert.expert",
+      "inversedBy": "projects"
+    },
+    "date": {
+      "type": "date"
+    },
+    "expert_rating": {
+      "type": "integer",
+      "max": 5
+    },
+    "fc_call_rating": {
+      "type": "integer",
+      "max": 5
+    },
+    "fc_expert_rating": {
+      "type": "integer",
+      "max": 5
+    }
+  }
+}
