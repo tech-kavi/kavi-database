@@ -11,30 +11,35 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "pro_slug": {
+      "type": "uid",
+      "targetField": "code",
+      "required": true
+    },
     "code": {
-      "type": "string"
-    },
-    "final_amount": {
-      "type": "integer"
-    },
-    "ca": {
       "type": "string"
     },
     "investor": {
       "type": "string"
     },
-    "call_rating": {
-      "type": "integer",
-      "max": 5
-    },
-    "expert": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::expert.expert",
-      "inversedBy": "projects"
+    "ca": {
+      "type": "string"
     },
     "date": {
       "type": "date"
+    },
+    "quote": {
+      "type": "integer"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "final_amount": {
+      "type": "integer"
+    },
+    "call_rating": {
+      "type": "integer",
+      "max": 5
     },
     "expert_rating": {
       "type": "integer",
@@ -47,6 +52,24 @@
     "fc_expert_rating": {
       "type": "integer",
       "max": 5
+    },
+    "account_number": {
+      "type": "biginteger"
+    },
+    "account_holder_name": {
+      "type": "string"
+    },
+    "ifsc": {
+      "type": "string"
+    },
+    "pan": {
+      "type": "string"
+    },
+    "expert": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::expert.expert",
+      "inversedBy": "projects"
     }
   }
 }

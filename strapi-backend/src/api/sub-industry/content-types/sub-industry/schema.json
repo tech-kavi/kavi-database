@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sub_industries",
+  "info": {
+    "singularName": "sub-industry",
+    "pluralName": "sub-industries",
+    "displayName": "sub-industry"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "ind_slug": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "experiences": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::experience.experience",
+      "mappedBy": "sub_industry"
+    }
+  }
+}

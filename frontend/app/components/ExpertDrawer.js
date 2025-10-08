@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import AddProjectModal from './AddProjectModal'
-import EditExpertDetailsModal from './EditExertDetailsModal'
+import EditExpertDetailsModal from './EditExpertDetailsModal'
 
 
 const getTypeClass = (type) => {
@@ -65,7 +65,7 @@ const handleSave = async(updatedExp) => {
 
   try {
     const res = await axios.put(
-      `http://localhost:1337/api/experiences/${updatedExp.experienceId}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experiences/${updatedExp.experienceId}`,
       {
         data: {
           experienceId:updatedExp.id,
@@ -75,7 +75,7 @@ const handleSave = async(updatedExp) => {
           end_date: updatedExp.end_date,
           engagement_status: updatedExp.engagement_status,
           source_of_response: updatedExp.source_of_response,
-          original_quote:updatedExp.original_quote,
+          quote:updatedExp.quote,
         },
       },
       {
@@ -134,7 +134,7 @@ const handleSave = async(updatedExp) => {
         <p>Email: {expert.email}</p>
         <p>Phone: {expert.phone}</p>
         <p>Source Of Response:{expert.source_of_response}</p>
-        <p>Quote:{expert.quote}</p>
+        <p>Quote:{expert?.original_quote}</p>
         <p>RA Comments:{expert.ra_comments}</p>
         
         <h3 className="drawer-section-title">Experiences</h3>

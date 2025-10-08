@@ -1,0 +1,732 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
+import axios from 'axios';
+
+import EditExperienceModal from '../../components/EditExperienceModal';
+import AddProjectModal from '../../components/AddProjectModal';
+import EditExpertDetailsModal from '../../components/EditExpertDetailsModal';
+import EditProjectModal from '../../components/EditProjectModal';
+import Badge from '../../components/Badge';
+import { ENGAGEMENT_COLORS } from '../../constants/options';
+import { TYPE_COLORS } from '../../constants/options';
+import ExperiencesTable from '../../components/ExperiencesTable';
+import ProjectsTable from '../../components/ProjectsTable';
+import Head from 'next/head';
+
+const getTypeClass = (type) => {
+  switch (type?.toLowerCase()) {
+    case 'current': return 'bg-green-100 text-green-800';
+    case 'former': return 'bg-gray-100 text-gray-800';
+    case 'advisor': return 'bg-yellow-100 text-yellow-800';
+    default: return 'bg-blue-100 text-blue-800';
+  }
+};
+
+export default function ExpertPage() {
+
+  
+
+  const { slug } = useParams();
+
+  const [expert, setExpert] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editingExp, setEditingExp] = useState(null);
+ 
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+ 
+  const [showEditDetailsModal, setShowEditDetailsModal] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchExpert();
+  }, [slug]);
+
+  
+
+  const fetchExpert = async () => {
+
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts?filters[slug][$eq]=${slug}&populate[expert_experiences][populate]=company&populate[expert_experiences][populate]=target_company&populate[expert_experiences][populate]=sub_industry&populate[projects][populate]&populate[last_update]=*`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      const data = res.data.data[0];
+      setExpert(data);
+      setLoading(false);
+
+    } catch (err) {
+      console.error('Failed to fetch expert:', err);
+      setLoading(false);
+    }
+  };
+
+  
+
+  const handleSave = async (updatedExp) => {
+    console.log("inside exp save");
+    console.log(updatedExp);
+    try {
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experiences/${updatedExp.exp_slug}`,
+        { data: updatedExp },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      const updatedExpert = res.data;
+      setExpert(updatedExpert);
+      console.log(updatedExpert);
+      setEditingExp(null);
+      alert('Experience updated successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update experience');
+    }
+  };
+
+   useEffect(() => {
+    if (expert) {
+      document.title = `KAVI | ${expert.name}`;
+    } else {
+      document.title = 'KAVI | Expert Page';
+    }
+  }, [expert]);
+
+  const handleProSave = async (updatedProject) => {
+  console.log(updatedProject);
+  try {
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${updatedProject.pro_slug}`,
+      { data: updatedProject },
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    const updatedExpert = res.data;
+      setExpert(updatedExpert);
+      console.log(updatedExpert);
+
+    setShowProjectModal(false);
+    alert('Project updated successfully!');
+  } catch (err) {
+    console.error(err);
+    alert('Failed to update project');
+  }
+};
+
+ 
+ const handleEdit = (experience) => {
+  console.log("handleEdit");
+    setEditingExp(experience)
+  }
+
+  const handleExpUpdate = async (updatedExp) => {
+
+    console.log(updatedExp);
+
+
+    try {
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experiences/${updatedExp.exp_slug}`,
+        {
+          data: {
+            experienceId: updatedExp.id,
+            designation: updatedExp.designation,
+            type: updatedExp.type,
+            start_date: updatedExp.start_date,
+            end_date: updatedExp.end_date,
+            engagement_status: updatedExp.engagement_status,
+            source_of_response: updatedExp.source_of_response,
+            quote: updatedExp.quote,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // or remove if public
+          }
+        }
+      );
+
+      const updatedExpert = res.data;
+
+
+      setExpert(updatedExpert)
+
+      alert('Update Successful.');
+      setEditingExp(null);
+      refetchHits();
+
+
+    } catch (err) {
+      console.error('Failed to update experience:', err)
+      alert('Update failed.')
+    }
+    setEditingExp(null)
+  }
+
+  const addProject = async ()=>{
+    try{
+
+    }
+    catch(err)
+    {
+      console.error(err);
+      alert('Failed to add project');
+    }
+  }
+
+    if (loading) return <div className="flex items-start justify-center py-4 bg-gray-200">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+        </div>;
+ 
+  if (!expert) return <p className="text-center mt-10 text-red-500">No expert found.</p>;
+
+  return (
+//     <div className="max-w-7xl mx-auto p-6 space-y-8">
+
+//       <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+//         <div className='flex md:flex-row md:items-center gap-2'>
+//             <h1 className="text-3xl font-bold text-gray-800">{expert.name}</h1> 
+//             <button className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer " onClick={() => setShowEditDetailsModal(true)}>✏️ Edit</button>
+    
+//         </div>
+       
+//         {expert.linkedin && (
+//           <a
+//             href={expert.linkedin}
+//             target="_blank"
+//             rel="noopener noreferrer"
+//             className="mt-2 md:mt-0 w-auto self-start md:self-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition"
+//           >
+//             View LinkedIn Profile →
+//           </a>
+//         )}
+//       </div>
+
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+//         <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+//             <h1 className="text-xl font-bold text-gray-800">Latest Data</h1>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Designation</p>
+//               <p className='font-semibold'>{expert.expert_experiences[0]?.designation}</p>
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Company</p>
+//               <p className='font-semibold'>{expert.expert_experiences[0]?.company?.name}</p>
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Topic</p>
+//               <p className='font-semibold'>{expert.expert_experiences[0]?.target_company?.name ?expert.expert_experiences[0].target_company?.name : '-'}</p>
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Type</p>
+//               <Badge label={expert.expert_experiences[0]?.type} options={TYPE_COLORS} />
+//               {/* <p className='font-semibold'>{expert.expert_experiences[0]?.type ? expert.expert_experiences[0].type : '-'}</p> */}
+//             </div>
+
+//         </div>
+//         <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+
+//           <h1 className="text-xl font-bold text-gray-800">Contact & Status</h1>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Email</p>
+//               <p className='font-semibold'>{expert?.email ? expert?.email:'-'}</p>
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Phone</p>
+//               <p className='font-semibold'>{expert?.phone ? expert?.phone : '-'}</p>
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Status</p>
+//               <Badge label={expert?.expert_status} options={ENGAGEMENT_COLORS} />
+//               {/* <p className='font-semibold'>{expert?.expert_status ? expert?.expert_status : '-'}</p> */}
+//             </div>
+
+//             <div className=''>
+//               <p className='text-gray-400'>Original Quote</p>
+//               <p className='font-semibold'>{expert?.original_quote ? expert?.original_quote : '-'}</p>
+//             </div>
+         
+//         </div>
+        
+//       </div>
+
+
+//       <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+//         <h1 className="text-xl font-bold text-gray-800">Expert Notes</h1>
+//         <p className='text-gray-400'>{expert?.notes ? expert?.notes : '-'}</p>
+//       </div>
+
+//       <ExperiencesTable expert={expert} handleEdit={handleEdit} />
+
+
+//       <section className="bg-white p-4 rounded shadow">
+//   <h2 className="text-xl font-semibold text-gray-800 mb-4">Experiences</h2>
+//   <div className="overflow-x-auto">
+//     <table className="min-w-full divide-y divide-gray-200">
+//       <thead className="">
+//         <tr>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Designation</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Company</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Type</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Start Date</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">End Date</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Status</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Quote</th>
+//           <th className="px-6 py-3 text-left text-sm font-bold uppercase">Industry</th>
+//         </tr>
+//       </thead>
+//       <tbody className="divide-y divide-gray-200">
+//         {expert.expert_experiences?.map((exp) => (
+//           <tr key={exp.id}>
+//             <td className="px-6 py-4 text-sm font-medium text-gray-900">{exp.designation}</td>
+//             <td className="px-6 py-4 text-sm text-gray-600">{exp.company?.name || '-'}</td>
+//             <td className="px-6 py-4 text-sm text-gray-600">
+//             <Badge label={exp.type} options={TYPE_COLORS} />
+//           </td>
+//             <td className="px-6 py-4 text-sm text-gray-600">{exp.start_date}</td>
+//             <td className="px-6 py-4 text-sm text-gray-600">{exp.end_date || 'Present'}</td>
+//             <td className="px-6 py-4 text-sm">
+//               <Badge label={exp?.engagement_status} options={ENGAGEMENT_COLORS} truncate={true}/>
+//               {/* <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+//                 {exp?.engagement_status || '-'}
+//               </span> */}
+//             </td>
+//             <td className="px-6 py-4 text-sm text-gray-600">{exp.quote || 'Present'}</td>
+//             <td className="px-6 py-4 text-sm text-gray-600">{exp?.sub_industry?.name || ''}</td>
+//             <td>
+//               <button className="edit-btn cursor-pointer" onClick={() => handleEdit(exp)}>
+//                         ✏️ Edit
+//                 </button>
+//             </td>
+//           </tr>
+//         ))}
+//       </tbody>
+//     </table>
+//   </div>
+//       </section>
+
+
+//       <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+//         <h1 className="text-xl font-bold text-gray-800">Summary</h1>
+
+//         <div className='flex flex-row justify-between'>
+//           <div>
+//             <p className='text-gray-400'>Calls Completed</p>
+//             <p className='font-semibold text-center'>
+//               {expert.projects?.length ? expert.projects.length : '-'}
+//             </p>
+//           </div>
+
+//           <div>
+//             <p className='text-gray-400'>Total Amount Paid</p>
+//             <p className='font-semibold text-center'>
+//               {expert.projects?.length
+//                 ? expert.projects.reduce(
+//                     (sum, project) => sum + (project.final_amount || 0),
+//                     0
+//                   )
+//                 : '-'}
+//             </p>
+//           </div>
+
+//           <div>
+//             <p className='text-gray-400'>Overall Rating</p>
+//             <p className='font-semibold text-center'>
+//               {expert.projects?.length
+//                 ? expert.projects.reduce(
+//                     (sum, project) => sum + (project.expert_rating || 0),
+//                     0
+//                   )/expert?.projects?.length
+//                 : '-'}
+//             </p>
+//           </div>
+
+//           <div>
+//             <p className='text-gray-400'>Call Codes</p>
+//             <p className='font-semibold text-center'>
+//               {expert.projects?.length
+//                 ? expert.projects.map(p => p.code).filter(Boolean).join(', ')
+//                 : '-'}
+//             </p>
+//           </div>
+//         </div>
+        
+//       </div>
+
+
+// <ProjectsTable
+//   projects={expert.projects}
+//   onEdit={(project) => {
+//     setSelectedProject(project);
+//     setShowProjectModal(true);
+//   }}
+// />
+     
+
+//       <section className="bg-white p-4 rounded shadow mt-8">
+//         <h2 className="text-xl font-semibold text-gray-800 mb-4">Projects</h2>
+//         <div className="overflow-x-auto">
+//           <table className="min-w-full divide-y divide-gray-200">
+//             <thead className="">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Code</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Investor</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">CA</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Call Rating</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Expert Rating</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Date</th>
+//                 <th className="px-6 py-3 text-left text-sm font-bold uppercase">Final Amount</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {expert.projects?.map((project) => (
+//                 <tr key={project.code}>
+//                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{project.code}</td>
+//                   <td className="px-6 py-4 text-sm text-gray-600">{project.investor}</td>
+//                   <td className="px-6 py-4 text-sm text-gray-600">{project.ca}</td>
+//                   <td className="px-6 py-4 text-sm text-gray-600">{project.call_rating}/5</td>
+//                   <td className="px-6 py-4 text-sm text-gray-600">{project.expert_rating}/5</td>
+//                   <td className="px-6 py-4 text-sm text-gray-600">{project.date}</td>
+//                   <td className="px-6 py-4 text-sm font-semibold text-gray-900">${project.final_amount}</td>
+//                   <td key={project.id || index} className="bg-white p-4 rounded shadow ">
+//                     <button 
+//                       className="edit-btn" 
+//                       onClick={() => {
+//                         setSelectedProject(project);
+//                         setShowProjectModal(true);
+//                       }}
+//                     >
+//                       ✏️ Edit
+//                     </button>
+//                     </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+    
+
+//       {expert?.projects?.length > 0 ? (
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+//                 {expert.projects.map((project, index) => (
+//                   <div key={project.id || index} className="bg-white p-4 rounded shadow ">
+//                     <button 
+//                       className="edit-btn" 
+//                       onClick={() => {
+//                         setSelectedProject(project);
+//                         setShowProjectModal(true);
+//                       }}
+//                     >
+//                       ✏️ Edit
+//                     </button>
+//                     <p><strong>Code:</strong> {project.code}</p>
+//                     <p><strong>Investor:</strong> {project.investor}</p>
+//                     <p><strong>CA:</strong> {project.ca}</p>
+//                     <p><strong>Call Rating:</strong> {project.call_rating} / 5</p>
+//                     <p><strong>Expert Rating:</strong> {project.expert_rating} / 5</p>
+//                     <p><strong>FC Call Rating:</strong> {project.fc_call_rating} / 5</p>
+//                     <p><strong>FC Expert Rating:</strong> {project.fc_expert_rating} / 5</p>
+//                     <p><strong>Date:</strong> {project.date}</p>
+//                     <p><strong>Duration:</strong> ₹{project.duration}</p>
+//                     <p><strong>Quote:</strong> ₹{project.quote}</p>
+//                     <p><strong>Final Amount:</strong> ₹{project.final_amount}</p>
+
+//                   </div>
+//                 ))}
+//               </div>
+
+//             ) : (
+//               <p>No project data available.</p>
+
+//         )}
+
+
+//        {/* Tags */}
+//       <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+//         <h2 className="font-semibold text-lg mb-2">Tags</h2>
+//         {expert?.tags?.length > 0 ? (
+//           <div className="flex flex-wrap gap-2">
+//             {expert.tags.map((tag, i) => (
+//               <span key={i} className="px-2 py-1 bg-blue-200 rounded text-sm">{tag}</span>
+//             ))}
+//           </div>
+//         ) : (
+//           <p className="text-gray-500">No tags</p>
+//         )}
+//       </div>
+
+//       <div className="bg-white p-4 rounded shadow flex flex-col gap-4">
+//         <h1 className="text-xl font-bold text-gray-800">Edit History</h1>
+//          <p className="text-gray-400">
+//           {expert?.last_update
+//             ? `Last edited by ${expert.last_update.name} on ${new Date(
+//                 expert.last_update.time
+//               ).toLocaleString('en-IN', {
+//                 timeZone: 'Asia/Kolkata',
+//                 day: '2-digit',
+//                 month: 'short',
+//                 year: 'numeric',
+//                 hour: '2-digit',
+//                 minute: '2-digit',
+//               })}`
+//             : '-'}
+//         </p>
+
+//       </div>
+
+       
+     
+
+    //   {/* Modals */}
+    //   {editingExp && (
+    //     <EditExperienceModal
+    //       experience={editingExp}
+    //       expertId={expert.id}
+    //       onClose={() => setEditingExp(null)}
+    //       onSave={handleSave}
+    //     />
+    //   )}
+
+    //   {showProjectModal && (
+    //     <AddProjectModal
+    //       expertId={slug}
+    //       onClose={() => setShowProjectModal(false)}
+    //       onProjectAdd={(expertData) =>{
+    //         setExpert(expertData);
+    //       } }
+    //     />
+    //   )}
+
+    //   {showProjectModal && (
+    //   <EditProjectModal
+    //     project={selectedProject}
+    //     expertId={expert.id}
+    //     onClose={() => setShowProjectModal(false)}
+    //     onSave={handleProSave}
+    //   />
+    // )}
+
+
+
+    //   {editingExp && (
+    //                 <EditExperienceModal
+    //                   experience={editingExp}
+    //                   expertId={expert.id}
+    //                   onClose={() => setEditingExp(null)}
+    //                   onSave={handleSave}
+    //                 />
+    //               )}
+//     </div>
+  <>
+  
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
+
+  {/* Header: Expert Name + Edit + LinkedIn */}
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div className="flex items-center gap-2">
+      <h1 className="text-3xl font-bold text-gray-900">{expert.name}</h1>
+      <button 
+        className="text-sm text-indigo-600 hover:text-indigo-800 transition"
+        onClick={() => setShowEditDetailsModal(true)}
+      >
+        ✏️ Edit
+      </button>
+    </div>
+    {expert.linkedin && (
+      <a
+        href={expert.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition font-medium text-sm"
+      >
+        View LinkedIn Profile →
+      </a>
+    )}
+  </div>
+
+  {/* Latest Data + Contact & Status */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Latest Data</h2>
+      <div className="space-y-2">
+        <p className="text-gray-400">Designation</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.designation || '-'}</p>
+
+        <p className="text-gray-400">Company</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.company?.name || '-'}</p>
+
+        <p className="text-gray-400">Topic</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.target_company?.name || '-'}</p>
+
+        <p className="text-gray-400">Type</p>
+        <Badge label={expert.expert_experiences[0]?.type} options={TYPE_COLORS} />
+      </div>
+    </div>
+
+    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Contact & Status</h2>
+      <div className="space-y-2">
+        <p className="text-gray-400">Email</p>
+        <p className="font-semibold">{expert.email || '-'}</p>
+
+        <p className="text-gray-400">Phone</p>
+        <p className="font-semibold">{expert.phone || '-'}</p>
+
+        <p className="text-gray-400">Status</p>
+        <Badge label={expert.expert_status} options={ENGAGEMENT_COLORS} />
+
+        <p className="text-gray-400">Original Quote</p>
+        <p className="font-semibold">{expert.original_quote || '-'}</p>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  {/* Experiences Table */}
+  <ExperiencesTable expert={expert} handleEdit={handleEdit} />
+
+  {/* Summary */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Summary</h2>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <p className="text-gray-400">Calls Completed</p>
+        <p className="font-semibold text-lg">{expert.projects?.length || '-'}</p>
+      </div>
+      <div>
+        <p className="text-gray-400">Total Amount Paid</p>
+        <p className="font-semibold text-lg">
+          {expert.projects?.length
+            ? expert.projects.reduce((sum, p) => sum + (p.final_amount || 0), 0)
+            : '-'}
+        </p>
+      </div>
+      <div>
+        <p className="text-gray-400">Overall Rating</p>
+        <p className="font-semibold text-lg">
+          {expert.projects?.length
+            ? (
+                expert.projects.reduce((sum, p) => sum + (p.expert_rating || 0), 0) /
+                expert.projects.length
+              ).toFixed(1)
+            : '-'} / 5
+        </p>
+      </div>
+      <div>
+        <p className="text-gray-400">Call Codes</p>
+        <p className="font-semibold text-lg">
+          {expert.projects?.length
+            ? expert.projects.map(p => p.code).filter(Boolean).join(', ')
+            : '-'}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Projects Table */}
+  <ProjectsTable projects={expert.projects} onEdit={(project) => {
+    setSelectedProject(project);
+    setShowProjectModal(true);
+  }} />
+
+    {/* Expert Notes */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Expert Notes</h2>
+    <p className="text-gray-600">{expert.notes || '-'}</p>
+  </div>
+
+    {/* Screening */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Expert Screening</h2>
+    <p className="text-gray-600">{expert.screening || '-'}</p>
+  </div>
+
+  {/* Tags */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h2 className="text-lg font-semibold mb-2">Tags</h2>
+    {expert.tags?.length > 0 ? (
+      <div className="flex flex-wrap gap-2">
+        {expert.tags.map((tag, i) => (
+          <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">{tag}</span>
+        ))}
+      </div>
+    ) : (
+      <p className="text-gray-500">No tags</p>
+    )}
+  </div>
+
+  {/* Edit History */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Edit History</h2>
+    <p className="text-gray-500">
+      {expert.last_update
+        ? `Last edited by ${expert.last_update.name} on ${new Date(expert.last_update.time).toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}`
+        : '-'}
+    </p>
+  </div>
+
+                {/* Modals */}
+      {editingExp && (
+        <EditExperienceModal
+          experience={editingExp}
+          expertId={expert.id}
+          onClose={() => setEditingExp(null)}
+          onSave={handleSave}
+        />
+      )}
+
+      {showProjectModal && (
+        <AddProjectModal
+          expertId={slug}
+          onClose={() => setShowProjectModal(false)}
+          onProjectAdd={(expertData) =>{
+            setExpert(expertData);
+          } }
+        />
+      )}
+
+      {showProjectModal && (
+      <EditProjectModal
+        project={selectedProject}
+        expertId={expert.id}
+        onClose={() => setShowProjectModal(false)}
+        onSave={handleProSave}
+      />
+    )}
+
+
+
+      {editingExp && (
+                    <EditExperienceModal
+                      experience={editingExp}
+                      expertId={expert.id}
+                      onClose={() => setEditingExp(null)}
+                      onSave={handleSave}
+                    />
+                  )}
+
+
+    </div>
+  </>
+  );
+}

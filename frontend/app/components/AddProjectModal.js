@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react';
 import './styles/EditExperienceModal.css';
 import axios from 'axios'
@@ -22,9 +24,9 @@ export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log(formData);
+      console.log(formData,expertId);
 
-       const res = await axios.post('http://localhost:1337/api/projects', {
+       const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects`, {
         data:{
             ...formData,
             expert:expertId
@@ -36,6 +38,7 @@ export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
         }
 
     });
+      console.log(res);
       onProjectAdd(res.data);
       onClose();
     } catch (err) {
@@ -48,7 +51,7 @@ export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
     <div className="modal-overlay">
   <div className="modal-content overflow-y-auto max-h-[90vh]">
     {/* Sticky Header */}
-    <div className="py-3 px-4 border-b text-lg font-semibold bg-white sticky top-0 z-10">
+    <div className="py-3 px-4 border-b text-lg font-semibold bg-white sticky top-0">
       Add New Project
     </div>
 
@@ -140,7 +143,7 @@ export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
     />
 
      {/* Sticky Footer Buttons */}
-    <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 z-10 flex justify-end gap-3">
+    <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 flex justify-end gap-3">
       <button className="save-btn" onClick={handleSubmit}>Save</button>
       <button className="cancel-btn" onClick={onClose}>Cancel</button>
     </div>

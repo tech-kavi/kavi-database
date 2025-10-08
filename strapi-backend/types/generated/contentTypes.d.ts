@@ -384,6 +384,7 @@ export interface ApiCompanyCompany extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    comp_slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -438,6 +439,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
         'Call Done',
       ]
     >;
+    exp_slug: Schema.Attribute.UID<'designation'> & Schema.Attribute.Required;
     expert: Schema.Attribute.Relation<'manyToOne', 'api::expert.expert'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -445,9 +447,13 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
       'api::experience.experience'
     > &
       Schema.Attribute.Private;
-    original_quote: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    quote: Schema.Attribute.Integer;
     start_date: Schema.Attribute.Date;
+    sub_industry: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::sub-industry.sub-industry'
+    >;
     target_company: Schema.Attribute.Relation<
       'oneToOne',
       'api::company.company'
@@ -475,14 +481,35 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
   attributes: {
     bank_details: Schema.Attribute.Text;
     companies: Schema.Attribute.Relation<'manyToMany', 'api::company.company'>;
+    compliance: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    credits: Schema.Attribute.Decimal;
     email: Schema.Attribute.Email;
     expert_experiences: Schema.Attribute.Relation<
       'oneToMany',
       'api::experience.experience'
     >;
+    expert_status: Schema.Attribute.Enumeration<
+      [
+        'Uncontacted',
+        'No response',
+        'Contacted but not screened',
+        'Contacted & screened',
+        'Sent to client',
+        'Negotiation',
+        'Contacted but ghosting',
+        'Six mos rule',
+        'Out of budget',
+        'NDA',
+        'Not Interested at all',
+        'Not interested in project',
+        'Call Scheduled',
+        'Call Done',
+      ]
+    >;
+    last_update: Schema.Attribute.Component<'update.update', false>;
     linkedin: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -492,16 +519,17 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
     notes: Schema.Attribute.Text;
-    phone: Schema.Attribute.BigInteger;
+    original_quote: Schema.Attribute.Integer;
+    phone: Schema.Attribute.String;
     projects: Schema.Attribute.Relation<'oneToMany', 'api::project.project'>;
     publishedAt: Schema.Attribute.DateTime;
-    quote: Schema.Attribute.Integer;
     ra_comments: Schema.Attribute.Text;
     screening: Schema.Attribute.Text;
-    slug: Schema.Attribute.UID;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     source_of_response: Schema.Attribute.Enumeration<
-      ['Cold calling', 'Linkedin', 'Email', 'Others']
+      ['Cold Call', 'Linkedin', 'E-mail', 'Others']
     >;
+    tags: Schema.Attribute.JSON;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -540,6 +568,38 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiMagicTokenMagicToken extends Struct.CollectionTypeSchema {
+  collectionName: 'magic_tokens';
+  info: {
+    displayName: 'magic-token';
+    pluralName: 'magic-tokens';
+    singularName: 'magic-token';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    expiresAt: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::magic-token.magic-token'
+    > &
+      Schema.Attribute.Private;
+    login_time: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    token: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    used: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    user: Schema.Attribute.String;
+  };
+}
+
 export interface ApiProjectProject extends Struct.CollectionTypeSchema {
   collectionName: 'projects';
   info: {
@@ -551,6 +611,8 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    account_holder_name: Schema.Attribute.String;
+    account_number: Schema.Attribute.BigInteger;
     ca: Schema.Attribute.String;
     call_rating: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<
@@ -564,6 +626,7 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     date: Schema.Attribute.Date;
+    duration: Schema.Attribute.Integer;
     expert: Schema.Attribute.Relation<'manyToOne', 'api::expert.expert'>;
     expert_rating: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<
@@ -587,6 +650,7 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
         number
       >;
     final_amount: Schema.Attribute.Integer;
+    ifsc: Schema.Attribute.String;
     investor: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -594,6 +658,72 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
       'api::project.project'
     > &
       Schema.Attribute.Private;
+    pan: Schema.Attribute.String;
+    pro_slug: Schema.Attribute.UID<'code'> & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    quote: Schema.Attribute.Integer;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSubIndustrySubIndustry extends Struct.CollectionTypeSchema {
+  collectionName: 'sub_industries';
+  info: {
+    displayName: 'sub-industry';
+    pluralName: 'sub-industries';
+    singularName: 'sub-industry';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    experiences: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::experience.experience'
+    >;
+    ind_slug: Schema.Attribute.UID<'name'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-industry.sub-industry'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiUploadLockUploadLock extends Struct.CollectionTypeSchema {
+  collectionName: 'upload_locks';
+  info: {
+    displayName: 'upload-lock';
+    pluralName: 'upload-locks';
+    singularName: 'upload-lock';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    islocked: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::upload-lock.upload-lock'
+    > &
+      Schema.Attribute.Private;
+    locked_by: Schema.Attribute.String;
+    lockedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1114,7 +1244,10 @@ declare module '@strapi/strapi' {
       'api::experience.experience': ApiExperienceExperience;
       'api::expert.expert': ApiExpertExpert;
       'api::global.global': ApiGlobalGlobal;
+      'api::magic-token.magic-token': ApiMagicTokenMagicToken;
       'api::project.project': ApiProjectProject;
+      'api::sub-industry.sub-industry': ApiSubIndustrySubIndustry;
+      'api::upload-lock.upload-lock': ApiUploadLockUploadLock;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

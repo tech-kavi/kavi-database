@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import Popup from '../components/Popup'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -10,24 +11,45 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
+   // Forgot password popup
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotMsg, setForgotMsg] = useState(null)
+  const [forgotErr, setForgotErr] = useState(null)
+
+  useEffect(() => {
+        document.title = `KAVI | Login`;
+     }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault()
 
     try {
-      const res = await axios.post('http://localhost:1337/api/auth/local', {
-        identifier: email,
-        password: password,
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/magic-tokens`, {
+        email: email.trim(),
+        password: password.trim(),
       })
 
-      const { jwt, user } = res.data
-
-      localStorage.setItem('token', jwt)
-      localStorage.setItem('user', JSON.stringify(user))
-
-      router.push('/')
+      console.log(res);
+      alert(res.data.message);
+      
     } catch (err) {
       console.error(err)
       setError('Invalid email or password')
+    }
+  }
+
+    const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/forgot-password`, {
+        email: forgotEmail.trim(),
+      })
+      setForgotMsg('Password reset email sent! Please check your inbox.')
+      setForgotErr(null)
+    } catch (err) {
+      console.error(err)
+      setForgotErr('Failed to send reset email')
     }
   }
 
@@ -105,8 +127,41 @@ export default function LoginPage() {
           Login
         </button>
 
+         <p className="text-center mt-4">
+          <span
+            onClick={() => setShowForgot(true)}
+            className="text-blue-600 hover:underline cursor-pointer"
+          >
+            Forgot Password?
+          </span>
+        </p>
+      
+
         {error && <p style={{ color: 'red', marginTop: '1rem', textAlign: 'center' }}>{error}</p>}
       </form>
+
+       {/* Forgot Password Popup */}
+      <Popup show={showForgot} onClose={() => setShowForgot(false)} title="Reset Password">
+        <form onSubmit={handleForgotPassword}>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={forgotEmail}
+            onChange={(e) => setForgotEmail(e.target.value)}
+            required
+            className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Send Reset Link
+          </button>
+        </form>
+        {forgotMsg && <p className="text-green-600 mt-3">{forgotMsg}</p>}
+        {forgotErr && <p className="text-red-500 mt-3">{forgotErr}</p>}
+      </Popup>
+
     </div>
   )
 }

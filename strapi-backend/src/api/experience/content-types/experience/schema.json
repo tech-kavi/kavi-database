@@ -40,7 +40,7 @@
       "relation": "oneToOne",
       "target": "api::company.company"
     },
-    "original_quote": {
+    "quote": {
       "type": "integer"
     },
     "engagement_status": {
@@ -70,6 +70,17 @@
       "relation": "manyToOne",
       "target": "api::expert.expert",
       "inversedBy": "expert_experiences"
+    },
+    "exp_slug": {
+      "type": "uid",
+      "targetField": "designation",
+      "required": true
+    },
+    "sub_industry": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::sub-industry.sub-industry",
+      "inversedBy": "experiences"
     }
   }
 }

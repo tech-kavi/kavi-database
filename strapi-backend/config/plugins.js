@@ -16,6 +16,30 @@
       // },
 
 
+       //sendgrid
+  email: {
+    config: {
+      provider: 'sendgrid',
+      providerOptions: {
+        apiKey: env('SENDGRID_API_KEY'),
+      },
+      settings: {
+        defaultFrom: env('DEFAULT_FROM'),
+        defaultReplyTo: env('DEFAULT_TO'),
+      },
+      
+    },
+  },
+
+      'users-permissions': {
+          config: {
+            jwt: {
+              expiresIn: '7d',
+            },
+          },
+        },
+
+
       upload: {
   config: {
     provider: 'strapi-provider-upload-supabase',
@@ -48,21 +72,8 @@
         config: {
           apiKey: env('ALGOLIA_ADMIN_KEY'),
           applicationId: env('ALGOLIA_APP_ID'),
-          contentTypes: [
-            { name: 'api::expert.expert' },
-          ],
-          // transformerCallback: (contentType, entry, operation) => {
-          //   if (contentType === 'api::expert.expert') {
-
-          //     // For indexing, skip unpublished
-          //     if (!entry.publishedAt) return null;
-
-          //     return {
-          //       ...entry,
-          //       objectID: entry.slug,
-          //     };
-          //   }
-          // }
+          contentTypes: [],
+          
         },
       },
 

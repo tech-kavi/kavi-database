@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_update_updates",
+  "info": {
+    "displayName": "update"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "time": {
+      "type": "datetime"
+    },
+    "field": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

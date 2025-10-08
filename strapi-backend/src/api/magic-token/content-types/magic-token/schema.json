@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "magic_tokens",
+  "info": {
+    "singularName": "magic-token",
+    "pluralName": "magic-tokens",
+    "displayName": "magic-token"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "string"
+    },
+    "token": {
+      "type": "string"
+    },
+    "expiresAt": {
+      "type": "datetime"
+    },
+    "used": {
+      "type": "boolean",
+      "default": false
+    },
+    "login_time": {
+      "type": "datetime"
+    }
+  }
+}

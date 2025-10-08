@@ -5,17 +5,40 @@ import { useState } from 'react';
 import './styles/EditExperienceModal.css';
 import axios from 'axios';
 
+const ENGAGEMENT_OPTIONS = [
+  'Uncontacted',
+  'No response',
+  'Contacted but not screened',
+  'Contacted & screened',
+  'Sent to client',
+  'Negotiation',
+  'Contacted but ghosting',
+  '6 mos rule',
+  'Out of budget',
+  'NDA',
+  'Not Interested at all',
+  'Not interested in project',
+  'Call Scheduled',
+  'Call Done',
+]
+
 export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
   const [formData, setFormData] = useState({
     email: expert.email || '',
     phone: expert.phone || '',
-    quote: expert.quote || '',
+    original_quote: expert.original_quote || '',
     ra_comments: expert.ra_comments || '',
     notes: expert.notes || '',
+    expert_status:expert.status||'',
     screening: expert.screening || '',
     bank_details: expert.bank_details || '',
     source_of_response: expert.source_of_response || '',
+    tags: expert.tags ||[],
+    credits: expert.credits || 0,
+    compliance: expert.compliance || '',
   });
+
+  const [tagsInput, setTagsInput] = useState(formData.tags.join(', '));
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -25,7 +48,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.put(
-        `http://localhost:1337/api/experts/${expert.documentId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
         {
           data: formData,
         },
@@ -70,13 +93,29 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
           </div>
 
           <div>
-            <label>Quote</label>
+            <label>Original Quote</label>
             <input
+              type="number"
               className="input-field"
-              value={formData.quote}
-              onChange={(e) => handleChange('quote', e.target.value)}
+              value={formData.original_quote}
+              onChange={(e) => handleChange('original_quote', e.target.value)}
             />
           </div>
+
+          <label>Expert Status</label>
+          <select
+            name="expert_status"
+            value={formData.expert_status}
+            onChange={(e) => handleChange('expert_status', e.target.value)}
+            className="input-field"
+          >
+            <option value="">Select status</option>
+            {ENGAGEMENT_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
 
           <div>
             <label>Source of Response</label>
@@ -86,9 +125,9 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               onChange={(e) => handleChange('source_of_response', e.target.value)}
             >
               <option value="">Select Source</option>
-              <option value="Cold Calling">Cold Calling</option>
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Email">Email</option>
+              <option value="Cold calling">Cold Call</option>
+              <option value="Linkedin">Linkedin</option>
+              <option value="Email">E-mail</option>
               <option value="Others">Others</option>
             </select>
           </div>
@@ -131,6 +170,43 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               value={formData.bank_details}
               onChange={(e) => handleChange('bank_details', e.target.value)}
             ></textarea>
+          </div>
+
+          <div>
+            <label>Credits</label>
+            <input
+              type="number"
+              className="input-field"
+              value={formData.credits}
+              onChange={(e) => handleChange('credits', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>Compliance</label>
+            <input
+              className="input-field"
+              rows={3}
+              value={formData.compliance}
+              onChange={(e) => handleChange('compliance', e.target.value)}
+            ></input>
+          </div>
+
+          <div>
+            <label>Tags</label>
+            <input
+              className="input-field"
+              value={tagsInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                setTagsInput(value);
+                handleChange(
+                  'tags',
+                  value.split(',').map((t) => t.trim()).filter(Boolean)
+                );
+              }}
+              placeholder="Enter tags separated by commas"
+            />
           </div>
 
         </div>

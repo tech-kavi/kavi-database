@@ -126,6 +126,18 @@ export interface SharedSlider extends Struct.ComponentSchema {
   };
 }
 
+export interface UpdateUpdate extends Struct.ComponentSchema {
+  collectionName: 'components_update_updates';
+  info: {
+    displayName: 'update';
+  };
+  attributes: {
+    field: Schema.Attribute.String;
+    name: Schema.Attribute.String;
+    time: Schema.Attribute.DateTime;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -136,6 +148,7 @@ declare module '@strapi/strapi' {
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
       'shared.slider': SharedSlider;
+      'update.update': UpdateUpdate;
     }
   }
 }

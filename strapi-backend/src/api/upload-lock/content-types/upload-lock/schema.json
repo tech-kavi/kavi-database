@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "upload_locks",
+  "info": {
+    "singularName": "upload-lock",
+    "pluralName": "upload-locks",
+    "displayName": "upload-lock"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "locked_by": {
+      "type": "string"
+    },
+    "islocked": {
+      "type": "boolean"
+    },
+    "lockedAt": {
+      "type": "datetime"
+    }
+  }
+}

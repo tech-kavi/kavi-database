@@ -22,6 +22,11 @@
       "relation": "manyToMany",
       "target": "api::expert.expert",
       "inversedBy": "companies"
+    },
+    "comp_slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
     }
   }
 }

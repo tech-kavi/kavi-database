@@ -12,7 +12,9 @@
   "pluginOptions": {},
   "attributes": {
     "slug": {
-      "type": "uid"
+      "type": "uid",
+      "targetField": "name",
+      "required": true
     },
     "name": {
       "type": "string"
@@ -23,10 +25,7 @@
     "email": {
       "type": "email"
     },
-    "phone": {
-      "type": "biginteger"
-    },
-    "quote": {
+    "original_quote": {
       "type": "integer"
     },
     "ra_comments": {
@@ -56,9 +55,9 @@
     "source_of_response": {
       "type": "enumeration",
       "enum": [
-        "Cold calling",
+        "Cold Call",
         "Linkedin",
-        "Email",
+        "E-mail",
         "Others"
       ]
     },
@@ -67,6 +66,42 @@
     },
     "screening": {
       "type": "text"
+    },
+    "expert_status": {
+      "type": "enumeration",
+      "enum": [
+        "Uncontacted",
+        "No response",
+        "Contacted but not screened",
+        "Contacted & screened",
+        "Sent to client",
+        "Negotiation",
+        "Contacted but ghosting",
+        "Six mos rule",
+        "Out of budget",
+        "NDA",
+        "Not Interested at all",
+        "Not interested in project",
+        "Call Scheduled",
+        "Call Done"
+      ]
+    },
+    "tags": {
+      "type": "json"
+    },
+    "last_update": {
+      "type": "component",
+      "component": "update.update",
+      "repeatable": false
+    },
+    "credits": {
+      "type": "decimal"
+    },
+    "compliance": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
     }
   }
 }
