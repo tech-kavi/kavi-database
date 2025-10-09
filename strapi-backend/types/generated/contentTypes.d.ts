@@ -425,6 +425,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
       [
         'Uncontacted',
         'No response',
+        'Call again',
         'Contacted but not screened',
         'Contacted & screened',
         'Sent to client',
@@ -433,10 +434,10 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
         'Six mos rule',
         'Out of budget',
         'NDA',
-        'Not Interested at all',
+        'Not interested at all',
         'Not interested in project',
-        'Call Scheduled',
-        'Call Done',
+        'Call scheduled',
+        'Call done',
       ]
     >;
     exp_slug: Schema.Attribute.UID<'designation'> & Schema.Attribute.Required;
@@ -495,6 +496,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
       [
         'Uncontacted',
         'No response',
+        'Call again',
         'Contacted but not screened',
         'Contacted & screened',
         'Sent to client',
@@ -503,10 +505,10 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
         'Six mos rule',
         'Out of budget',
         'NDA',
-        'Not Interested at all',
+        'Not interested at all',
         'Not interested in project',
-        'Call Scheduled',
-        'Call Done',
+        'Call scheduled',
+        'Call done',
       ]
     >;
     last_update: Schema.Attribute.Component<'update.update', false>;
@@ -527,7 +529,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
     screening: Schema.Attribute.Text;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     source_of_response: Schema.Attribute.Enumeration<
-      ['Cold Call', 'Linkedin', 'E-mail', 'Others']
+      ['Cold Call', 'LinkedIn', 'E-mail', 'Reference', 'Others']
     >;
     tags: Schema.Attribute.JSON;
     updatedAt: Schema.Attribute.DateTime;

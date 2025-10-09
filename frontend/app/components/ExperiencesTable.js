@@ -95,6 +95,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                                 <strong className="text-gray-800">Topic:</strong>{' '}
                                 {exp.target_company?.name || '-'}
                               </p>
+                              
                             </div>
                           </td>
                         </motion.tr>

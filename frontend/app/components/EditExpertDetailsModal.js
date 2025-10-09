@@ -5,22 +5,25 @@ import { useState } from 'react';
 import './styles/EditExperienceModal.css';
 import axios from 'axios';
 
-const ENGAGEMENT_OPTIONS = [
-  'Uncontacted',
-  'No response',
-  'Contacted but not screened',
-  'Contacted & screened',
-  'Sent to client',
-  'Negotiation',
-  'Contacted but ghosting',
-  '6 mos rule',
-  'Out of budget',
-  'NDA',
-  'Not Interested at all',
-  'Not interested in project',
-  'Call Scheduled',
-  'Call Done',
-]
+// const ENGAGEMENT_OPTIONS = [
+//   'Uncontacted',
+//   'No response',
+//   'Contacted but not screened',
+//   'Contacted & screened',
+//   'Sent to client',
+//   'Negotiation',
+//   'Contacted but ghosting',
+//   '6 mos rule',
+//   'Out of budget',
+//   'NDA',
+//   'Not Interested at all',
+//   'Not interested in project',
+//   'Call Scheduled',
+//   'Call Done',
+// ]
+
+import { ENGAGEMENT_OPTIONS } from '../constants/options';
+import { SOURCE_OF_RESPONSE } from '../constants/options';
 
 export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -29,7 +32,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     original_quote: expert.original_quote || '',
     ra_comments: expert.ra_comments || '',
     notes: expert.notes || '',
-    expert_status:expert.status||'',
+    expert_status:expert.expert_status||'',
     screening: expert.screening || '',
     bank_details: expert.bank_details || '',
     source_of_response: expert.source_of_response || '',
@@ -38,33 +41,50 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     compliance: expert.compliance || '',
   });
 
-  const [tagsInput, setTagsInput] = useState(formData.tags.join(', '));
+  // const [tagsInput, setTagsInput] = useState(formData.tags.join(', '));
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async () => {
+     const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
-        {
-          data: formData,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      onSave(res.data);
-      onClose();
+      // Call your onSave which does the API update
+      await onSave({...formData });
     } catch (err) {
-      console.error(err);
-      alert('Failed to update expert details.');
+      console.error("Error updating experience:", err);
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+};
+
+  // const handleSubmit = async () => {
+  //   setIsSubmitting(true);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const res = await axios.put(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
+  //       {
+  //         data: formData,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     onSave(res.data);
+  //     onClose();
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert('Failed to update expert details.');
+  //   }
+  //   finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   return (
     <div className="modal-overlay">
@@ -102,6 +122,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             />
           </div>
 
+          <div>
           <label>Expert Status</label>
           <select
             name="expert_status"
@@ -116,19 +137,21 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               </option>
             ))}
           </select>
+          </div>
 
           <div>
             <label>Source of Response</label>
             <select
+              name="ource_of_response"
               className="input-field"
               value={formData.source_of_response}
               onChange={(e) => handleChange('source_of_response', e.target.value)}
             >
-              <option value="">Select Source</option>
-              <option value="Cold calling">Cold Call</option>
-              <option value="Linkedin">Linkedin</option>
-              <option value="Email">E-mail</option>
-              <option value="Others">Others</option>
+              {SOURCE_OF_RESPONSE.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
             </select>
           </div>
 
@@ -142,7 +165,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             ></textarea>
           </div>
 
-          <div>
+          {/* <div>
             <label>Notes</label>
             <textarea
               className="input-field"
@@ -150,9 +173,9 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
             ></textarea>
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <label>Screening</label>
             <textarea
               className="input-field"
@@ -160,7 +183,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               value={formData.screening}
               onChange={(e) => handleChange('screening', e.target.value)}
             ></textarea>
-          </div>
+          </div> */}
 
           <div>
             <label>Bank Details</label>
@@ -192,7 +215,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             ></input>
           </div>
 
-          <div>
+          {/* <div>
             <label>Tags</label>
             <input
               className="input-field"
@@ -207,13 +230,27 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               }}
               placeholder="Enter tags separated by commas"
             />
-          </div>
+          </div> */}
 
         </div>
 
        <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 z-10 flex justify-end gap-3">
-          <button className="save-btn" onClick={handleSubmit}>Save</button>
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+        <button
+            className="save-btn"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+
+          <button
+            className="cancel-btn"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          
         </div>
       </div>
     </div>

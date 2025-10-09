@@ -56,8 +56,9 @@
       "type": "enumeration",
       "enum": [
         "Cold Call",
-        "Linkedin",
+        "LinkedIn",
         "E-mail",
+        "Reference",
         "Others"
       ]
     },
@@ -72,6 +73,7 @@
       "enum": [
         "Uncontacted",
         "No response",
+        "Call again",
         "Contacted but not screened",
         "Contacted & screened",
         "Sent to client",
@@ -80,10 +82,10 @@
         "Six mos rule",
         "Out of budget",
         "NDA",
-        "Not Interested at all",
+        "Not interested at all",
         "Not interested in project",
-        "Call Scheduled",
-        "Call Done"
+        "Call scheduled",
+        "Call done"
       ]
     },
     "tags": {

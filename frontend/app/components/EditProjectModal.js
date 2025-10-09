@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 export default function EditProjectModal({ project, expertId, onClose, onSave }) {
   const router = useRouter();
 
+   const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -51,9 +53,18 @@ export default function EditProjectModal({ project, expertId, onClose, onSave })
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = () => {
-    onSave({ ...project, ...formData });
-  };
+   const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // Call your onSave which does the API update
+      await onSave({ ...project, ...formData });
+    } catch (err) {
+      console.error("Error updating experience:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+};
+
 
   return (
     <div className="modal-overlay">
@@ -177,12 +188,22 @@ export default function EditProjectModal({ project, expertId, onClose, onSave })
         />
 
         <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 z-10 flex justify-end gap-3">
-          <button className="save-btn" onClick={handleSubmit}>
-            Save
+          <button
+            className="save-btn"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
           </button>
-          <button className="cancel-btn" onClick={onClose}>
+
+          <button
+            className="cancel-btn"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
+         
         </div>
       </div>
     </div>

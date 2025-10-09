@@ -48,6 +48,7 @@
       "enum": [
         "Uncontacted",
         "No response",
+        "Call again",
         "Contacted but not screened",
         "Contacted & screened",
         "Sent to client",
@@ -56,10 +57,10 @@
         "Six mos rule",
         "Out of budget",
         "NDA",
-        "Not Interested at all",
+        "Not interested at all",
         "Not interested in project",
-        "Call Scheduled",
-        "Call Done"
+        "Call scheduled",
+        "Call done"
       ]
     },
     "upload_file_details": {

@@ -39,6 +39,16 @@ export default function ExpertPage() {
  
   const [showEditDetailsModal, setShowEditDetailsModal] = useState(false);
 
+
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [isEditingScreening, setIsEditingScreening] = useState(false);
+  const [notesValue, setNotesValue] = useState('');
+  const [screeningValue, setScreeningValue] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+
+
+
   useEffect(() => {
     if (!slug) return;
     fetchExpert();
@@ -63,6 +73,9 @@ export default function ExpertPage() {
       setLoading(false);
     }
   };
+
+    const [editingTags, setEditingTags] = useState(false);
+  const [tagsInput, setTagsInput] = useState(expert?.tags?.join(', ') || '');
 
   
 
@@ -95,7 +108,7 @@ export default function ExpertPage() {
   }, [expert]);
 
   const handleProSave = async (updatedProject) => {
-  console.log(updatedProject);
+  //console.log(updatedProject);
   try {
     const res = await axios.put(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/projects/${updatedProject.pro_slug}`,
@@ -164,6 +177,34 @@ export default function ExpertPage() {
     }
     setEditingExp(null)
   }
+
+
+  const handleExpertSave = async (updatedData) => {
+      console.log('inside expert save');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
+        {
+          data: updatedData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updatedExpert = res.data;
+      setExpert(updatedExpert);
+      console.log(updatedExpert);
+      setShowEditDetailsModal(false);
+
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update expert details.');
+    }
+    
+  };
 
   const addProject = async ()=>{
     try{
@@ -536,7 +577,7 @@ export default function ExpertPage() {
     <div className="flex items-center gap-2">
       <h1 className="text-3xl font-bold text-gray-900">{expert.name}</h1>
       <button 
-        className="text-sm text-indigo-600 hover:text-indigo-800 transition"
+        className="text-sm text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
         onClick={() => setShowEditDetailsModal(true)}
       >
         ✏️ Edit
@@ -571,6 +612,9 @@ export default function ExpertPage() {
 
         <p className="text-gray-400">Type</p>
         <Badge label={expert.expert_experiences[0]?.type} options={TYPE_COLORS} />
+
+         <p className="text-gray-400">Status</p>
+        <Badge label={expert.expert_experiences[0]?.engagement_status} options={ENGAGEMENT_COLORS} />
       </div>
     </div>
 
@@ -583,11 +627,15 @@ export default function ExpertPage() {
         <p className="text-gray-400">Phone</p>
         <p className="font-semibold">{expert.phone || '-'}</p>
 
-        <p className="text-gray-400">Status</p>
-        <Badge label={expert.expert_status} options={ENGAGEMENT_COLORS} />
-
         <p className="text-gray-400">Original Quote</p>
         <p className="font-semibold">{expert.original_quote || '-'}</p>
+
+        <p className="text-gray-400">Source Of Response</p>
+        <p className="font-semibold">{expert?.source_of_response || '-'}</p>
+
+        
+        <p className="text-gray-400">Status</p>
+        <Badge label={expert.expert_status} options={ENGAGEMENT_COLORS} />
       </div>
     </div>
 
@@ -642,31 +690,188 @@ export default function ExpertPage() {
     setShowProjectModal(true);
   }} />
 
-    {/* Expert Notes */}
-  <div className="bg-white p-6 rounded-xl shadow-md">
-    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Expert Notes</h2>
-    <p className="text-gray-600">{expert.notes || '-'}</p>
+
+  {/* Expert Notes */}
+<div className="bg-white p-6 rounded-xl shadow-md">
+  <div className="flex justify-between items-center border-b pb-2 mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">Expert Notes</h2>
+    {!isEditingNotes ? (
+      <button
+        className="text-sm text-indigo-600 hover:text-indigo-800"
+        onClick={() => {
+          setNotesValue(expert.notes || '');
+          setIsEditingNotes(true);
+        }}
+      >
+        ✏️ Edit
+      </button>
+    ) : null}
   </div>
 
-    {/* Screening */}
-  <div className="bg-white p-6 rounded-xl shadow-md">
-    <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Expert Screening</h2>
-    <p className="text-gray-600">{expert.screening || '-'}</p>
+  {!isEditingNotes ? (
+    <p className="text-gray-600 whitespace-pre-line">{expert.notes || '-'}</p>
+  ) : (
+    <div className="space-y-3">
+      <textarea
+        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+        rows={4}
+        value={notesValue}
+        onChange={(e) => setNotesValue(e.target.value)}
+      />
+      <div className="flex justify-end gap-3">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          onClick={() => setIsEditingNotes(false)}
+          disabled={isSaving}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2"
+          onClick={async () => {
+            setIsSaving(true);
+            await handleExpertSave({ notes: notesValue });
+            setIsSaving(false);
+            setIsEditingNotes(false);
+          }}
+          disabled={isSaving}
+        >
+          {isSaving && (
+            <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
+          Save
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
+{/* Expert Screening */}
+<div className="bg-white p-6 rounded-xl shadow-md">
+  <div className="flex justify-between items-center border-b pb-2 mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">Expert Screening</h2>
+    {!isEditingScreening ? (
+      <button
+        className="text-sm text-indigo-600 hover:text-indigo-800"
+        onClick={() => {
+          setScreeningValue(expert.screening || '');
+          setIsEditingScreening(true);
+        }}
+      >
+        ✏️ Edit
+      </button>
+    ) : null}
   </div>
+
+  {!isEditingScreening ? (
+    <p className="text-gray-600 whitespace-pre-line">{expert.screening || '-'}</p>
+  ) : (
+    <div className="space-y-3">
+      <textarea
+        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+        rows={4}
+        value={screeningValue}
+        onChange={(e) => setScreeningValue(e.target.value)}
+      />
+      <div className="flex justify-end gap-3">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          onClick={() => setIsEditingScreening(false)}
+          disabled={isSaving}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2"
+          onClick={async () => {
+            setIsSaving(true);
+            await handleExpertSave({ screening: screeningValue });
+            setIsSaving(false);
+            setIsEditingScreening(false);
+          }}
+          disabled={isSaving}
+        >
+          {isSaving && (
+            <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
+          Save
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
+
 
   {/* Tags */}
-  <div className="bg-white p-6 rounded-xl shadow-md">
-    <h2 className="text-lg font-semibold mb-2">Tags</h2>
-    {expert.tags?.length > 0 ? (
-      <div className="flex flex-wrap gap-2">
-        {expert.tags.map((tag, i) => (
-          <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">{tag}</span>
-        ))}
-      </div>
-    ) : (
-      <p className="text-gray-500">No tags</p>
+<div className="bg-white p-6 rounded-xl shadow-md">
+  <h2 className="text-lg font-semibold mb-2 flex items-center justify-between">
+    Tags
+    {!editingTags && (
+      <button
+        className="text-sm text-indigo-600 hover:text-indigo-800"
+        onClick={() => {
+          setEditingTags(true);
+          setTagsInput(expert.tags?.join(', ') || ''); // retain previous tags
+        }}
+      >
+        ✏️ Edit
+      </button>
     )}
-  </div>
+  </h2>
+
+  {editingTags ? (
+    <div className="flex flex-col gap-2">
+      <input
+        className="input-field"
+        value={tagsInput}
+        onChange={(e) => 
+          setTagsInput(e.target.value) }
+        placeholder="Enter tags separated by commas"
+      />
+      <p className="text-sm text-red-500">⚠️ Please enter tags separated by commas</p>
+      <div className="flex gap-2">
+        <button
+          className="save-btn"
+           onClick={async () => {
+          const newTags = tagsInput
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean);
+
+          await handleExpertSave({ tags: newTags });
+          setEditingTags(false);
+        }}
+        >
+          Save
+        </button>
+        <button
+          className="cancel-btn"
+          onClick={() => {
+          setTagsInput(expert.tags?.join(', ') || '');
+          setEditingTags(false);
+        }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ) : expert.tags?.length > 0 ? (
+    <div className="flex flex-wrap gap-2">
+      {expert.tags.map((tag, i) => (
+        <span
+          key={i}
+          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+        >
+          {tag}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500">No tags</p>
+  )}
+</div>
+
 
   {/* Edit History */}
   <div className="bg-white p-6 rounded-xl shadow-md">
@@ -711,6 +916,14 @@ export default function ExpertPage() {
         expertId={expert.id}
         onClose={() => setShowProjectModal(false)}
         onSave={handleProSave}
+      />
+    )}
+
+    {showEditDetailsModal && (
+      <EditExpertDetailsModal
+        expert={expert}
+        onClose={() => setShowEditDetailsModal(false)}
+        onSave={handleExpertSave}
       />
     )}
 

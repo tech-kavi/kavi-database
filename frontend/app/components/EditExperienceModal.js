@@ -34,7 +34,8 @@ import { TYPE_OPTIONS, ENGAGEMENT_OPTIONS, TYPE_COLORS, ENGAGEMENT_COLORS } from
 
 export default function EditExperienceModal({ experience, expertId, onClose, onSave }) {
 
-  const router = useRouter()
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
   const token = localStorage.getItem('token');
@@ -81,10 +82,17 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleSubmit = () => {
-    //console.log(experience);
-    onSave({ ...experience, ...formData })
-  }
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // Call your onSave which does the API update
+      await onSave({ ...experience, ...formData });
+    } catch (err) {
+      console.error("Error updating experience:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+};
 
   return (
     <div className="modal-overlay">
@@ -188,8 +196,21 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
         />
 
         <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 z-10 flex justify-end gap-3">
-          <button className="save-btn" onClick={handleSubmit}>Save</button>
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button
+            className="save-btn"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+
+          <button
+            className="cancel-btn"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>

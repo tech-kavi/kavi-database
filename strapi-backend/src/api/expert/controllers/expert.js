@@ -122,7 +122,7 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
         const slug = ctx.params.id;
          const body = ctx.request.body?.data || ctx.request.body;
 
-
+        console.log(body);
 
         // console.log(slug);
         // Filter out empty values
@@ -150,7 +150,13 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
         const updatedExpert = await strapi.documents('api::expert.expert').update({
             documentId:expertDetails.documentId,
             data: cleanedData,
-            populate:'*',
+            populate:{
+              expert_experiences:{
+                populate:['company','target_company','sub_industry']
+              },
+              projects:true,
+              last_update:true,
+            },
             status: 'published',
           });
 
