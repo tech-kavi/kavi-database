@@ -62,7 +62,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
         status: 'published',
       });
 
-      //console.log(updatedExperience);
+      console.log(updatedExperience);
 
       const expertId = updatedExperience.expert?.documentId;
       if (!expertId) {

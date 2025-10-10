@@ -181,6 +181,7 @@ export default function ExpertPage() {
 
   const handleExpertSave = async (updatedData) => {
       console.log('inside expert save');
+      console.log(updatedData);
     try {
       const token = localStorage.getItem('token');
       const res = await axios.put(

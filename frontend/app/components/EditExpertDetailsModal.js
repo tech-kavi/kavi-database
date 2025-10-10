@@ -126,8 +126,8 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
           <label>Expert Status</label>
           <select
             name="expert_status"
-            value={formData.expert_status}
-            onChange={(e) => handleChange('expert_status', e.target.value)}
+            value={formData.expert_status || ''}
+            onChange={(e) => handleChange('expert_status', e.target.value || null)}
             className="input-field"
           >
             <option value="">Select status</option>
@@ -142,10 +142,10 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
           <div>
             <label>Source of Response</label>
             <select
-              name="ource_of_response"
+              name="source_of_response"
               className="input-field"
-              value={formData.source_of_response}
-              onChange={(e) => handleChange('source_of_response', e.target.value)}
+              value={formData.source_of_response || ''}
+              onChange={(e) => handleChange('source_of_response', e.target.value || null)}
             >
               {SOURCE_OF_RESPONSE.map((option) => (
               <option key={option} value={option}>
