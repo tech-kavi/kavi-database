@@ -59,10 +59,7 @@
     },
   },
 },
-      'component-filters': {
-        enabled: true,
-        resolve: './src/plugins/component-filters'
-      },
+      
       // ...
 
       //algolia
