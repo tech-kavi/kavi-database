@@ -55,7 +55,7 @@
     "source_of_response": {
       "type": "enumeration",
       "enum": [
-        "Cold Call",
+        "Cold call",
         "LinkedIn",
         "E-mail",
         "Reference",

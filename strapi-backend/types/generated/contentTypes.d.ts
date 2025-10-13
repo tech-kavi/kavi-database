@@ -529,7 +529,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
     screening: Schema.Attribute.Text;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     source_of_response: Schema.Attribute.Enumeration<
-      ['Cold Call', 'LinkedIn', 'E-mail', 'Reference', 'Others']
+      ['Cold call', 'LinkedIn', 'E-mail', 'Reference', 'Others']
     >;
     tags: Schema.Attribute.JSON;
     updatedAt: Schema.Attribute.DateTime;

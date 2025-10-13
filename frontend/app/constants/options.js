@@ -54,7 +54,7 @@ export const ENGAGEMENT_OPTIONS = [
 
 
 export const SOURCE_OF_RESPONSE = [
-  'Cold Call',
+  'Cold call',
   'LinkedIn',
   'E-mail',
   'Reference',

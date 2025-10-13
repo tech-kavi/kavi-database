@@ -91,16 +91,18 @@ const ENGAGEMENT_ENUM = [
   "Six mos rule",
   "Out of budget",
   "NDA",
-  "Not Interested at all",
+  "Not interested at all",
   "Not interested in project",
-  "Call Scheduled",
-  "Call Done"
+  "Call scheduled",
+  "Call done",
+  "Call again"
 ];
 
 const SOR=[
-  "Cold Call",
-  "Linkedin",
+  "Cold call",
+  "LinkedIn",
   "E-mail",
+  "Reference",
   "Others"
 ]
 
