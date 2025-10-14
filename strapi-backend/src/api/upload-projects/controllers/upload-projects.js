@@ -7,9 +7,18 @@
 module.exports = {
   createproject: async (ctx, next) => {
     try {
+
+       const uploaderEmail = ctx.state.user?.email;
+
+        // Try to acquire lock
+    const gotLock = await strapi.service('api::upload-lock.upload-lock').acquireLock(uploaderEmail);
+    console.log(gotLock);
+    if (gotLock?.isLocked) {
+      return ctx.badRequest(`${gotLock.lockedBy}'s upload is already in progress. Please wait until it finishes.`);
+    }
       const rawFiles = ctx.request.files || ctx.request.body.files;
 
-     const uploaderEmail = ctx.state.user?.email;
+    
       const uploadedFile =
         Array.isArray(rawFiles) ? rawFiles[0] :
         rawFiles?.files?.[0] || rawFiles?.files || rawFiles;
@@ -22,7 +31,7 @@ module.exports = {
       const originalFilename = uploadedFile.originalFilename;
 
       // Upload file to Strapi Upload plugin (or Supabase if you are using Supabase storage)
-      await strapi.service('plugin::upload.upload').upload({
+      const uploaded = await strapi.service('plugin::upload.upload').upload({
         data: {
           fileInfo: {
             name: originalFilename,
@@ -32,10 +41,15 @@ module.exports = {
         files: uploadedFile,
       });
 
+      const fileId = uploaded?.[0]?.id;
+      if (!fileId) {
+        return ctx.internalServerError('File upload failed to generate URL.');
+      }
+
       // Kick off background processing (non-blocking)
       setTimeout(async () => {
         try {
-          await strapi.service('api::upload-projects.upload-projects').processProjectFileInBackground(filePath,uploaderEmail);
+          await strapi.service('api::upload-projects.upload-projects').processProjectFileInBackground(fileId,uploaderEmail);
           strapi.log.info('✅ Background processing completed.');
         } catch (err) {
           strapi.log.error('❌ Background processing failed:', err);

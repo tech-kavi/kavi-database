@@ -29,7 +29,7 @@ module.exports = {
       const originalFilename = uploadedFile.originalFilename;
 
       // Upload file to Strapi Upload plugin (or Supabase if you are using Supabase storage)
-      await strapi.service('plugin::upload.upload').upload({
+      const uploaded = await strapi.service('plugin::upload.upload').upload({
         data: {
           fileInfo: {
             name: originalFilename,
@@ -39,10 +39,15 @@ module.exports = {
         files: uploadedFile,
       });
 
-      // Kick off background processing (non-blocking)
+      const fileId = uploaded?.[0]?.id;
+      if (!fileId) {
+        return ctx.internalServerError('File upload failed to generate URL.');
+      }
+
+      //Kick off background processing (non-blocking)
       setTimeout(async () => {
         try {
-          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(filePath,uploaderEmail,topic);
+          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic);
           strapi.log.info('✅ Background processing completed.');
         } catch (err) {
           strapi.log.error('❌ Background processing failed:', err);

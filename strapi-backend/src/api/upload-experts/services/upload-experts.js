@@ -5,6 +5,7 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 const moment = require("moment-timezone");
+const axios = require('axios');
 
 
 function excelDateToISO(serial) {
@@ -474,9 +475,30 @@ async indexExpertsToAlgoliaAll() {
 
 
 
-   async processExpertFileInBackground(filePath,uploaderEmail,topic) {
+   async processExpertFileInBackground(fileId,uploaderEmail,topic) {
     try {
-      const workbook = XLSX.readFile(filePath);
+
+      const file = await strapi.entityService.findOne('plugin::upload.file', fileId);
+
+      if (!file) throw new Error('Uploaded file not found in Media Library');
+
+      //console.log(file);
+
+       let buffer;
+
+      if (file.provider === 'local') {
+        // Local provider
+        const localPath = `public${file.url}`;
+        buffer = fs.readFileSync(localPath);
+      } else {
+        // Remote provider (Supabase, S3, etc.)
+        const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+        buffer = Buffer.from(response.data);
+      }
+
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+
+      //const workbook = XLSX.readFile(filePath);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rawData = XLSX.utils.sheet_to_json(sheet);
       const data = rawData.map(remapRow);
