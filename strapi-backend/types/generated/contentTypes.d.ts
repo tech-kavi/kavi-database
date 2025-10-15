@@ -415,7 +415,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    company: Schema.Attribute.Relation<'oneToOne', 'api::company.company'>;
+    company: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import './styles/EditExperienceModal.css'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
+import AsyncSelect from 'react-select/async';
 
 import { TYPE_OPTIONS, ENGAGEMENT_OPTIONS, TYPE_COLORS, ENGAGEMENT_COLORS } from '../constants/options'
 
@@ -37,10 +39,15 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
+  const [allCompanies, setAllCompanies] = useState(false);
+
+
+
+ useEffect(() => {
   const token = localStorage.getItem('token');
   if (!token) {
     router.push('/login');
+    return;
   }
 }, []);
 
@@ -53,9 +60,33 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
     engagement_status: '',
     company: '',
     target_company: '',
+    target_company_name: '',
     quote: '',
     sub_industry:'',
   })
+
+  const [prefetchedCompanies, setPrefetchedCompanies] = useState([]);
+const [prefetchedIndustries, setPrefetchedIndustries] = useState([]);
+
+useEffect(() => {
+  const fetchDefaults = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const [companiesRes, industriesRes] = await Promise.all([
+        axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies?pagination[limit]=50`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries?pagination[limit]=50`, { headers: { Authorization: `Bearer ${token}` }}),
+      ]);
+
+      setPrefetchedCompanies(companiesRes.data.data.map(c => ({ value: c.documentId, label: c.name })));
+      setPrefetchedIndustries(industriesRes.data.data.map(i => ({ value: i.documentId, label: i.name })));
+    } catch (err) {
+      console.error("Prefetch error:", err);
+    }
+  };
+
+  fetchDefaults();
+}, []);
 
   useEffect(() => {
     if (experience) {
@@ -67,10 +98,12 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
         start_date: experience.start_date || '',
         end_date: experience.end_date || '',
         engagement_status: experience.engagement_status || '',
-        company: experience.company?.name || '',
-        target_company: experience.target_company?.name || '',
+        company: experience.company || '',
+        target_company_name: experience.target_company?.name || '',
+        target_company: experience.target_company?.documentId || '',
         quote: experience.quote || '',
-        sub_industry: experience?.sub_industry?.name||'',
+        sub_industry_name: experience?.sub_industry?.name||'',
+        sub_industry: experience?.sub_industry?.documentId||'',
       })
     }
 
@@ -163,28 +196,130 @@ export default function EditExperienceModal({ experience, expertId, onClose, onS
         <input
           name="company"
           value={formData.company}
-          readOnly
-          className="input-field read-only"
+          onChange={handleChange}
+          className="input-field"
           placeholder="Company name"
         />
 
+
         <label>Target Company</label>
-        <input
-          name="target_company"
-          value={formData.target_company}
-          readOnly
-          className="input-field read-only"
-          placeholder="Target company name"
+        {/* <AsyncSelect
+          cacheOptions
+          defaultOptions
+          value={
+            formData.target_company
+              ? { value: formData.target_company, label: formData.target_company_name }
+              : null
+          }
+          loadOptions={async (inputValue) => {
+            if (!inputValue || inputValue.length < 2) return [];
+
+            try {
+              const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies?filters[name][$containsi]=${inputValue}`,
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+              );
+
+              return res.data.data.map((company) => ({
+                value: company.documentId,
+                label: company.name,
+                name: company.name,
+              }));
+            } catch (err) {
+              console.error('Error fetching companies:', err);
+              return [];
+            }
+          }}
+          onChange={(selected) => {
+            setFormData({
+              ...formData,
+              target_company: selected?.value || '',
+              target_company_name: selected?.label || '',
+            });
+          }}
+          placeholder="Search and select target company..."
+        /> */}
+
+        <AsyncSelect
+          cacheOptions
+          defaultOptions={prefetchedCompanies} // use preloaded companies
+          value={
+            formData.target_company
+              ? { value: formData.target_company, label: formData.target_company_name }
+              : null
+          }
+          loadOptions={async (inputValue) => {
+            if (!inputValue || inputValue.length < 2) return prefetchedCompanies; // return prefetched if no input
+
+            try {
+              const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies?filters[name][$containsi]=${inputValue}`,
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+              );
+
+              return res.data.data.map((company) => ({
+                value: company.documentId,
+                label: company.name,
+              }));
+            } catch (err) {
+              console.error('Error fetching companies:', err);
+              return [];
+            }
+          }}
+          onChange={(selected) => {
+            setFormData({
+              ...formData,
+              target_company: selected?.value || '',
+              target_company_name: selected?.label || '',
+            });
+          }}
+          placeholder="Search and select target company..."
         />
 
+
+
+
+
         <label>Industry</label>
-        <input
-          name="sub_industry"
-          value={formData.sub_industry}
-          readOnly
-          className="input-field read-only"
-          placeholder="Industry name"
+        <AsyncSelect
+          cacheOptions
+          defaultOptions={prefetchedIndustries}
+          value={
+            formData.sub_industry
+              ? { value: formData.sub_industry, label: formData?.sub_industry_name }
+              : null
+          }
+          loadOptions={async (inputValue) => {
+            if (!inputValue || inputValue.length < 2) return prefetchedIndustries;;
+
+            try {
+              const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries?filters[name][$containsi]=${inputValue}`,
+                {
+                  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                }
+              );
+
+              return res.data.data.map((industry) => ({
+                value: industry.documentId,
+                label: industry.name,
+                name: industry.name
+              }));
+            } catch (err) {
+              console.error('Error fetching sub-industries:', err);
+              return [];
+            }
+          }}
+          onChange={(selected) => {
+            setFormData({
+              ...formData,
+              sub_industry: selected?.value || '',
+              sub_industry_name: selected?.label || '',
+            });
+          }}
+          placeholder="Search and select sub-industry..."
         />
+
 
         <label>Quote</label>
         <input

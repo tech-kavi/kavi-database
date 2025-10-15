@@ -14,11 +14,6 @@
     "designation": {
       "type": "string"
     },
-    "company": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::company.company"
-    },
     "type": {
       "type": "enumeration",
       "enum": [
@@ -82,6 +77,9 @@
       "relation": "manyToOne",
       "target": "api::sub-industry.sub-industry",
       "inversedBy": "experiences"
+    },
+    "company": {
+      "type": "string"
     }
   }
 }

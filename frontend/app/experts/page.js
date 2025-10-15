@@ -178,7 +178,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-gray-700">Company</h3>
             <RefinementList
-              attribute="company.name"
+              attribute="company"
               searchable={true}
               searchablePlaceholder="Search companies..."
               limit={10}

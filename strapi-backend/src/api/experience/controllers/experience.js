@@ -32,17 +32,42 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
       const updateData = {};
 
-      allowedFields.forEach((field) => {
-        const value = body[field];
 
-        // Treat empty string as "do not update"
+      allowedFields.forEach((field) => {
+        let value = body[field];
+
+        // Only process defined and non-empty fields
         if (value !== undefined && value !== '') {
-          updateData[field] =
-            (field === 'start_date' || field === 'end_date') && value === ''
-              ? null
-              : value;
+          if (typeof value === 'string') {
+            value = value.trim();
+          }
+
+          // Convert empty string after trim to null (for dates)
+          if ((field === 'start_date' || field === 'end_date') && value === '') {
+            value = null;
+          }
+
+          updateData[field] = value;
         }
       });
+
+      // ✅ Handle relation update
+    if (body.target_company) {
+      updateData.target_company = {
+        connect: [{ documentId: body.target_company }],
+      };
+    }
+
+    // Optional: handle company if you make it editable too
+    if (body.company) {
+      updateData.company = body.company.trim();
+    }
+
+    if (body.sub_industry) {
+      updateData.sub_industry = {
+        connect: [{ documentId: body.sub_industry }],
+      };
+    }
 
       // Skip update if no valid fields provided
       if (Object.keys(updateData).length === 0) {
@@ -85,9 +110,8 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
           populate: {
           expert_experiences: {
             populate: {
-              company: true,
               target_company: true,
-              sub_industry: true,   // 👈 explicitly fetch
+              sub_industry: true, 
             },
           },
           projects: true,

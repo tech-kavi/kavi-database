@@ -53,7 +53,7 @@ const columnMap = {
   screening:'screening',
   notes:'notes',
   status:'status',
-  subindustry:'subindustry',
+  industry:'industry',
 };
 
 function remapRow(row) {
@@ -131,7 +131,7 @@ const strapiAlgolia = strapi.plugin('strapi-algolia');
  const expert = await strapi.documents('api::expert.expert').findOne({
   documentId,
   populate: {
-    expert_experiences: { populate: ['company', 'target_company'] },
+    expert_experiences: { populate: ['target_company'] },
     projects: true,
     companies: true,
     last_update: true,
@@ -223,7 +223,7 @@ const transformedExperts = expert.expert_experiences?.length
       notes:expert.notes,
       project: expert.projects,
       ...exp,
-      company: exp.company ? { id: exp.company.id, name: exp.company.name, comp_slug:exp.company.comp_slug  } : null,
+      company: exp.company,
       target_company: exp.target_company ? { id: exp.target_company.id, name: exp.target_company.name } : null,
       sub_industry: exp.sub_industry ? { id: exp.sub_industry.id, name: exp.sub_industry.name, ind_slug:exp.sub_industry.ind_slug } : null,
       start_date_ts: exp.start_date ? Math.floor(new Date(exp.start_date).getTime() / 1000) : 0,
@@ -283,7 +283,7 @@ async indexExpertsToAlgoliaAll() {
 
       while (true) {
         const expertsBatch = await strapi.documents('api::expert.expert').findMany({
-          populate: { expert_experiences: { populate: ['company', 'target_company','sub_industry'] }, projects: true, companies: true, last_update: true },
+          populate: { expert_experiences: { populate: ['target_company','sub_industry'] }, projects: true, companies: true, last_update: true },
           status: 'published',
           start: start,
           limit: limit,
@@ -320,7 +320,7 @@ async indexExpertsToAlgoliaAll() {
       ...exp,
 
       // normalize relations inside exp
-      company: exp.company ? { id: exp.company.id, name: exp.company.name, comp_slug:exp.company.comp_slug } : null,
+      company: exp.company,
       target_company: exp.target_company
         ? { id: exp.target_company.id, name: exp.target_company.name, comp_slug:exp.target_company.comp_slug }
         : null,
@@ -390,7 +390,7 @@ async indexExpertsToAlgoliaAll() {
         filters:{id:{$in: expertIds}},
           populate:{
             expert_experiences:{
-              populate:['company','target_company','sub_industry']
+              populate:['target_company','sub_industry']
             },
             projects:true,
             companies:true,
@@ -423,7 +423,7 @@ async indexExpertsToAlgoliaAll() {
       ...exp,
 
       // normalize relations inside exp
-      company: exp.company ? { id: exp.company.id, name: exp.company.name, comp_slug:exp.company.comp_slug } : null,
+      company: exp.company,
       target_company: exp.target_company
         ? { id: exp.target_company.id, name: exp.target_company.name, comp_slug:exp.target_company.comp_slug }
         : null,
@@ -509,7 +509,7 @@ async indexExpertsToAlgoliaAll() {
 
       //checking errors
       data.forEach((row, index) => {
-        const { Name, LinkedIn, Type, source_of_response, Designation, CompanyName, status,subindustry,SheetName } = row;
+        const { Name, LinkedIn, Type, source_of_response, Designation, CompanyName, status,industry,SheetName } = row;
 
         if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
         if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
@@ -523,7 +523,7 @@ async indexExpertsToAlgoliaAll() {
         }
         if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
         if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
-        if(!subindustry) error.push(`Row ${index + 2}: Subindustry is missing`)
+        if(!industry) error.push(`Row ${index + 2}: Industry is missing`)
       });
 
       if (errors.length > 0) {
@@ -560,37 +560,37 @@ async indexExpertsToAlgoliaAll() {
     
       const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
 
-      const allSubIndustriesInExcel = new Set();
+      const allIndustriesInExcel = new Set();
       data.forEach(row=>{
-        if(row.subindustry) allSubIndustriesInExcel.add(row.subindustry.trim());
+        if(row.industry) allIndustriesInExcel.add(row.industry.trim());
       });
 
-      const subindustriesArray = Array.from(allSubIndustriesInExcel);
+      const industriesArray = Array.from(allIndustriesInExcel);
 
-      const allsubindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
+      const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
         fields: ['id', 'name'],
         filters:{
-          name:{$in: subindustriesArray},
+          name:{$in: industriesArray},
         },
       });
 
-      const subIndustryMap = new Map(allsubindustries.map(c=>[c.name.trim(),c]));
+      const industryMap = new Map(allindustries.map(c=>[c.name.trim(),c]));
 
-      const missingSubIndustries=[];
-      const existingSubIndustries=[];
+      const missingIndustries=[];
+      const existingIndustries=[];
 
-      subindustriesArray.forEach(name => {
-        if (subIndustryMap.has(name)) {
-          existingSubIndustries.push(subIndustryMap.get(name));
+      industriesArray.forEach(name => {
+        if (industryMap.has(name)) {
+          existingIndustries.push(industryMap.get(name));
         } else {
-          missingSubIndustries.push(name);
+          missingIndustries.push(name);
         }
       });
 
 
       //if any company not found
-      if (missingSubIndustries.length > 0) {
-        console.log('Companies missing in collection:', missingSubIndustries);
+      if (missingIndustries.length > 0) {
+        console.log('Companies missing in collection:', missingIndustries);
 
          await strapi.plugin('email').service('email').send({
           to: uploaderEmail,
@@ -599,7 +599,7 @@ async indexExpertsToAlgoliaAll() {
             <h2>Upload Failed</h2>
             <p>The following companies from your Excel file are <strong>not present</strong> in the system:</p>
             <ul>
-              ${missingSubIndustries.map(c => `<li>${c}</li>`).join('')}
+              ${missingIndustries.map(c => `<li>${c}</li>`).join('')}
             </ul>
             <p>Please add these companies to the collection and try again.</p>
           `,
@@ -617,7 +617,6 @@ async indexExpertsToAlgoliaAll() {
 
       const allCompanyNamesInExcel = new Set();
       data.forEach(row=>{
-        if(row.CompanyName) allCompanyNamesInExcel.add(row.CompanyName.trim());
         if(row.TargetCompany) allCompanyNamesInExcel.add(row.TargetCompany.trim());
       });
 
@@ -712,7 +711,7 @@ async indexExpertsToAlgoliaAll() {
               Phone,
               originalquote,
               Email,
-              subindustry,
+              industry,
             } = row;
 
             if (SheetName) sheetNamesList.push(SheetName.trim());
@@ -728,9 +727,9 @@ async indexExpertsToAlgoliaAll() {
             const slug = getLinkedInUsername(LinkedIn);
             const linkedinKey = normalizeLinkedIn(LinkedIn);
             let expert = expertMap.get(linkedinKey);
-            const company = companyMap.get(CompanyName?.trim());
+            const company = CompanyName?.trim();
             const targetCompany = companyMap.get(TargetCompany?.trim());
-            const subIndustry = subIndustryMap.get(subindustry?.trim());
+            const foundindustry = industryMap.get(industry?.trim());
             const expSlug = slugify(`${Designation}-${CompanyName}-${Start ? new Date(Start).getTime() : Date.now()}`);
 
             if (expert) {
@@ -794,12 +793,12 @@ async indexExpertsToAlgoliaAll() {
                   start_date: parseExcelDate(Start),
                   end_date: parseExcelDate(End),
                   upload_file_details: SheetName,
-                  company: company?.documentId || null,
+                  company: company,
                   target_company: targetCompany?.documentId || null,
                   expert: expert.documentId,
                   quote:negotiatedquote,
                   engagement_status:status ? status.trim() : null,
-                  sub_industry:subIndustry?.documentId||null,
+                  sub_industry:foundindustry?.documentId||null,
                 },
                 trx,
               });
@@ -814,7 +813,7 @@ async indexExpertsToAlgoliaAll() {
                   phone:String(Phone || '').trim(),
                   slug,
                   email:Email,
-                  companies: company?.id,
+                  companies: targetCompany?.id,
                   tags: parseTags(Tags),
                   ra_comments:Comments||null,
                   original_quote:originalquote,
@@ -836,12 +835,12 @@ async indexExpertsToAlgoliaAll() {
                   start_date: parseExcelDate(Start),
                   end_date: parseExcelDate(End),
                   upload_file_details: SheetName,
-                  company: company?.id || null,
+                  company: company,
                   target_company: targetCompany?.id || null,
                   quote:negotiatedquote,
                   engagement_status: status ? status.trim() : null,
                   expert: newExpert.documentId,
-                  sub_industry:subIndustry?.documentId||null,
+                  sub_industry:foundindustry?.documentId||null,
                 },
                 trx,
               });

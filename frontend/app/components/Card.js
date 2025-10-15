@@ -68,7 +68,7 @@ export default function Card({ hits, onSelectSlug }) {
                     <Highlight attribute="name" hit={hit} />
                   </a>
                 </td>
-                <td className="px-4 py-3 max-w-[150px] truncate">{hit?.company?.name || '-'}</td>
+                <td className="px-4 py-3 max-w-[150px] truncate">{hit?.company || '-'}</td>
                 <td className="px-4 py-3 text-center"><Badge label={hit.type} options={TYPE_COLORS} /></td>
                 <td title={hit?.designation} className="px-4 py-3 max-w-[150px] truncate">{hit?.designation || '-'}</td>
                 <td className="px-4 py-3 max-w-[150px] truncate">{hit?.target_company?.name || '-'}</td>

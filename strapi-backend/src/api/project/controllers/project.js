@@ -149,14 +149,24 @@ module.exports = createCoreController('api::project.project',({strapi})=>({
         field: 'Updated Project',
       };
 
-      const updatedExpert = await strapi
-        .documents('api::expert.expert')
-        .update({
-          documentId: expertId,
-          data: { last_update: lastUpdate },
-          populate: '*',
-          status: 'published',
-        });
+      const updatedExpert = await strapi.documents('api::expert.expert').update({
+        documentId: expertId,
+        data: {
+          last_update: lastUpdate,
+        },
+          populate: {
+          expert_experiences: {
+            populate: {
+              target_company: true,
+              sub_industry: true,   // 👈 explicitly fetch
+            },
+          },
+          projects: true,
+          companies: true,
+          last_update: true,
+        },
+        status: 'published',
+      });
 
       const sanitizedExpert = await this.sanitizeOutput(updatedExpert, ctx);
 

@@ -52,7 +52,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                       className="hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4 font-medium text-gray-900">{exp.designation}</td>
-                      <td className="px-6 py-4 text-gray-600">{exp.company?.name || '-'}</td>
+                      <td className="px-6 py-4 text-gray-600">{exp?.company || '-'}</td>
                       <td className="px-6 py-4">
                         <Badge label={exp.type} options={TYPE_COLORS} truncate />
                       </td>
