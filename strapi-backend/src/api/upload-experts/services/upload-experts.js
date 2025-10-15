@@ -514,9 +514,13 @@ async indexExpertsToAlgoliaAll() {
         if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
         if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
         if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
-        if (!Type || !TYPE_ENUM.includes(Type)) errors.push(`Row ${index + 2}: Invalid Type`);
+        if (!Type || !TYPE_ENUM.includes(Type.trim())) {
+          errors.push(`Row ${index + 2}: Invalid Type (Allowed: ${TYPE_ENUM.join(', ')})`);
+        }
+
+        // ✅ Validate Engagement Status
         if (status && !ENGAGEMENT_ENUM.includes(status.trim())) {
-          errors.push(`Row ${index + 2}: Invalid status`);
+          errors.push(`Row ${index + 2}: Invalid status (Allowed: ${ENGAGEMENT_ENUM.join(', ')})`);
         }
         if (source_of_response && !SOR.includes(source_of_response.trim())) {
           errors.push(`Row ${index + 2}: Invalid source of response`);
@@ -797,7 +801,10 @@ async indexExpertsToAlgoliaAll() {
                   target_company: targetCompany?.documentId || null,
                   expert: expert.documentId,
                   quote:negotiatedquote,
-                  engagement_status:status ? status.trim() : null,
+                  engagement_status:
+                     status && ENGAGEMENT_ENUM.includes(status.trim())
+                    ? status.trim()
+                    : "Uncontacted",
                   sub_industry:foundindustry?.documentId||null,
                 },
                 trx,
@@ -818,7 +825,10 @@ async indexExpertsToAlgoliaAll() {
                   ra_comments:Comments||null,
                   original_quote:originalquote,
                   source_of_response:sourceofresponse ? sourceofresponse.trim() : null,
-                  expert_status:status ? status.trim() : null,
+                  expert_status:                     
+                  status && ENGAGEMENT_ENUM.includes(status.trim())
+                    ? status.trim()
+                    : "Uncontacted",
                   screening: screening? screening.trim():"",
                   notes:notes? notes.trim():"",
                 },
@@ -838,7 +848,10 @@ async indexExpertsToAlgoliaAll() {
                   company: company,
                   target_company: targetCompany?.id || null,
                   quote:negotiatedquote,
-                  engagement_status: status ? status.trim() : null,
+                  engagement_status:
+                     status && ENGAGEMENT_ENUM.includes(status.trim())
+                    ? status.trim()
+                    : "Uncontacted",
                   expert: newExpert.documentId,
                   sub_industry:foundindustry?.documentId||null,
                 },
