@@ -49,15 +49,24 @@ export default function Dashboard() {
     } finally { setLoading(false); }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
-    </div>
-  );
+  // if (loading) return (
+  //   <div className="flex items-center justify-center h-screen bg-gray-100">
+  //     <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+  //   </div>
+  // );
 
-  const typeLabels = Object.keys(dashboard?.typeCounts);
-  const typeData = Object.values(dashboard?.typeCounts);
-  const pieData = { labels: typeLabels, datasets: [{ label: 'Expert Distribution', data: typeData, backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'] }] };
+  const typeLabels = dashboard ? Object.keys(dashboard?.typeCounts):[];
+  const typeData = dashboard ? Object.values(dashboard?.typeCounts):[];
+  const pieData = dashboard? { labels: typeLabels, datasets: [{ label: 'Expert Distribution', data: typeData, backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'] }] } : {
+  labels: typeLabels,
+  datasets: [
+    {
+      label: 'Expert Distribution',
+      data: typeData,
+      backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'],
+    },
+  ],
+};
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-10">
@@ -85,7 +94,7 @@ export default function Dashboard() {
             { label: 'Average Quote', value: `$${dashboard?.avgQuote}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
             { label: 'Calls Completed', value: dashboard?.callsCompleted, subtitle: 'Total', color: 'from-gray-500 to-gray-400' },
             { label: 'Avg Call Price', value: `$${dashboard?.avgCallPrice}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
-            { label: 'Recent Uploads', value: dashboard.recentExpertsCount, subtitle: period, color: 'from-gray-600 to-gray-500' },
+            { label: 'Recent Uploads', value: dashboard?.recentExpertsCount, subtitle: period, color: 'from-gray-600 to-gray-500' },
           ].map((stat, idx) => (
             <div key={idx} className={`bg-gradient-to-r ${stat.color} text-white p-6 rounded-2xl shadow-md hover:shadow-lg transition`}>
               <p className="text-sm opacity-80">{stat.label}</p>

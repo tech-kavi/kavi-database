@@ -83,15 +83,15 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
-      {/* don’t block login/register page */}
-      {loading ? (
-        // ✅ Replace this with your custom loader
-        <div className="flex items-center justify-center py-4 bg-white">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-        </div>
-      ) : (
-        children
-      )}
+      <>
+        {children}
+        {loading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-[9999]">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+          </div>
+        )}
+      </>
+
     </AuthContext.Provider>
   );
 }
