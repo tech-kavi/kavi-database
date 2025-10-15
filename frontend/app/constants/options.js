@@ -20,43 +20,57 @@ export const ENGAGEMENT_COLORS = {
 
 export const TYPE_COLORS = {
   'Former': 'bg-gray-100 text-gray-700',
-  'Customer': 'bg-blue-100 text-blue-700 ',
-  'Competitor': 'bg-red-100 text-red-700 ',
-  'Industry Expert': 'bg-green-100 text-green-700 ',
-  'Partner': 'bg-indigo-100 text-indigo-700 ',
+  'Customer': 'bg-blue-100 text-blue-700',
+  'Competitor': 'bg-red-100 text-red-700',
+  'Industry Expert': 'bg-green-100 text-green-700',
+  'Partner': 'bg-indigo-100 text-indigo-700',
+  'Franchisee': 'bg-purple-100 text-purple-700',
+  'Distributer': 'bg-yellow-100 text-yellow-700',
+  'Supplier': 'bg-pink-100 text-pink-700',
+  'Reference': 'bg-teal-100 text-teal-700',
+  'Dealer': 'bg-orange-100 text-orange-700',
+  'Consultant': 'bg-cyan-100 text-cyan-700',
+  'Others': 'bg-gray-200 text-gray-800',
 };
 
 export const TYPE_OPTIONS = [
-  'Former',
-  'Customer',
   'Competitor',
+  'Consultant',
+  'Customer',
+  'Dealer',
+  'Distributer',
+  'Franchisee',
+  'Former',
   'Industry Expert',
   'Partner',
+  'Reference',
+  'Supplier',
+  'Others',
 ];
 
 export const ENGAGEMENT_OPTIONS = [
-  'Uncontacted',
-  'No response',
   'Call again',
-  'Contacted but not screened',
+  'Call done',
+  'Call scheduled',
   'Contacted & screened',
-  'Sent to client',
-  'Negotiation',
   'Contacted but ghosting',
-  'Six mos rule',
-  'Out of budget',
+  'Contacted but not screened',
+  'No response',
   'NDA',
+  'Negotiation',
   'Not interested at all',
   'Not interested in project',
-  'Call scheduled',
-  'Call done',
+  'Out of budget',
+  'Sent to client',
+  'Six mos rule',
+  'Uncontacted',
 ];
 
 
 export const SOURCE_OF_RESPONSE = [
   'Cold call',
-  'LinkedIn',
   'E-mail',
+  'LinkedIn',
   'Reference',
   'Others'
 ];

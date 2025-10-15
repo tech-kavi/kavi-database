@@ -80,7 +80,20 @@ function getLinkedInUsername(link) {
   }
 }
 
-const TYPE_ENUM = ["Former", "Competitor", "Customer", "Partner", "Industry Expert"];
+const TYPE_ENUM = [  
+  'Competitor',
+  'Consultant',
+  'Customer',
+  'Dealer',
+  'Distributer',
+  'Franchisee',
+  'Former',
+  'Industry Expert',
+  'Partner',
+  'Reference',
+  'Supplier',
+  'Others',
+];
 const ENGAGEMENT_ENUM = [
   "Uncontacted",
   "No response",
@@ -193,7 +206,7 @@ const strapiAlgolia = strapi.plugin('strapi-algolia');
           documentId:documentId,
           populate:{
             expert_experiences:{
-              populate:['company','target_company','sub_industry']
+              populate:['target_company','sub_industry']
             },
             projects:true,
             companies:true,

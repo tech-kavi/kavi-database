@@ -4,6 +4,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Badge from './Badge';
 import { TYPE_COLORS, ENGAGEMENT_COLORS } from '../constants/options';
 
+const getTenure = (startDate, endDate) => {
+  if (!startDate) return 'N/A';
+  const start = new Date(startDate);
+  const end = endDate ? new Date(endDate) : new Date(); // Use current date if no end date
+
+  let years = end.getFullYear() - start.getFullYear();
+  let months = end.getMonth() - start.getMonth();
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const yearStr = years > 0 ? `${years} yr${years > 1 ? 's' : ''}` : '';
+  const monthStr = months > 0 ? `${months} mo${months > 1 ? 's' : ''}` : '';
+
+  return [yearStr, monthStr].filter(Boolean).join(' '); // join non-empty parts
+};
+
+
 export default function ExperiencesTable({ expert, handleEdit }) {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
@@ -27,6 +47,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                 'Type',
                 'Start Date',
                 'End Date',
+                'Tenure',
                 'Status',
                 'Quote',
                 ''
@@ -51,13 +72,15 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                       onClick={() => toggleRow(exp.id)}
                       className="hover:bg-gray-50 transition-colors cursor-pointer"
                     >
-                      <td className="px-6 py-4 font-medium text-gray-900">{exp.designation}</td>
-                      <td className="px-6 py-4 text-gray-600">{exp?.company || '-'}</td>
+                      <td className="px-6 py-4 font-medium text-gray-900 truncate max-w-[200px]" title={exp.designation}>{exp.designation}</td>
+                      <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]" title={exp?.company || '-'}>{exp?.company || '-'}</td>
                       <td className="px-6 py-4">
                         <Badge label={exp.type} options={TYPE_COLORS} truncate />
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{exp.start_date || '-'}</td>
+                      <td className="px-6 py-4 text-gray-600 truncate">{exp.start_date || '-'}</td>
                       <td className="px-6 py-4 text-gray-600">{exp.end_date || 'Present'}</td>
+                      <td className="px-6 py-4 text-gray-600 truncate">{getTenure(exp.start_date, exp.end_date)}</td>
+
                       <td className="px-6 py-4">
                         <Badge label={exp.engagement_status} options={ENGAGEMENT_COLORS} truncate />
                       </td>
@@ -85,7 +108,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                           exit={{ opacity: 0, height: 0 }}
                           className="bg-gray-50"
                         >
-                          <td colSpan={8} className="px-6 py-4 text-gray-700">
+                          <td colSpan={9} className="px-6 py-4 text-gray-700">
                             <div className="grid sm:grid-cols-2 gap-2">
                               <p>
                                 <strong className="text-gray-800">Industry:</strong>{' '}

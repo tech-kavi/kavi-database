@@ -48,7 +48,7 @@ export default function Card({ hits, onSelectSlug }) {
         </thead>
           {/* Table Body */}
         <tbody className="divide-y divide-gray-200">
-          {status === 'loading' ? (
+          {(status === 'loading' || hits.length === 0)  ? (
             <tr>
               <td colSpan={9} className="py-10 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />

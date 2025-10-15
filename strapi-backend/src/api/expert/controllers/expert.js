@@ -152,7 +152,7 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
             data: cleanedData,
             populate:{
               expert_experiences:{
-                populate:['company','target_company','sub_industry']
+                populate:['target_company','sub_industry']
               },
               projects:true,
               last_update:true,
