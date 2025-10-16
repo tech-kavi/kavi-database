@@ -49,3 +49,10 @@ body {
 .ais-RefinementList-searchBox .ais-SearchBox-reset {
   display: none; /* Hide submit & reset icons */
 }
+
+.last-update-td {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}

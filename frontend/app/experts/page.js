@@ -43,8 +43,8 @@ function CustomRangeInput({ attribute }) {
     <div className="space-y-1">
       <div className="text-sm font-semibold text-gray-700">Start Date Range</div>
       <div className="flex gap-2">
-        <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
-        <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+        <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400" />
+        <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400" />
       </div>
     </div>
   );
@@ -76,8 +76,8 @@ function EndDateFilter({ attribute }) {
     <div className="space-y-1">
       <div className="text-sm font-semibold text-gray-700">End Date Range</div>
       <div className="flex gap-2">
-        <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
-        <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+        <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400" />
+        <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400" />
       </div>
     </div>
   );
@@ -108,57 +108,32 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
       </button>
 
       <div
-        className={`absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4
+        className={`absolute right-0 mt-2 lg:w-90 sm:w-60 md:w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4
           transition-transform duration-200 origin-top ${
             open ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
           }`}
+          
       >
-        <div className="flex flex-col gap-6 text-sm max-h-96 overflow-y-auto">
-          {/* Type Filter - Non-searchable */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Type</h3>
+        <div className="flex flex-col gap-6 text-sm max-h-[400px] overflow-y-auto">
+          
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Type</h3>
             <RefinementList
               attribute="type"
               classNames={{
                 root: '',
                 list: 'space-y-1 max-h-32 overflow-y-auto',
-                item: 'flex items-center justify-between text-sm text-gray-800',
-                checkbox: 'form-checkbox h-4 w-4 text-blue-600',
-                label: 'flex items-center gap-2',
-                count: 'text-gray-500 text-xs',
-              }}
-            />
-          </div>
-
-          {/* Tags Filter - With proper search configuration */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Tags</h3>
-            <RefinementList
-              attribute="tags"
-              searchable={true}
-              searchablePlaceholder="Search tags..."
-              limit={10}
-              classNames={{
-                root: 'w-full',
-                searchBox: 'mb-2',
-                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300',
-                searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
-                searchBoxSubmit: 'hidden',
-                searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
-                searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-32 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
-                labelText: 'flex-1',
-                count: 'text-gray-500 text-xs ml-2',
+                count: 'text-gray-500 text-xs',
               }}
             />
-          </div>
+          
+          
 
           {/* Target Company Filter - With proper search configuration */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Industry</h3>
+         
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Industry</h3>
             <RefinementList
               attribute="sub_industry.name"
               searchable={true}
@@ -167,12 +142,12 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
               classNames={{
                 root: 'w-full',
                 searchBox: 'mb-2',
-                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
                 searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-32 overflow-y-auto',
+                list: 'space-y-1 max-h-36 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -180,11 +155,11 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs ml-2',
               }}
             />
-          </div>
+         
 
           {/* Company Filter - With proper search configuration */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Company</h3>
+        
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Company</h3>
             <RefinementList
               attribute="company"
               searchable={true}
@@ -193,12 +168,12 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
               classNames={{
                 root: 'w-full',
                 searchBox: 'mb-2',
-                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
                 searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-32 overflow-y-auto',
+                list: 'space-y-1 max-h-36 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -206,11 +181,11 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs ml-2',
               }}
             />
-          </div>
+          
 
            {/* Target Company Filter - With proper search configuration */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Topic</h3>
+          
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Topic</h3>
             <RefinementList
               attribute="target_company.name"
               searchable={true}
@@ -219,12 +194,12 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
               classNames={{
                 root: 'w-full',
                 searchBox: 'mb-2',
-                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
                 searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-32 overflow-y-auto',
+                list: 'space-y-1 max-h-36 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -232,13 +207,38 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs ml-2',
               }}
             />
-          </div>
+
+            
+          
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Tags</h3>
+            <RefinementList
+              attribute="tags"
+              searchable={true}
+              searchablePlaceholder="Search tags..."
+              limit={10}
+              classNames={{
+                root: 'w-full',
+                searchBox: 'mb-2',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
+                searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
+                searchBoxSubmit: 'hidden',
+                searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
+                searchBoxResetIcon: 'w-3 h-3',
+                list: 'space-y-1 max-h-36 overflow-y-auto',
+                item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
+                checkbox: 'form-checkbox h-4 w-4 text-blue-600',
+                label: 'flex items-center gap-2 cursor-pointer',
+                labelText: 'flex-1',
+                count: 'text-gray-500 text-xs ml-2',
+              }}
+            />
+          
 
 
 
           {/* File Filter - With proper search configuration */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">File</h3>
+         
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">File</h3>
             <RefinementList
               attribute="upload_file_details"
               searchable={true}
@@ -247,12 +247,12 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
               classNames={{
                 root: 'w-full',
                 searchBox: 'mb-2',
-                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
                 searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-32 overflow-y-auto',
+                list: 'space-y-1 max-h-36 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -260,7 +260,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs ml-2',
               }}
             />
-          </div>
+         
 
           {/* Date Filters */}
           <CustomRangeInput attribute="start_date_ts" />
@@ -274,10 +274,15 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
             <EndDateNumericMenu attribute="end_date_ts" />
           </div> */}
         </div>
-      </div>
     </div>
+    </div>
+    
   );
 }
+
+
+
+
 
 export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
@@ -318,7 +323,7 @@ export default function Search() {
           }}
         />
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-row items-center gap-3 ml-auto">
           <SortBy
             items={[
               { label: 'Latest', value: 'development_api::expert.expert' },
