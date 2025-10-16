@@ -69,15 +69,48 @@ function remapRow(row) {
 }
 
 function getLinkedInUsername(link) {
-  if (!link) return Math.random().toString(36).substring(2, 10);;
+  if (!link) return null; // no LinkedIn provided
+
   try {
     const url = new URL(link.trim());
-    const parts = url.pathname.split('/').filter(Boolean); // remove empty
-    const username = parts[parts.length - 1]; // last part
+    const parts = url.pathname.split('/').filter(Boolean);
+    let username = parts[parts.length - 1] || '';
+
+    // Decode any URL encoding (like %E2%9C%85)
+    username = decodeURIComponent(username);
+
+    // Remove emojis or special characters
+    username = username.replace(/[^\p{L}\p{N}\-_~.]/gu, '');
+
+    // Ensure it’s not empty after sanitization
+    if (!username || username.length < 3) return null;
+
     return username.toLowerCase();
   } catch (e) {
-    return Math.random().toString(36).substring(2, 10);;
+    return null;
   }
+}
+
+// stricter slugify
+function slugify(str) {
+  return str
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-_.~]/g, '')
+    .replace(/-+/g, '-');
+}
+
+function getExpertSlug({ LinkedIn, Designation, CompanyName, Start }) {
+  const username = getLinkedInUsername(LinkedIn);
+  const timePart = Start ? new Date(Start).getTime() : Date.now();
+
+  const base =
+    username ||
+    `${Designation || 'expert'}-${CompanyName || 'company'}`;
+
+  return slugify(`${base}-${timePart}`);
 }
 
 const TYPE_ENUM = [  
@@ -741,14 +774,14 @@ async indexExpertsToAlgoliaAll() {
 
             if (!Name || !LinkedIn) continue;
 
-            const slug = getLinkedInUsername(LinkedIn);
+            const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Date.now()}`);
             const linkedinKey = normalizeLinkedIn(LinkedIn);
             let expert = expertMap.get(linkedinKey);
             const company = CompanyName?.trim();
             const targetCompany = companyMap.get(TargetCompany?.trim());
             const foundindustry = industryMap.get(industry?.trim());
-            const expSlug = slugify(`${Designation}-${CompanyName}-${Start ? new Date(Start).getTime() : Date.now()}`);
-
+            const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
+            
             if (expert) {
 
                let updateData = {};
@@ -928,7 +961,7 @@ async indexExpertsToAlgoliaAll() {
         html: `
           <h2>Upload Failed</h2>
           <p>We were unable to process your Excel file.</p>
-          <p><strong>Error:</strong> ${error.message}</p>
+          <p><strong>Error:</strong> ${error}</p>
           <p>Please fix the file and try again.</p>
         `,
       });
