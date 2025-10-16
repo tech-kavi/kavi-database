@@ -733,7 +733,7 @@ async indexExpertsToAlgoliaAll() {
       let created = 0;
       let updated = 0;
 
-      let sheetNamesList = [];
+      const sheetNamesSet = new Set();
 
       // Atomic DB Transaction
       await strapi.db.transaction(async ({ trx }) => {
@@ -764,7 +764,7 @@ async indexExpertsToAlgoliaAll() {
               industry,
             } = row;
 
-            if (SheetName) sheetNamesList.push(SheetName.trim());
+            if (SheetName) sheetNamesSet.add(SheetName.trim());
 
           const parseTags = Tags =>
             String(Tags || '')
@@ -781,7 +781,7 @@ async indexExpertsToAlgoliaAll() {
             const targetCompany = companyMap.get(TargetCompany?.trim());
             const foundindustry = industryMap.get(industry?.trim());
             const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
-            
+
             if (expert) {
 
                let updateData = {};
@@ -928,6 +928,8 @@ async indexExpertsToAlgoliaAll() {
           strapi.log.error('❌ Background algolia indexin failed:', err);
         }
       }, 0);
+
+      const sheetNamesList = Array.from(sheetNamesSet);
 
       const sheetNamesHtml = sheetNamesList.length
   ? `<p><strong>Sheet Names Found:</strong></p>
