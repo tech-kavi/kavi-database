@@ -106,11 +106,12 @@ function getExpertSlug({ LinkedIn, Designation, CompanyName, Start }) {
   const username = getLinkedInUsername(LinkedIn);
   const timePart = Start ? new Date(Start).getTime() : Date.now();
 
-  const base =
-    username ||
-    `${Designation || 'expert'}-${CompanyName || 'company'}`;
+  const base = username || `${Designation || 'expert'}-${CompanyName || 'company'}`;
 
-  return slugify(`${base}-${timePart}`);
+  // Append a random 4-digit number for extra uniqueness
+  const randomPart = Math.floor(1000 + Math.random() * 9000); // 1000-9999
+
+  return slugify(`${base}-${timePart}-${randomPart}`);
 }
 
 const TYPE_ENUM = [  
@@ -963,7 +964,7 @@ async indexExpertsToAlgoliaAll() {
         html: `
           <h2>Upload Failed</h2>
           <p>We were unable to process your Excel file.</p>
-          <p><strong>Error:</strong> ${error}</p>
+          <p><strong>Error:</strong> ${error.stack}</p>
           <p>Please fix the file and try again.</p>
         `,
       });
