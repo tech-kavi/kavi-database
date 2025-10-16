@@ -338,7 +338,7 @@ async indexExpertsToAlgoliaAll() {
         ? { id: exp.target_company.id, name: exp.target_company.name, comp_slug:exp.target_company.comp_slug }
         : null,
 
-        sub_industry: exp.sub_industry ? { id: exp.sub_industry.id, name: exp.sub_industry.name, ind_slug:exp.sub_industry.ind_slug } : null,
+      sub_industry: exp.sub_industry ? { id: exp.sub_industry.id, name: exp.sub_industry.name, ind_slug:exp.sub_industry.ind_slug } : null,
 
       // Add timestamps as numeric fields (for easier range filters/sorting)
       start_date_ts: exp.start_date

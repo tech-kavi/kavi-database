@@ -41,7 +41,7 @@ function CustomRangeInput({ attribute }) {
 
   return (
     <div className="space-y-1">
-      <div className="text-sm font-semibold text-gray-700">Start Date</div>
+      <div className="text-sm font-semibold text-gray-700">Start Date Range</div>
       <div className="flex gap-2">
         <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
         <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
@@ -51,31 +51,39 @@ function CustomRangeInput({ attribute }) {
 }
 
 
+function EndDateFilter({ attribute }) {
+  const { start, range, refine } = useRange({ attribute });
+  const [sd, setSd] = useState('');
+  const [ed, setEd] = useState('');
 
-function EndDateNumericMenu({ attribute }) {
-  const CURRENT_TS = Math.floor(Date.now() / 1000);
-  const { items, refine } = useNumericMenu({
-    attribute,
-    items: [
-      { label: 'Any', start: undefined, end: undefined },
-      { label: 'Currently Working', start: 0, end: 0 },
-      { label: '6+ Months', start: CURRENT_TS - 6 * 30 * 24 * 3600 },
-      { label: '1+ Year', start: CURRENT_TS - 365 * 24 * 3600 },
-      { label: '2+ Years', start: CURRENT_TS - 2 * 365 * 24 * 3600 },
-    ],
-  });
+  const dateToUnix = (dateStr) => {
+    if (!dateStr) return undefined;
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? undefined : Math.floor(date.getTime() / 1000);
+  };
+
+  const handleChange = (type, value) => {
+    if (type === 'min') setSd(value);
+    else setEd(value);
+
+    const newStart = type === 'min' ? dateToUnix(value) : start[0] ?? range.min;
+    const newEnd = type === 'max' ? dateToUnix(value) : start[1] ?? range.max;
+
+    refine([Number.isFinite(newStart) ? newStart : undefined, Number.isFinite(newEnd) ? newEnd : undefined]);
+  };
 
   return (
     <div className="space-y-1">
-      {items.map((item) => (
-        <label key={item.label} className="flex items-center gap-2 text-sm">
-          <input type="radio" name={attribute} checked={item.isRefined} onChange={() => refine(item.value)} className="form-radio h-4 w-4 text-blue-600" />
-          <span>{item.label} ({item.count})</span>
-        </label>
-      ))}
+      <div className="text-sm font-semibold text-gray-700">End Date Range</div>
+      <div className="flex gap-2">
+        <input type="date" value={sd} onChange={(e) => handleChange('min', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+        <input type="date" value={ed} onChange={(e) => handleChange('max', e.target.value)} className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+      </div>
     </div>
   );
 }
+
+
 
 function DropdownFilters({ open, setOpen,setSelectedSlug }) {
   const containerRef = useRef(null);
@@ -256,6 +264,10 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
 
           {/* Date Filters */}
           <CustomRangeInput attribute="start_date_ts" />
+
+          <EndDateFilter attribute="end_date_ts" />
+
+
           
           {/* <div className="space-y-2">
             <h3 className="text-sm font-semibold text-gray-700">End Date</h3>
@@ -314,6 +326,7 @@ export default function Search() {
               { label: 'Original Quote (1-*)', value: 'experts_by_original_quote' },
               { label: 'Normal Status (A-Z)', value: 'experts_by_normal_status' },
               { label: 'Type (A-Z)', value: 'experts_by_type' },
+              { label: 'End Date(*-0)', value: 'expert_by_enddate' },
             ]}
             defaultValue="development_api::expert.expert"
             classNames={{ select: 'border px-2 py-1 rounded text-sm' }}

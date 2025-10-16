@@ -51,7 +51,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
     }
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts?filters[slug][$eq]=${slug}&populate[expert_experiences][populate]=company&populate[expert_experiences][populate]=target_company&populate[projects][populate]&populate[expert_experiences][populate]=sub_industry`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts?filters[slug][$eq]=${slug}&populate[expert_experiences][populate]=target_company&populate[projects][populate]&populate[expert_experiences][populate]=sub_industry`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
