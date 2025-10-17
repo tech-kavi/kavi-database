@@ -308,7 +308,7 @@ export default function Search() {
   return (
     <>
 
-    <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-7xl space-y-8 sm:space-y-8">
+    <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8">
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <SearchBox

@@ -92,7 +92,7 @@ export default function CompanyPage() {
   if (!company) return <p className="text-center mt-10 text-red-500 text-lg">Company not found</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8">
       <div className="bg-white shadow-lg rounded-xl p-6 space-y-6">
         {/* Header with gradient */}
         <div className="flex items-center justify-between border-b pb-4">

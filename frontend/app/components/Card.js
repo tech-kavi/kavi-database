@@ -6,6 +6,21 @@ import { TYPE_COLORS, ENGAGEMENT_COLORS } from '../constants/options';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+
+  // Parse safely
+  const date = new Date(dateStr + 'T00:00:00Z');
+  if (isNaN(date)) return null;
+
+  // Get short month and 2-digit year
+  const month = date.toLocaleString('en-US', { month: 'short' }); // e.g., "Dec"
+  const year = date.toLocaleString('en-US', { year: '2-digit' }); // e.g., "21"
+
+  return `${month}-${year}`; // e.g., "Dec-21"
+};
+
+
 export default function Card({ hits, onSelectSlug }) {
   const { status } = useInstantSearch();
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, slug: null });
@@ -40,14 +55,16 @@ export default function Card({ hits, onSelectSlug }) {
       <table className="w-full table-fixed text-left border-collapse text-sm">
         <thead className="bg-gray-50 text-gray-600 text-sm uppercase tracking-wide">
           <tr className="border-b">
-            <th className="px-4 py-3 h-14 w-[150px]">Name</th>
-            <th className="px-4 py-3 w-[150px]">Company</th>
-            <th className="px-4 py-3 text-center w-[100px]">Type</th>
-            <th className="px-4 py-3 w-[180px]">Designation</th>
-            <th className="px-4 py-3 w-[150px]">Topic</th>
-            <th className="px-4 py-3 text-center w-[100px]">Quote ₹</th>
-            <th className="px-4 py-3 text-center w-[130px]">Project Status</th>
-            <th className="px-4 py-3 text-center w-[130px]">Key Status</th>
+            <th className="px-2 py-3 h-14 w-[150px]">Name</th>
+            <th className="px-2 py-3 w-[150px]">Company</th>
+            <th className="px-2 py-3 text-center w-[100px]">Type</th>
+            <th className="px-2 py-3 w-[180px]">Designation</th>
+            <th className="px-2 py-3 w-[150px]">Topic</th>
+            <th className="px-2 py-3 w-[80px] text-center">Start</th>
+            <th className="px-2 py-3 w-[80px] text-center">End</th>
+            <th className="px-2 py-3 text-center w-[80px]">Quote ₹</th>
+            <th className="px-2 py-3 text-center w-[150px]">Project Status</th>
+            <th className="px-2 py-3 text-center w-[150px]">Key Status</th>
             {/* <th className="px-4 py-3 w-[180px]">Last Update</th> */}
           </tr>
         </thead>
@@ -82,47 +99,55 @@ export default function Card({ hits, onSelectSlug }) {
                       })}`
                     : '-'}
               >
-                <td className="px-4 py-3 max-w-[180px] truncate">
+                <td className="px-2 py-3 max-w-[180px] truncate">
                   <a
                     href={hit.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline text-blue-600 font-medium"
                   >
-                    <Highlight attribute="name" hit={hit} />
+                    <Highlight attribute="name" hit={hit} title={hit?.name}/>
                   </a>
                 </td>
 
-                <td className="px-4 py-3 max-w-[160px] truncate">
+                <td className="px-2 py-3 max-w-[160px] truncate" title={hit?.company}>
                   {hit?.company || '-'}
                 </td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-2 py-3 text-center">
                   <Badge label={hit.type} options={TYPE_COLORS} />
                 </td>
 
                 <td
                   title={hit?.designation}
-                  className="px-4 py-3 truncate text-gray-700"
+                  className="px-2 py-3 truncate text-gray-700"
                 >
                   {hit?.designation || '-'}
                 </td>
 
-                <td className="px-4 py-3 max-w-[150px] truncate">
+                <td className="px-2 py-3 max-w-[150px] truncate" title={hit?.target_company?.name}>
                   {hit?.target_company?.name || '-'}
                 </td>
 
-                <td className="px-4 py-3 text-center font-semibold text-gray-700">
+                <td className="px-2 py-3 max-w-[80px] truncate text-center" title={hit?.start_date}>
+                    {formatDate(hit?.start_date) || '-'}
+                  </td>
+
+                  <td className="px-2 py-3 max-w-[80px] truncate text-center" title={hit?.end_date}>
+                    {formatDate(hit?.end_date) || '-'}
+                  </td>
+
+                <td className="px-2 py-3 text-center font-semibold text-gray-700 max-w-[80px] ">
                   {hit?.original_quote
                     ? `₹${Number(hit.original_quote).toLocaleString('en-IN')}`
                     : '-'}
                 </td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-2 py-3 text-center">
                   <Badge label={hit.engagement_status} options={ENGAGEMENT_COLORS} truncate={true} />
                 </td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-2 py-3 text-center">
                   <Badge label={hit.expert_status} options={ENGAGEMENT_COLORS} truncate={true} />
                 </td>
 

@@ -23,6 +23,20 @@ const getTenure = (startDate, endDate) => {
   return [yearStr, monthStr].filter(Boolean).join(' '); // join non-empty parts
 };
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+
+  // Parse safely
+  const date = new Date(dateStr + 'T00:00:00Z');
+  if (isNaN(date)) return null;
+
+  // Get short month and 2-digit year
+  const month = date.toLocaleString('en-US', { month: 'short' }); // e.g., "Dec"
+  const year = date.toLocaleString('en-US', { year: '2-digit' }); // e.g., "21"
+
+  return `${month}-${year}`; // e.g., "Dec-21"
+};
+
 
 export default function ExperiencesTable({ expert, handleEdit }) {
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -45,6 +59,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                 'Designation',
                 'Company',
                 'Type',
+                'Topic',
                 'Start Date',
                 'End Date',
                 'Tenure',
@@ -77,14 +92,16 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                       <td className="px-6 py-4">
                         <Badge label={exp.type} options={TYPE_COLORS} truncate />
                       </td>
-                      <td className="px-6 py-4 text-gray-600 truncate">{exp.start_date || '-'}</td>
-                      <td className="px-6 py-4 text-gray-600">{exp.end_date || 'Present'}</td>
+
+                      <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]" title={exp?.target_company?.name || '-'}>{exp?.target_company?.name || '-'}</td>
+                      <td className="px-6 py-4 text-gray-600 truncate">{formatDate(exp.start_date) || '-'}</td>
+                      <td className="px-6 py-4 text-gray-600">{formatDate(exp.end_date) || 'Present'}</td>
                       <td className="px-6 py-4 text-gray-600 truncate">{getTenure(exp.start_date, exp.end_date)}</td>
 
                       <td className="px-6 py-4">
                         <Badge label={exp.engagement_status} options={ENGAGEMENT_COLORS} truncate />
                       </td>
-                      <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">
+                      <td className="px-6 py-4 text-gray-600 truncate max-w-[80px]">
                         {exp.quote || '-'}
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -114,10 +131,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                                 <strong className="text-gray-800">Industry:</strong>{' '}
                                 {exp.sub_industry?.name || '-'}
                               </p>
-                              <p>
-                                <strong className="text-gray-800">Topic:</strong>{' '}
-                                {exp.target_company?.name || '-'}
-                              </p>
+                             
                               
                             </div>
                           </td>
