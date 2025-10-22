@@ -40,23 +40,23 @@ module.exports = {
       });
 
       // Add expert count
-      // const enrichedCompanies = await Promise.all(
-      //   companies.map(async (company) => {
-      //     const expertCount = await strapi.documents("api::expert.expert").count({
-      //       filters: {
-      //         companies: { id: company.id },
-      //       },
-      //     });
+      const enrichedCompanies = await Promise.all(
+        companies.map(async (company) => {
+          const expertCount = await strapi.documents("api::expert.expert").count({
+            filters: {
+              companies: { id: company.id },
+            },
+          });
 
-      //     return {
-      //       ...company,
-      //       expertCount,
-      //     };
-      //   })
-      // );
+          return {
+            ...company,
+            expertCount,
+          };
+        })
+      );
 
       ctx.body = {
-        data: companies,
+        data: enrichedCompanies,
         meta: {
           page: pageNum,
           pageSize: pageSizeNum,

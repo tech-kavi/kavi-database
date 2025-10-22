@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { useAuth } from './components/AuthProvider';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -13,6 +14,8 @@ export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [period, setPeriod] = useState('week');
   const [loading, setLoading] = useState(true);
+
+  const {user}=useAuth();
 
   useEffect(() => { document.title = `KAVI | Home`; }, []);
   useEffect(() => { const token = localStorage.getItem('token'); if (!token) router.push('/login'); }, []);
@@ -76,6 +79,8 @@ export default function Dashboard() {
           <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">Expert Dashboard</h1>
           <p className="text-gray-500 mt-1">Overview of all experts empanelled with KAVI</p>
         </div>
+
+         {user?.role?.type == "admin" && (
         <button
           onClick={handleReindex}
           disabled={loading}
@@ -85,6 +90,7 @@ export default function Dashboard() {
         >
           {loading ? "Reindexing..." : "Reindex Experts"}
         </button>
+         )}
       </div>
 
       {/* Top Stats */}

@@ -95,6 +95,10 @@ export default function Companies() {
                 <h2 className="text-xl font-semibold mb-2 text-gray-800">{company.name}</h2>
                 <p className="text-gray-700 mt-2">
                   <span className="font-semibold">Tags:</span>{' '}
+                  {company.expertCount}
+                </p>
+                <p className="text-gray-700 mt-2">
+                  <span className="font-semibold">Tags:</span>{' '}
                   {company.tags && company.tags.length > 0
                     ? company.tags
                     : 'No tags'}

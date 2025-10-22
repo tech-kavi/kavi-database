@@ -83,11 +83,15 @@ export default function CompanyPage() {
     }
   }, [company]);
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600"></div>
-    </div>
-  );
+  // if (loading) return (
+  //   <div className="flex items-center justify-center min-h-screen bg-gray-100">
+  //     <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600"></div>
+  //   </div>
+  // );
+
+  if (loading) {
+  return <p className="text-center mt-10 text-gray-500 text-lg">Loading company data...</p>;
+  }
 
   if (!company) return <p className="text-center mt-10 text-red-500 text-lg">Company not found</p>;
 
