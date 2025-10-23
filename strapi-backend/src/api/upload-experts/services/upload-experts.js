@@ -119,7 +119,7 @@ const TYPE_ENUM = [
   'Consultant',
   'Customer',
   'Dealer',
-  'Distributer',
+  'Distributor',
   'Franchisee',
   'Former',
   'Industry Expert',

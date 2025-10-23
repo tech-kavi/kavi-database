@@ -38,7 +38,7 @@ export const TYPE_OPTIONS = [
   'Consultant',
   'Customer',
   'Dealer',
-  'Distributer',
+  'Distributor',
   'Franchisee',
   'Former',
   'Industry Expert',
