@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import axios from 'axios'
+import toast from 'react-hot-toast';
+
 
 export default function ExpertForm({ onClose, onExpertAdded }) {
   const [formData, setFormData] = useState({
@@ -87,7 +89,8 @@ export default function ExpertForm({ onClose, onExpertAdded }) {
     onExpertAdded(res.data);
   } catch (err) {
     console.error("Error creating expert", err);
-    alert("Failed to create expert");
+    //alert("Failed to create expert");
+    toast.error('Failed to create expert')
   }
 };
 

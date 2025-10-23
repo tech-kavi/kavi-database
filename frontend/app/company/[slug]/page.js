@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuth } from '../../components/AuthProvider';
+import toast from 'react-hot-toast';
+
 
 export default function CompanyPage() {
   const { slug } = useParams(); // comp_slug
@@ -66,10 +68,12 @@ export default function CompanyPage() {
 
       await fetchCompany();
       setIsEditing(false);
-      alert('✅ Company updated successfully');
+      toast.success('Company updated successfully!');
+      //alert('✅ Company updated successfully');
     } catch (err) {
       console.error('Failed to update company:', err);
-      alert('❌ Failed to update company');
+      //alert('❌ Failed to update company');
+      toast.success('Failed to update company');
     } finally {
       setSaving(false);
     }

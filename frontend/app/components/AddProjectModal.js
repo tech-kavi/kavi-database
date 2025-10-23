@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import './styles/EditExperienceModal.css';
 import axios from 'axios'
+import toast from 'react-hot-toast';
 
 export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
   const [formData, setFormData] = useState({
@@ -43,7 +44,8 @@ export default function AddProjectModal({ expertId, onClose, onProjectAdd }) {
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Failed to add project.');
+      //alert('Failed to add project.');
+      toast.error('Failed to add project');
     }
   };
 

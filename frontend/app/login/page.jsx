@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import Popup from '../components/Popup'
+import toast from 'react-hot-toast';
+
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,7 +33,8 @@ export default function LoginPage() {
       })
 
       console.log(res);
-      alert(res.data.message);
+      //alert(res.data.message);
+      toast.success(res.data.message);
       
     } catch (err) {
       console.error(err)

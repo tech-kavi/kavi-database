@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useAuth } from './components/AuthProvider';
+import toast from 'react-hot-toast';
+
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -26,10 +28,12 @@ export default function Dashboard() {
       await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reindex-experts`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      alert('Reindexing started successfully!');
+      //alert('Reindexing started successfully!');
+      toast.success('Reindexing started successfully!');
     } catch (error) {
       console.error('Reindexing failed:', error);
-      alert('Failed to start reindexing.');
+      //alert('Failed to start reindexing.');
+      toast.error('Failed to start reindexing');
     } 
   };
 
@@ -48,7 +52,7 @@ export default function Dashboard() {
       });
     } catch (err) {
       console.error(err);
-      alert('Failed to fetch dashboard data.');
+      toast.error('Failed to fetch dashboard data');
     } finally { setLoading(false); }
   };
 

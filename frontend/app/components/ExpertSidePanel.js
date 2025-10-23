@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation'
 import AddProjectModal from './AddProjectModal'
 import EditExpertDetailsModal from './EditExpertDetailsModal'
 import { FiX, FiChevronLeft, FiChevronRight, FiExternalLink } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+
 
 
 const getTypeClass = (type) => {
@@ -23,6 +25,20 @@ const getTypeClass = (type) => {
       return 'tag-default'
   }
 }
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+
+  // Parse safely
+  const date = new Date(dateStr + 'T00:00:00Z');
+  if (isNaN(date)) return null;
+
+  // Get short month and 2-digit year
+  const month = date.toLocaleString('en-US', { month: 'short' }); // e.g., "Dec"
+  const year = date.toLocaleString('en-US', { year: '2-digit' }); // e.g., "21"
+
+  return `${month}-${year}`; // e.g., "Dec-21"
+};
 
 export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, refetchHits }) {
   const [expert, setExpert] = useState(null);
@@ -131,14 +147,17 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
 
       setExpert(updatedExpert)
 
-      alert('Update Successful.');
+      //alert('Update Successful.');
+      toast.success('Update Successful!');
       setEditingExp(null);
       refetchHits();
 
 
     } catch (err) {
       console.error('Failed to update experience:', err)
-      alert('Update failed.')
+      //alert('Update failed.')
+      toast.error('Update failed');
+
     }
     setEditingExp(null)
   }
@@ -240,7 +259,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                     <span className={`px-2 py-0.5 rounded text-white ${getTypeClass(exp.type)}`}>{exp.type}</span>
-                    <span>{exp.start_date} – {exp.end_date || 'Present'}</span>
+                    <span>{formatDate(exp.start_date)} – {formatDate(exp.end_date) || 'Present'}</span>
                   </div>
                   {exp.engagement_status && <p className="text-gray-700 text-sm">Status: {exp.engagement_status}</p>}
                 </div>

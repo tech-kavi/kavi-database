@@ -7,6 +7,8 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import AddProjectModal from './AddProjectModal'
 import EditExpertDetailsModal from './EditExpertDetailsModal'
+import toast from 'react-hot-toast';
+
 
 
 const getTypeClass = (type) => {
@@ -91,13 +93,15 @@ const handleSave = async(updatedExp) => {
     // Call handler to lift updated experience to parent state
     onExperienceUpdate(updatedExpert);
 
-    alert('Update Successful.');
+    //alert('Update Successful.');
+    toast.success('Update Successful');
     setEditingExp(null);
   
 
   } catch (err) {
     console.error('Failed to update experience:', err)
-    alert('Update failed.')
+    //alert('Update failed.')
+    toast.error('Update failed');
   }
   setEditingExp(null)
 }

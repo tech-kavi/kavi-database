@@ -2,6 +2,8 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+
 
 const MagicLogin = () => {
   const router = useRouter();
@@ -23,7 +25,7 @@ const MagicLogin = () => {
         router.push("/"); // redirect to home after login
       } catch (err) {
         console.error(err);
-        alert("Invalid or expired magic link");
+        toast.error("Invalid or expired magic link");
         router.push("/login"); // fallback if token invalid
       }
     };

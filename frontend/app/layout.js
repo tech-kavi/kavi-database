@@ -4,6 +4,7 @@ import "./globals.css";
 import NavbarWrapper from "./components/NavbarWrapper";
 import { Providers } from "./components/Providers";
 import { AuthProvider } from "./components/AuthProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,17 @@ export default function RootLayout({ children }) {
           <NavbarWrapper />
           <Providers>{children}</Providers>
         </AuthProvider>
+
+                {/* 👇 Add Toaster once globally */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              fontSize: '14px',
+            },
+          }}
+        />
         
       </body>
     </html>
