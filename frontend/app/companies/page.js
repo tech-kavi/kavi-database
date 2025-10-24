@@ -67,7 +67,8 @@ export default function Companies() {
       </div> */}
 
       {/* Search Bar */}
-      <div className="mb-6 flex justify-center">
+      {/* Search Bar with Clear Button */}
+      <div className="mb-6 flex justify-center relative w-full sm:w-1/2 mx-auto">
         <input
           type="text"
           value={search}
@@ -76,9 +77,22 @@ export default function Companies() {
             setPage(1)
           }}
           placeholder="Search companies by name or tags..."
-          className="w-full sm:w-1/2 border border-gray-300 p-3 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+          className="w-full bg-white text-black border border-gray-300 p-3 pr-10 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
         />
-      </div>
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            aria-label="Clear search"
+          >
+            {/* Simple "X" icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10 3.636 5.05a1 1 0 011.414-1.414L10 8.586z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+</div>
+
 
       {/* Companies Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
