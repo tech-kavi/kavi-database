@@ -377,66 +377,66 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
 
 
 
-function IndexSwitcher({ switchIndex }) {
-  const [open, setOpen] = useState(false);
-  const { indexName } = useIndex(); // get current index from context
+// function IndexSwitcher({ switchIndex }) {
+//   const [open, setOpen] = useState(false);
+//   const { indexName } = useIndex(); // get current index from context
   
-  const dropdownRef = useRef();
-  const { instantSearchInstance } = useInstantSearch();
+//   const dropdownRef = useRef();
+//   const { instantSearchInstance } = useInstantSearch();
 
-  const options = [
-    { label: "Full", value: "development_api::expert.expert" },
-    { label: "Screening", value: "expert_screening" },
-  ];
+//   const options = [
+//     { label: "Full", value: "development_api::expert.expert" },
+//     { label: "Screening", value: "expert_screening" },
+//   ];
 
-    // derive label from current index
-  const selectedLabel = options.find(opt => opt.value === indexName)?.label || "Full Search";
+//     // derive label from current index
+//   const selectedLabel = options.find(opt => opt.value === indexName)?.label || "Full Search";
 
-  const handleSelect = (option) => {
-    switchIndex(option.value);
-    setOpen(false);
-  };
+//   const handleSelect = (option) => {
+//     switchIndex(option.value);
+//     setOpen(false);
+//   };
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+//         setOpen(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
 
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
-      >
-        {selectedLabel}
-        <ChevronDown
-          className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+//   return (
+//     <div className="relative" ref={dropdownRef}>
+//       <button
+//         onClick={() => setOpen(!open)}
+//         className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
+//       >
+//         {selectedLabel}
+//         <ChevronDown
+//           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+//         />
+//       </button>
 
-      {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-20">
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => handleSelect(opt)}
-              className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                selectedLabel === opt.label ? "bg-gray-50 font-semibold" : ""
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+//       {open && (
+//         <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+//           {options.map((opt) => (
+//             <button
+//               key={opt.value}
+//               onClick={() => handleSelect(opt)}
+//               className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+//                 selectedLabel === opt.label ? "bg-gray-50 font-semibold" : ""
+//               }`}
+//             >
+//               {opt.label}
+//             </button>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
 
 
@@ -502,7 +502,7 @@ export default function Search() {
 
         <div className="flex flex-row items-center gap-3 ml-auto">
 
-          <IndexSwitcher switchIndex={switchIndex} />
+          {/* <IndexSwitcher switchIndex={switchIndex} /> */}
 
           <SortBy
             items={[
