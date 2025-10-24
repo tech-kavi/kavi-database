@@ -32,21 +32,33 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
       const updateData = {};
 
+      const numericFields = ['quote', 'original_quote', 'credits'];
 
       allowedFields.forEach((field) => {
         let value = body[field];
 
-        // Only process defined and non-empty fields
-        if (value !== undefined && value !== '') {
+        if (value !== undefined) {
           if (typeof value === 'string') {
             value = value.trim();
           }
 
-          // Convert empty string after trim to null (for dates)
+          // Convert empty string for numbers → null
+          if (numericFields.includes(field) && value === '') {
+            value = null;
+          }
+
+          // Convert to number if it's a valid number string
+          if (numericFields.includes(field) && value !== null) {
+            value = Number(value);
+            if (isNaN(value)) value = null;
+          }
+
+          // Convert empty string for dates → null
           if ((field === 'start_date' || field === 'end_date') && value === '') {
             value = null;
           }
 
+          // Only set the field if it's not undefined
           updateData[field] = value;
         }
       });

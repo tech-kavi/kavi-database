@@ -118,7 +118,12 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               type="number"
               className="input-field"
               value={formData.original_quote}
-              onChange={(e) => handleChange('original_quote', e.target.value)}
+              onChange={(e) =>
+              handleChange(
+                'original_quote',
+                e.target.value === '' ? null : Number(e.target.value)
+              )
+            }
             />
           </div>
 
