@@ -35,7 +35,6 @@ const columnMap = {
   sheetname: 'SheetName',
   linkedinlink: 'LinkedIn',
   name: 'Name',
-  targetcompany: 'Topic',
   topic: 'TargetCompany',
   type: 'Type',
   experttype: 'Type',
@@ -269,6 +268,7 @@ const transformedExperts = expert.expert_experiences?.length
       source_of_response:expert.source_of_response,
       notes:expert.notes,
       project: expert.projects,
+      screening:expert.screening,
       ...exp,
       company: exp.company,
       target_company: exp.target_company ? { id: exp.target_company.id, name: exp.target_company.name } : null,
@@ -285,7 +285,7 @@ const transformedExperts = expert.expert_experiences?.length
       linkedin: expert.linkedin,
       phone: expert.phone,
       tags:expert.tags,
-      original_quote: expert.original_quote,
+      original_quote: Number(expert.original_quote),
       createdAt: expert.createdAt,
       updatedAt: expert.updatedAt,
     }];
@@ -360,8 +360,9 @@ async indexExpertsToAlgoliaAll() {
       notes:expert.notes,
       linkedin: expert.linkedin,
       phone: expert.phone,
-      original_quote: expert.original_quote,
+      original_quote: Number(expert.original_quote),
       project:expert.projects,
+      screening:expert.screening,
 
       // spread all fields from experience (so you keep createdAt, updatedAt, etc.)
       ...exp,
@@ -463,8 +464,9 @@ async indexExpertsToAlgoliaAll() {
       notes:expert.notes,
       linkedin: expert.linkedin,
       phone: expert.phone,
-      original_quote: expert.original_quote,
+      original_quote: Number(expert.original_quote),
       project:expert.projects,
+      screening:expert.screening,
 
       // spread all fields from experience (so you keep createdAt, updatedAt, etc.)
       ...exp,
@@ -522,455 +524,703 @@ async indexExpertsToAlgoliaAll() {
 
 
 
-   async processExpertFileInBackground(fileId,uploaderEmail,topic) {
-    try {
+  //  async processExpertFileInBackground(fileId,uploaderEmail,topic) {
+  //   try {
 
-      const file = await strapi.entityService.findOne('plugin::upload.file', fileId);
+  //     const file = await strapi.entityService.findOne('plugin::upload.file', fileId);
 
-      if (!file) throw new Error('Uploaded file not found in Media Library');
+  //     if (!file) throw new Error('Uploaded file not found in Media Library');
 
-      //console.log(file);
+  //     //console.log(file);
 
-       let buffer;
+  //      let buffer;
 
-      if (file.provider === 'local') {
-        // Local provider
-        const localPath = `public${file.url}`;
-        buffer = fs.readFileSync(localPath);
-      } else {
-        // Remote provider (Supabase, S3, etc.)
-        const response = await axios.get(file.url, { responseType: 'arraybuffer' });
-        buffer = Buffer.from(response.data);
-      }
+  //     if (file.provider === 'local') {
+  //       // Local provider
+  //       const localPath = `public${file.url}`;
+  //       buffer = fs.readFileSync(localPath);
+  //     } else {
+  //       // Remote provider (Supabase, S3, etc.)
+  //       const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+  //       buffer = Buffer.from(response.data);
+  //     }
 
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
+  //     const workbook = XLSX.read(buffer, { type: 'buffer' });
 
-      //const workbook = XLSX.readFile(filePath);
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData = XLSX.utils.sheet_to_json(sheet);
-      const data = rawData.map(remapRow);
+  //     //const workbook = XLSX.readFile(filePath);
+  //     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  //     const rawData = XLSX.utils.sheet_to_json(sheet);
+  //     const data = rawData.map(remapRow);
 
-      //console.log(uploaderEmail);
+  //     //console.log(uploaderEmail);
 
-      const errors = [];
+  //     const errors = [];
 
-      //checking errors
-      data.forEach((row, index) => {
-        const { Name, LinkedIn, Type, source_of_response, Designation, CompanyName, status,industry,SheetName } = row;
+  //     //checking errors
+  //     data.forEach((row, index) => {
+  //       const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status,industry,SheetName } = row;
 
-        if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
-        if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
-        if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
-        if (!Type || !TYPE_ENUM.includes(Type.trim())) {
-          errors.push(`Row ${index + 2}: Invalid Type (Allowed: ${TYPE_ENUM.join(', ')})`);
-        }
+  //       if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
+  //       if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
+  //       if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
+  //       if (!Type || !TYPE_ENUM.includes(Type.trim())) {
+  //         errors.push(`Row ${index + 2}: Invalid Type (Allowed: ${TYPE_ENUM.join(', ')})`);
+  //       }
 
-        // ✅ Validate Engagement Status
-        if (status && !ENGAGEMENT_ENUM.includes(status.trim())) {
-          errors.push(`Row ${index + 2}: Invalid status (Allowed: ${ENGAGEMENT_ENUM.join(', ')})`);
-        }
-        if (source_of_response && !SOR.includes(source_of_response.trim())) {
-          errors.push(`Row ${index + 2}: Invalid source of response`);
-        }
-        if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
-        if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
-        if(!industry) error.push(`Row ${index + 2}: Industry is missing`)
-      });
+  //       // ✅ Validate Engagement Status
+  //       if (status && !ENGAGEMENT_ENUM.includes(status.trim())) {
+  //         errors.push(`Row ${index + 2}: Invalid status (Allowed: ${ENGAGEMENT_ENUM.join(', ')})`);
+  //       }
+  //       if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) {
+  //         errors.push(`Row ${index + 2}: Invalid source of response`);
+  //       }
+  //       if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
+  //       if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
+  //       if(!industry) errors.push(`Row ${index + 2}: Industry is missing`)
+  //     });
 
-      if (errors.length > 0) {
-        await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Upload Failed - Validation Errors',
-          html: `<p>Errors found before processing:</p><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`
-        });
-        //throw new Error('Validation failed.');
-        const err = new Error('Validation failed.');
-        // @ts-ignore
-        err.alreadyNotified = true; // 🔑 avoid duplicate email
-        throw err;
-      }
+  //     if (errors.length > 0) {
+  //       await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Validation Errors',
+  //         html: `<p>Errors found before processing:</p><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`
+  //       });
+  //       //throw new Error('Validation failed.');
+  //       const err = new Error('Validation failed.');
+  //       // @ts-ignore
+  //       err.alreadyNotified = true; // 🔑 avoid duplicate email
+  //       throw err;
+  //     }
 
 
-       // 🔑 Create unique code
-        const timestamp = moment().tz("Asia/Kolkata").format("YYYYMMDD-HHmmss"); 
-        const sanitizedEmail = uploaderEmail.split("@")[0];   // part before @
-        const sanitizedTopic = topic.toLowerCase().replace(/\s+/g, "-");
+  //      // 🔑 Create unique code
+  //       const timestamp = moment().tz("Asia/Kolkata").format("YYYYMMDD-HHmmss"); 
+  //       const sanitizedEmail = uploaderEmail.split("@")[0];   // part before @
+  //       const sanitizedTopic = topic.toLowerCase().replace(/\s+/g, "-");
 
-        const uniqueCode = `${sanitizedTopic}-${sanitizedEmail}-${timestamp}`;
+  //       const uniqueCode = `${sanitizedTopic}-${sanitizedEmail}-${timestamp}`;
         
-       // strapi.log.info(`📌 Upload Code (IST): ${uniqueCode}`);
+  //      // strapi.log.info(`📌 Upload Code (IST): ${uniqueCode}`);
 
-       const linkedinKeys = data.map(row=>normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+  //      const linkedinKeys = data.map(row=>normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
 
-      const allExperts = await strapi.entityService.findMany('api::expert.expert', {
-        fields: ['id', 'linkedin', 'documentId','tags','ra_comments','source_of_response','original_quote','screening','notes'],
-        filters:{linkedin:{$in:linkedinKeys}},
-        limit:linkedinKeys.length,
-      });
+  //     const allExperts = await strapi.entityService.findMany('api::expert.expert', {
+  //       fields: ['id', 'linkedin', 'documentId','tags','ra_comments','source_of_response','original_quote','screening','notes'],
+  //       filters:{linkedin:{$in:linkedinKeys}},
+  //       limit:linkedinKeys.length,
+  //     });
 
     
-      const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
+  //     const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
 
-      const allIndustriesInExcel = new Set();
-      data.forEach(row=>{
-        if(row.industry) allIndustriesInExcel.add(row.industry.trim());
-      });
+  //     const allIndustriesInExcel = new Set();
+  //     data.forEach(row=>{
+  //       if(row.industry) allIndustriesInExcel.add(row.industry.trim());
+  //     });
 
-      const industriesArray = Array.from(allIndustriesInExcel);
+  //     const industriesArray = Array.from(allIndustriesInExcel);
 
-      const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
-        fields: ['id', 'name'],
-        filters:{
-          name:{$in: industriesArray},
-        },
-      });
+  //     const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
+  //       fields: ['id', 'name'],
+  //       filters:{
+  //         name:{$in: industriesArray},
+  //       },
+  //     });
 
-      const industryMap = new Map(allindustries.map(c=>[c.name.trim(),c]));
+  //     const industryMap = new Map(allindustries.map(c=>[c.name.trim(),c]));
 
-      const missingIndustries=[];
-      const existingIndustries=[];
+  //     const missingIndustries=[];
+  //     const existingIndustries=[];
 
-      industriesArray.forEach(name => {
-        if (industryMap.has(name)) {
-          existingIndustries.push(industryMap.get(name));
-        } else {
-          missingIndustries.push(name);
-        }
-      });
-
-
-      //if any company not found
-      if (missingIndustries.length > 0) {
-        console.log('Companies missing in collection:', missingIndustries);
-
-         await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Upload Failed - Missing Companies',
-          html: `
-            <h2>Upload Failed</h2>
-            <p>The following companies from your Excel file are <strong>not present</strong> in the system:</p>
-            <ul>
-              ${missingIndustries.map(c => `<li>${c}</li>`).join('')}
-            </ul>
-            <p>Please add these companies to the collection and try again.</p>
-          `,
-        });
-
-        
-      //throw new Error(`Missing companies`);
-              const err = new Error('Missing SubIndustries');
-            err.alreadyNotified = true; // 🔑 avoid duplicate email
-            throw err;
-        
-      }
+  //     industriesArray.forEach(name => {
+  //       if (industryMap.has(name)) {
+  //         existingIndustries.push(industryMap.get(name));
+  //       } else {
+  //         missingIndustries.push(name);
+  //       }
+  //     });
 
 
+  //     //if any company not found
+  //     if (missingIndustries.length > 0) {
+  //       console.log('SubIndustries missing in collection:', missingIndustries);
 
-      const allCompanyNamesInExcel = new Set();
-      data.forEach(row=>{
-        if(row.TargetCompany) allCompanyNamesInExcel.add(row.TargetCompany.trim());
-      });
-
-      const companyNamesArray = Array.from(allCompanyNamesInExcel);
-      //console.log(companyNamesArray);
-
-      const allCompanies = await strapi.entityService.findMany('api::company.company', {
-        fields: ['id', 'name'],
-        filters:{
-          name:{$in: companyNamesArray},
-        },
-      });
-
-
-
-      //console.log(allCompanies);
-
-      const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
-
-      // 4️⃣ Check missing companies
-      const missingCompanies = [];
-      const existingCompanies = [];
-
-      companyNamesArray.forEach(name => {
-        if (companyMap.has(name)) {
-          existingCompanies.push(companyMap.get(name));
-        } else {
-          missingCompanies.push(name);
-        }
-      });
-
-      //if any company not found
-      if (missingCompanies.length > 0) {
-        console.log('Companies missing in collection:', missingCompanies);
-
-         await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Upload Failed - Missing Companies',
-          html: `
-            <h2>Upload Failed</h2>
-            <p>The following companies from your Excel file are <strong>not present</strong> in the system:</p>
-            <ul>
-              ${missingCompanies.map(c => `<li>${c}</li>`).join('')}
-            </ul>
-            <p>Please add these companies to the collection and try again.</p>
-          `,
-        });
+  //        await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Missing Sub-Industries',
+  //         html: `
+  //           <h2>Upload Failed</h2>
+  //           <p>The following sub-industries from your Excel file are <strong>not present</strong> in the system:</p>
+  //           <ul>
+  //             ${missingIndustries.map(c => `<li>${c}</li>`).join('')}
+  //           </ul>
+  //           <p>Please add these subindustries to the collection and try again.</p>
+  //         `,
+  //       });
 
         
-      //throw new Error(`Missing companies`);
-              const err = new Error('Missing companies');
-            err.alreadyNotified = true; // 🔑 avoid duplicate email
-            throw err;
+  //     //throw new Error(`Missing companies`);
+  //             const err = new Error('Missing SubIndustries');
+  //           err.alreadyNotified = true; // 🔑 avoid duplicate email
+  //           throw err;
         
-      }
+  //     }
 
 
-      const slugify = (str) =>
-        str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+
+  //     const allCompanyNamesInExcel = new Set();
+  //     data.forEach(row=>{
+  //       if(row.TargetCompany) allCompanyNamesInExcel.add(row.TargetCompany.trim());
+  //     });
+
+  //     const companyNamesArray = Array.from(allCompanyNamesInExcel);
+  //     //console.log(companyNamesArray);
+
+  //     const allCompanies = await strapi.entityService.findMany('api::company.company', {
+  //       fields: ['id', 'name'],
+  //       filters:{
+  //         name:{$in: companyNamesArray},
+  //       },
+  //     });
+
+
+
+  //     //console.log(allCompanies);
+
+  //     const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
+
+  //     // 4️⃣ Check missing companies
+  //     const missingCompanies = [];
+  //     const existingCompanies = [];
+
+  //     companyNamesArray.forEach(name => {
+  //       if (companyMap.has(name)) {
+  //         existingCompanies.push(companyMap.get(name));
+  //       } else {
+  //         missingCompanies.push(name);
+  //       }
+  //     });
+
+  //     //if any company not found
+  //     if (missingCompanies.length > 0) {
+  //       console.log('Companies missing in collection:', missingCompanies);
+
+  //        await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Missing Companies',
+  //         html: `
+  //           <h2>Upload Failed</h2>
+  //           <p>The following companies from your Excel file are <strong>not present</strong> in the system:</p>
+  //           <ul>
+  //             ${missingCompanies.map(c => `<li>${c}</li>`).join('')}
+  //           </ul>
+  //           <p>Please add these companies to the collection and try again.</p>
+  //         `,
+  //       });
+
+        
+  //     //throw new Error(`Missing companies`);
+  //             const err = new Error('Missing companies');
+  //           err.alreadyNotified = true; // 🔑 avoid duplicate email
+  //           throw err;
+        
+  //     }
+
+
+  //     const slugify = (str) =>
+  //       str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
     
 
 
-      let created = 0;
-      let updated = 0;
+  //     let created = 0;
+  //     let updated = 0;
 
-      const sheetNamesSet = new Set();
+  //     const sheetNamesSet = new Set();
 
-      // Atomic DB Transaction
-      await strapi.db.transaction(async ({ trx }) => {
-        for (let index = 0; index < data.length; index++) {
-          const row = data[index];
-          try {
-            const {
-              SheetName,
-              CompanyName,
-              LinkedIn,
-              Start,
-              End,
-              TargetCompany,
-              Name,
-              Type,
-              Designation,
-              Tags,
-              Comments,
-              original_quote,
-              negotiatedquote,
-              sourceofresponse,
-              screening,
-              notes,
-              status,
-              Phone,
-              originalquote,
-              Email,
-              industry,
-            } = row;
+  //     // Atomic DB Transaction
+  //     await strapi.db.transaction(async ({ trx }) => {
+  //       for (let index = 0; index < data.length; index++) {
+  //         const row = data[index];
+  //         try {
+  //           const {
+  //             SheetName,
+  //             CompanyName,
+  //             LinkedIn,
+  //             Start,
+  //             End,
+  //             TargetCompany,
+  //             Name,
+  //             Type,
+  //             Designation,
+  //             Tags,
+  //             Comments,
+  //             negotiatedquote,
+  //             sourceofresponse,
+  //             screening,
+  //             notes,
+  //             status,
+  //             Phone,
+  //             originalquote,
+  //             Email,
+  //             industry,
+  //           } = row;
 
-            if (SheetName) sheetNamesSet.add(SheetName.trim());
+  //           if (SheetName) sheetNamesSet.add(SheetName.trim());
 
-          const parseTags = Tags =>
-            String(Tags || '')
-            .split(',')
-            .map(t => t.trim())
-            .filter(Boolean);
+  //         const parseTags = Tags =>
+  //           String(Tags || '')
+  //           .split(',')
+  //           .map(t => t.trim())
+  //           .filter(Boolean);
 
-            if (!Name || !LinkedIn) continue;
+  //           if (!Name || !LinkedIn) continue;
 
-            const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Date.now()}`);
-            const linkedinKey = normalizeLinkedIn(LinkedIn);
-            let expert = expertMap.get(linkedinKey);
-            const company = CompanyName?.trim();
-            const targetCompany = companyMap.get(TargetCompany?.trim());
-            const foundindustry = industryMap.get(industry?.trim());
-            const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
+  //           const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Date.now()}`);
+  //           const linkedinKey = normalizeLinkedIn(LinkedIn);
+  //           let expert = expertMap.get(linkedinKey);
+  //           const company = CompanyName?.trim();
+  //           const targetCompany = companyMap.get(TargetCompany?.trim());
+  //           const foundindustry = industryMap.get(industry?.trim());
+  //           const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
 
-            if (expert) {
+  //           if (expert) {
 
-               let updateData = {};
+  //              let updateData = {};
 
-               if (Tags) {
-              const newTags = parseTags(Tags);
-              updateData.tags = [...new Set([...(expert.tags || []), ...newTags])];
-              }
+  //              if (Tags) {
+  //             const newTags = parseTags(Tags);
+  //             updateData.tags = [...new Set([...(expert.tags || []), ...newTags])];
+  //             }
 
-              // Only update comments if Excel has comments
-                if (Comments) {
-              updateData.ra_comments = [Comments, expert.ra_comments]
-              .filter(Boolean)
-              .join('\n');
-              }
+  //             // Only update comments if Excel has comments
+  //               if (Comments) {
+  //             updateData.ra_comments = [Comments, expert.ra_comments]
+  //             .filter(Boolean)
+  //             .join('\n');
+  //             }
 
-              if(original_quote){
-              updateData.original_quote=original_quote;
-              }
+  //             if(originalquote){
+  //             updateData.original_quote=originalquote;
+  //             }
 
-              if(sourceofresponse)
-              {
-                updateData.source_of_response=sourceofresponse.trim();
-              }
+  //             if(sourceofresponse)
+  //             {
+  //               updateData.source_of_response=sourceofresponse.trim();
+  //             }
 
-              if(screening)
-              {
-                const prevScreening = expert.screening ? String(expert.screening) : "";
+  //             if(screening)
+  //             {
+  //               const prevScreening = expert.screening ? String(expert.screening) : "";
 
-                  updateData.screening = [screening?.trim(), prevScreening]
-                .filter(Boolean) // remove empty values
-                .join("\n");     // newline-separated
-              }
+  //                 updateData.screening = [screening?.trim(), prevScreening]
+  //               .filter(Boolean) // remove empty values
+  //               .join("\n");     // newline-separated
+  //             }
 
-              if(notes)
-              {
-                const prevNotes = expert.notes ? String(expert.notes) : "";
+  //             if(notes)
+  //             {
+  //               const prevNotes = expert.notes ? String(expert.notes) : "";
 
-                  updateData.notes = [notes?.trim(), prevNotes]
-                .filter(Boolean) // remove empty values
-                .join("\n");     // newline-separated
-              }
+  //                 updateData.notes = [notes?.trim(), prevNotes]
+  //               .filter(Boolean) // remove empty values
+  //               .join("\n");     // newline-separated
+  //             }
 
-                // 👉 persist tags/comments if present
-              if (Object.keys(updateData).length > 0) {
-                await strapi.documents('api::expert.expert').update({
-                    documentId: expert.documentId,
-                    data: updateData,
-                    status: 'published',   // publish in one go
-                    trx,
-                  });
-              }
+  //               // 👉 persist tags/comments if present
+  //             if (Object.keys(updateData).length > 0) {
+  //               await strapi.documents('api::expert.expert').update({
+  //                   documentId: expert.documentId,
+  //                   data: updateData,
+  //                   status: 'published',   // publish in one go
+  //                   trx,
+  //                 });
+  //             }
 
-              await strapi.entityService.create('api::experience.experience', {
-                data: {
-                  exp_slug: expSlug,
-                  type: Type,
-                  designation: Designation,
-                  start_date: parseExcelDate(Start),
-                  end_date: parseExcelDate(End),
-                  upload_file_details: SheetName,
-                  company: company,
-                  target_company: targetCompany?.documentId || null,
-                  expert: expert.documentId,
-                  quote:negotiatedquote,
-                  engagement_status:
-                     status && ENGAGEMENT_ENUM.includes(status.trim())
-                    ? status.trim()
-                    : "Uncontacted",
-                  sub_industry:foundindustry?.documentId||null,
-                },
-                trx,
-              });
+  //             await strapi.entityService.create('api::experience.experience', {
+  //               data: {
+  //                 exp_slug: expSlug,
+  //                 type: Type,
+  //                 designation: Designation,
+  //                 start_date: parseExcelDate(Start),
+  //                 end_date: parseExcelDate(End),
+  //                 upload_file_details: SheetName,
+  //                 company: company,
+  //                 target_company: targetCompany?.documentId || null,
+  //                 expert: expert.documentId,
+  //                 quote:negotiatedquote,
+  //                 engagement_status:
+  //                    status && ENGAGEMENT_ENUM.includes(status.trim())
+  //                   ? status.trim()
+  //                   : "Uncontacted",
+  //                 sub_industry:foundindustry?.documentId||null,
+  //               },
+  //               trx,
+  //             });
 
-              updated++;
-            } else {
+  //             updated++;
+  //           } else {
 
-              const newExpert = await strapi.entityService.create('api::expert.expert', {
-                data: {
-                  name: Name,
-                  linkedin: LinkedIn,
-                  phone:String(Phone || '').trim(),
-                  slug,
-                  email:Email,
-                  companies: targetCompany?.id,
-                  tags: parseTags(Tags),
-                  ra_comments:Comments||null,
-                  original_quote:originalquote,
-                  source_of_response:sourceofresponse ? sourceofresponse.trim() : null,
-                  expert_status:                     
-                  status && ENGAGEMENT_ENUM.includes(status.trim())
-                    ? status.trim()
-                    : "Uncontacted",
-                  screening: screening? screening.trim():"",
-                  notes:notes? notes.trim():"",
-                },
-                trx,
-              });
+  //             const newExpert = await strapi.entityService.create('api::expert.expert', {
+  //               data: {
+  //                 name: Name,
+  //                 linkedin: LinkedIn,
+  //                 phone:String(Phone || '').trim(),
+  //                 slug,
+  //                 email:Email,
+  //                 companies: targetCompany?.documentId || null,
+  //                 tags: parseTags(Tags),
+  //                 ra_comments:Comments||null,
+  //                 original_quote:originalquote,
+  //                 source_of_response:sourceofresponse ? sourceofresponse.trim() : null,
+  //                 expert_status:                     
+  //                 status && ENGAGEMENT_ENUM.includes(status.trim())
+  //                   ? status.trim()
+  //                   : "Uncontacted",
+  //                 screening: screening? screening.trim():"",
+  //                 notes:notes? notes.trim():"",
+  //               },
+  //               trx,
+  //             });
 
-              expertMap.set(linkedinKey, newExpert);
+  //             expertMap.set(linkedinKey, newExpert);
 
-              await strapi.entityService.create('api::experience.experience', {
-                data: {
-                  exp_slug: expSlug,
-                  type: Type,
-                  designation: Designation,
-                  start_date: parseExcelDate(Start),
-                  end_date: parseExcelDate(End),
-                  upload_file_details: SheetName,
-                  company: company,
-                  target_company: targetCompany?.id || null,
-                  quote:negotiatedquote,
-                  engagement_status:
-                     status && ENGAGEMENT_ENUM.includes(status.trim())
-                    ? status.trim()
-                    : "Uncontacted",
-                  expert: newExpert.documentId,
-                  sub_industry:foundindustry?.documentId||null,
-                },
-                trx,
-              });
+  //             await strapi.entityService.create('api::experience.experience', {
+  //               data: {
+  //                 exp_slug: expSlug,
+  //                 type: Type,
+  //                 designation: Designation,
+  //                 start_date: parseExcelDate(Start),
+  //                 end_date: parseExcelDate(End),
+  //                 upload_file_details: SheetName,
+  //                 company: company,
+  //                 target_company: targetCompany?.id || null,
+  //                 quote:negotiatedquote,
+  //                 engagement_status:
+  //                    status && ENGAGEMENT_ENUM.includes(status.trim())
+  //                   ? status.trim()
+  //                   : "Uncontacted",
+  //                 expert: newExpert.documentId,
+  //                 sub_industry:foundindustry?.documentId||null,
+  //               },
+  //               trx,
+  //             });
 
-              created++;
-            }
-          } catch (err) {
-            console.error(`❌ Error at row ${index + 2}:`, row);
-            throw err; // triggers rollback
-          }
-        }
-      });
+  //             created++;
+  //           }
+  //         } catch (err) {
+  //           console.error(`❌ Error at row ${index + 2}:`, row);
+  //           throw err; // triggers rollback
+  //         }
+  //       }
+  //     });
 
-      const affectedExpertIds = Array.from(expertMap.values()).map(e => e.id);
+  //     const affectedExpertIds = Array.from(expertMap.values()).map(e => e.id);
 
      
 
-      // Trigger Algolia reindex
-      // await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
+  //     // Trigger Algolia reindex
+  //     // await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
 
-      setTimeout(async () => {
-        try {
-          await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
-          strapi.log.info('✅ Background algolia indexing completed.');
-        } catch (err) {
-          strapi.log.error('❌ Background algolia indexin failed:', err);
-        }
-      }, 0);
+  //     setTimeout(async () => {
+  //       try {
+  //         await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
+  //         strapi.log.info('✅ Background algolia indexing completed.');
+  //       } catch (err) {
+  //         strapi.log.error('❌ Background algolia indexin failed:', err);
+  //       }
+  //     }, 0);
 
-      const sheetNamesList = Array.from(sheetNamesSet);
+  //     const sheetNamesList = Array.from(sheetNamesSet);
 
-      const sheetNamesHtml = sheetNamesList.length
-  ? `<p><strong>Sheet Names Found:</strong></p>
-     <ul>${sheetNamesList.map(name => `<li>${name}</li>`).join('')}</ul>`
-  : `<p><em>No sheet names detected in rows.</em></p>`;
+  //     const sheetNamesHtml = sheetNamesList.length
+  // ? `<p><strong>Sheet Names Found:</strong></p>
+  //    <ul>${sheetNamesList.map(name => `<li>${name}</li>`).join('')}</ul>`
+  // : `<p><em>No sheet names detected in rows.</em></p>`;
 
+  //     await strapi.plugin('email').service('email').send({
+  //     to: uploaderEmail,
+  //     subject: 'Expert Upload Result',
+  //     html: `
+  //       <h2>Upload Completed</h2>
+  //       <p>Your Excel file has been processed successfully.</p>
+  //       <ul>
+  //         <li>✅ Experts Created: ${created}</li>
+  //         <li>🔄 Experts Updated: ${updated}</li>
+  //       </ul>
+  //       ${sheetNamesHtml}
+  //       <p>If you notice any errors, please recheck your file.</p>
+  //     `,
+  //   });
+
+  //     strapi.log.info(`✅ Processing Completed. Created: ${created}, Updated: ${updated}`);
+
+  //   } catch (error) {
+  //     console.error('❌ Background Processing Error:', error);
+
+  //      if (!error.alreadyNotified) {
+  //     await strapi.plugin('email').service('email').send({
+  //       to: uploaderEmail,
+  //       subject: 'Expert Upload Failed',
+  //       html: `
+  //         <h2>Upload Failed</h2>
+  //         <p>We were unable to process your Excel file.</p>
+  //         <p><strong>Error:</strong> ${error.stack}</p>
+  //         <p>Please fix the file and try again.</p>
+  //       `,
+  //     });
+  //   }
+  //   } finally{
+  //     await strapi.service('api::upload-lock.upload-lock').releaseLock();
+  //   }
+  // },
+
+    async processExpertFileInBackground(fileId, uploaderEmail, topic) {
+  try {
+    const file = await strapi.entityService.findOne('plugin::upload.file', fileId);
+    if (!file) throw new Error('Uploaded file not found in Media Library');
+
+    let buffer;
+    if (file.provider === 'local') {
+      const localPath = `public${file.url}`;
+      buffer = fs.readFileSync(localPath);
+    } else {
+      const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+      buffer = Buffer.from(response.data);
+    }
+
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rawData = XLSX.utils.sheet_to_json(sheet);
+    const data = rawData.map(remapRow);
+
+    // Basic validations
+    const errors = [];
+    data.forEach((row, index) => {
+      const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName } = row;
+      if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
+      if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
+      if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
+      if (!Type || !TYPE_ENUM.includes(Type.trim())) errors.push(`Row ${index + 2}: Invalid Type`);
+      if (status && !ENGAGEMENT_ENUM.includes(status.trim())) errors.push(`Row ${index + 2}: Invalid status`);
+      if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
+      if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
+      if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
+      if (!industry) errors.push(`Row ${index + 2}: Industry is missing`);
+    });
+
+    if (errors.length > 0) {
       await strapi.plugin('email').service('email').send({
+        to: uploaderEmail,
+        subject: 'Upload Failed - Validation Errors',
+        html: `<p>Errors found before processing:</p><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`
+      });
+      const err = new Error('Validation failed.');
+      err.alreadyNotified = true;
+      throw err;
+    }
+
+    const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+    const allExperts = await strapi.entityService.findMany('api::expert.expert', {
+      fields: ['id', 'linkedin', 'documentId','tags','ra_comments','source_of_response','original_quote','screening','notes'],
+      filters: { linkedin: { $in: linkedinKeys } },
+      limit: linkedinKeys.length,
+    });
+    const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
+
+    const industriesArray = Array.from(new Set(data.map(r => r.industry?.trim()).filter(Boolean)));
+    const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
+      fields: ['id', 'name'],
+      filters: { name: { $in: industriesArray } },
+    });
+    const industryMap = new Map(allindustries.map(c => [c.name.trim(), c]));
+    const missingIndustries = industriesArray.filter(name => !industryMap.has(name));
+    if (missingIndustries.length > 0) {
+      await strapi.plugin('email').service('email').send({
+        to: uploaderEmail,
+        subject: 'Upload Failed - Missing Sub-Industries',
+        html: `<h2>Upload Failed</h2><p>Missing sub-industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
+      });
+      const err = new Error('Missing SubIndustries');
+      err.alreadyNotified = true;
+      throw err;
+    }
+
+    const companyNamesArray = Array.from(new Set(data.map(r => r.TargetCompany?.trim()).filter(Boolean)));
+    const allCompanies = await strapi.entityService.findMany('api::company.company', {
+      fields: ['id', 'name'],
+      filters: { name: { $in: companyNamesArray } },
+    });
+    const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
+    const missingCompanies = companyNamesArray.filter(name => !companyMap.has(name));
+    if (missingCompanies.length > 0) {
+      await strapi.plugin('email').service('email').send({
+        to: uploaderEmail,
+        subject: 'Upload Failed - Missing Companies',
+        html: `<h2>Upload Failed</h2><p>Missing companies:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
+      });
+      const err = new Error('Missing Companies');
+      err.alreadyNotified = true;
+      throw err;
+    }
+
+    const slugify = str => str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+    let created = 0, updated = 0;
+    const rowErrors = [];
+    const sheetNamesSet = new Set();
+
+    // 🔑 Process each row atomically
+    for (let index = 0; index < data.length; index++) {
+      const row = data[index];
+      try {
+        await strapi.db.transaction(async ({ trx }) => {
+          const { SheetName, CompanyName, LinkedIn, Start, End, TargetCompany, Name, Type, Designation, Tags, Comments, negotiatedquote, sourceofresponse, screening, notes, status, Phone, originalquote, Email, industry } = row;
+
+          if (SheetName) sheetNamesSet.add(SheetName.trim());
+
+          if (!Name || !LinkedIn) throw new Error("Name or LinkedIn missing");
+
+          const linkedinKey = normalizeLinkedIn(LinkedIn);
+          let expert = expertMap.get(linkedinKey);
+          const targetCompany = companyMap.get(TargetCompany?.trim());
+          const foundIndustry = industryMap.get(industry?.trim());
+          const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
+
+          const parseTags = Tags => String(Tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
+          if (expert) {
+            let updateData = {};
+            if (Tags) updateData.tags = [...new Set([...(expert.tags || []), ...parseTags(Tags)])];
+            if (Comments) updateData.ra_comments = [Comments, expert.ra_comments].filter(Boolean).join('\n');
+            if (originalquote) updateData.original_quote = originalquote;
+            if (sourceofresponse) updateData.source_of_response = sourceofresponse?.trim();
+            if (screening) updateData.screening = [screening?.trim(), expert.screening || ''].filter(Boolean).join('\n');
+            if (notes) updateData.notes = [notes?.trim(), expert.notes || ''].filter(Boolean).join('\n');
+
+            if (Object.keys(updateData).length > 0) {
+              await strapi.documents('api::expert.expert').update({
+                documentId: expert.documentId,
+                data: updateData,
+                status: 'published',
+                trx,
+              });
+            }
+
+            await strapi.entityService.create('api::experience.experience', {
+              data: {
+                exp_slug: expSlug,
+                type: Type,
+                designation: Designation,
+                start_date: parseExcelDate(Start),
+                end_date: parseExcelDate(End),
+                upload_file_details: SheetName,
+                company: CompanyName,
+                target_company: targetCompany?.documentId || null,
+                expert: expert.documentId,
+                quote: negotiatedquote,
+                engagement_status: status?.trim() || 'Uncontacted',
+                sub_industry: foundIndustry?.documentId || null,
+              },
+              trx,
+            });
+
+            updated++;
+          } else {
+            const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Date.now()}`);
+            const newExpert = await strapi.entityService.create('api::expert.expert', {
+              data: {
+                name: Name,
+                linkedin: LinkedIn,
+                phone: String(Phone || '').trim(),
+                slug,
+                email: Email,
+                companies: targetCompany?.documentId || null,
+                tags: parseTags(Tags),
+                ra_comments: Comments || null,
+                original_quote: originalquote,
+                source_of_response: sourceofresponse?.trim() || null,
+                expert_status: status?.trim() || 'Uncontacted',
+                screening: screening?.trim() || '',
+                notes: notes?.trim() || '',
+              },
+              trx,
+            });
+
+            expertMap.set(linkedinKey, newExpert);
+
+            await strapi.entityService.create('api::experience.experience', {
+              data: {
+                exp_slug: expSlug,
+                type: Type,
+                designation: Designation,
+                start_date: parseExcelDate(Start),
+                end_date: parseExcelDate(End),
+                upload_file_details: SheetName,
+                company: CompanyName,
+                target_company: targetCompany?.documentId || null,
+                quote: negotiatedquote,
+                engagement_status: status || 'Uncontacted',
+                expert: newExpert.documentId,
+                sub_industry: foundIndustry?.documentId || null,
+              },
+              trx,
+            });
+
+            created++;
+          }
+        });
+      } catch (err) {
+        console.error(`❌ Error at row ${index + 2}:`, err);
+        rowErrors.push(`Row ${index + 2}: ${err.message}`);
+        continue; // move to next row
+      }
+    }
+
+    const affectedExpertIds = Array.from(expertMap.values()).map(e => e.id);
+
+    // Trigger Algolia reindex in background
+    setTimeout(async () => {
+      try {
+        await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
+        strapi.log.info('✅ Background algolia indexing completed.');
+      } catch (err) {
+        strapi.log.error('❌ Background algolia indexing failed:', err);
+      }
+    }, 0);
+
+    const sheetNamesList = Array.from(sheetNamesSet);
+    const sheetNamesHtml = sheetNamesList.length
+      ? `<p><strong>Sheet Names Found:</strong></p><ul>${sheetNamesList.map(name => `<li>${name}</li>`).join('')}</ul>`
+      : `<p><em>No sheet names detected in rows.</em></p>`;
+
+    await strapi.plugin('email').service('email').send({
       to: uploaderEmail,
-      subject: 'Expert Upload Result',
+      subject: `Expert Upload Result ${rowErrors.length > 0 ? '⚠️ - Errors Found' : ''}`,
       html: `
         <h2>Upload Completed</h2>
-        <p>Your Excel file has been processed successfully.</p>
         <ul>
           <li>✅ Experts Created: ${created}</li>
           <li>🔄 Experts Updated: ${updated}</li>
         </ul>
+        ${rowErrors.length > 0 ? `<p>⚠️ Errors:</p><ul>${rowErrors.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
         ${sheetNamesHtml}
-        <p>If you notice any errors, please recheck your file.</p>
       `,
     });
 
-      strapi.log.info(`✅ Processing Completed. Created: ${created}, Updated: ${updated}`);
-
-    } catch (error) {
-      console.error('❌ Background Processing Error:', error);
-
-       if (!error.alreadyNotified) {
+    strapi.log.info(`✅ Processing Completed. Created: ${created}, Updated: ${updated}`);
+  } catch (error) {
+    console.error('❌ Background Processing Error:', error);
+    if (!error.alreadyNotified) {
       await strapi.plugin('email').service('email').send({
         to: uploaderEmail,
         subject: 'Expert Upload Failed',
-        html: `
-          <h2>Upload Failed</h2>
-          <p>We were unable to process your Excel file.</p>
-          <p><strong>Error:</strong> ${error.stack}</p>
-          <p>Please fix the file and try again.</p>
-        `,
+        html: `<h2>Upload Failed</h2><p>Error: ${error.stack}</p>`
       });
     }
-    } finally{
-      await strapi.service('api::upload-lock.upload-lock').releaseLock();
-    }
-  },
+  } finally {
+    await strapi.service('api::upload-lock.upload-lock').releaseLock();
+  }
+}
+
+
 });

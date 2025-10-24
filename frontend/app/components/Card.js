@@ -26,6 +26,8 @@ export default function Card({ hits, onSelectSlug }) {
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, slug: null });
   const menuRef = useRef();
 
+  console.log(hits);
+
   // Hide menu on click elsewhere
   useEffect(() => {
     const handleClick = () => setMenu({ visible: false, x: 0, y: 0, slug: null });
@@ -71,14 +73,21 @@ export default function Card({ hits, onSelectSlug }) {
 
         {/* Table Body */}
         <tbody className="divide-y divide-gray-200">
-          {(status === 'loading' || hits.length === 0) ? (
+          {status === 'loading' ? (
             <tr>
               <td colSpan={9} className="py-10 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
                 <p className="text-gray-500 mt-2">Loading experts...</p>
               </td>
             </tr>
-          ) : (
+          ) : hits.length === 0 ? (
+          <tr>
+            <td colSpan={9} className="py-10 text-center text-gray-500">
+              No experts found.
+            </td>
+          </tr>
+        ) :
+          (
             hits.map((hit) => (
               <tr
                 key={hit.objectID}
@@ -106,7 +115,7 @@ export default function Card({ hits, onSelectSlug }) {
                     rel="noopener noreferrer"
                     className="hover:underline text-blue-600 font-medium"
                   >
-                    <Highlight attribute="name" hit={hit} title={hit?.name}/>
+                    {hit?.name}
                   </a>
                 </td>
 

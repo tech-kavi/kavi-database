@@ -7,7 +7,20 @@ import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure,
 import Card from '../components/Card';
 import ExpertSidePanel from '../components/ExpertSidePanel';
 import Head from 'next/head';
+import { useIndex } from '../components/Providers';
+import { ChevronDown } from "lucide-react";
 
+const ATTRIBUTE_OPTIONS = [
+  { label: "All", value: null },
+  { label: "Name", value: ["name"] },
+  { label: "Designation", value: ["designation"] },
+  { label: "Company", value: ["company"] },
+  { label: "Target Company", value: ["target_company.name"] },
+  { label: "Notes", value: ["notes"] },
+  { label: "Screening", value: ["screening"] },
+  { label: "Email", value: ["email"] },
+  { label: "Phone", value: ["phone"] },
+];
 
 function StatsHeader() {
   const { nbHits } = useStats();
@@ -83,6 +96,61 @@ function EndDateFilter({ attribute }) {
   );
 }
 
+function OriginalQuoteFilter({ attribute }) {
+  const { start, range, refine } = useRange({ attribute });
+  const [min, setMin] = useState('');
+  const [max, setMax] = useState('');
+
+  const handleChange = (type, value) => {
+    if (type === 'min') setMin(value);
+    else setMax(value);
+
+    // convert input to number, fallback to undefined
+    const newMin = type === 'min' ? Number(value) : start[0] ?? 0;
+    const newMax = type === 'max' ? Number(value) : start[1] ?? undefined;
+
+    // refine range
+    refine([
+      Number.isFinite(newMin) ? newMin : 0,
+      Number.isFinite(newMax) ? newMax : undefined,
+    ]);
+  };
+
+  const handleReset = () => {
+    setMin('');
+    setMax('');
+    refine([0, undefined]);
+  };
+
+  return (
+    <div className="space-y-1 w-full"> {/* match max width like EndDateFilter */}
+      <div className="flex justify-between items-center text-sm font-semibold text-gray-700">
+        <span>Original Quote Range</span>
+        <button onClick={handleReset} className="text-xs text-blue-600 hover:underline">
+          Reset
+        </button>
+      </div>
+      <div className="flex gap-2 w-full">
+        <input
+          type="number"
+          value={min}
+          onChange={(e) => handleChange('min', e.target.value)}
+          placeholder={range.min}
+          className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400 max-w-[150px]"
+        />
+        <input
+          type="number"
+          value={max}
+          onChange={(e) => handleChange('max', e.target.value)}
+          placeholder={range.max}
+          className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm shadow-sm focus:ring-1 focus:ring-blue-400 max-w-[150px]"
+        />
+      </div>
+    </div>
+  );
+}
+
+
 
 
 function DropdownFilters({ open, setOpen,setSelectedSlug }) {
@@ -128,6 +196,29 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs',
               }}
             />
+
+            <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Expert Status</h3>
+            <RefinementList
+              attribute="expert_status"
+              searchable={true}
+              searchablePlaceholder="Search status..."
+              limit={10}
+              classNames={{
+                root: 'w-full',
+                searchBox: 'mb-2',
+                searchBoxForm: 'flex rounded-md overflow-hidden border border-gray-300 shadow-sm',
+                searchBoxInput: 'flex-grow px-2 py-1 focus:outline-none text-sm',
+                searchBoxSubmit: 'hidden',
+                searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
+                searchBoxResetIcon: 'w-3 h-3',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
+                item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
+                checkbox: 'form-checkbox h-4 w-4 text-blue-600',
+                label: 'flex items-center gap-2 cursor-pointer',
+                labelText: 'flex-1',
+                count: 'text-gray-500 text-xs ml-2',
+              }}
+            />
           
           
 
@@ -147,7 +238,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-36 overflow-y-auto',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -173,7 +264,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-36 overflow-y-auto',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -199,7 +290,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-36 overflow-y-auto',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -224,7 +315,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-36 overflow-y-auto',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -252,7 +343,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 searchBoxSubmit: 'hidden',
                 searchBoxReset: 'px-2 text-gray-400 hover:text-gray-600 cursor-pointer',
                 searchBoxResetIcon: 'w-3 h-3',
-                list: 'space-y-1 max-h-36 overflow-y-auto',
+                list: 'space-y-1 max-h-48 overflow-y-auto',
                 item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
                 checkbox: 'form-checkbox h-4 w-4 text-blue-600',
                 label: 'flex items-center gap-2 cursor-pointer',
@@ -266,6 +357,10 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
           <CustomRangeInput attribute="start_date_ts" />
 
           <EndDateFilter attribute="end_date_ts" />
+
+          <OriginalQuoteFilter attribute="original_quote" />
+
+          
 
 
           
@@ -282,12 +377,79 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
 
 
 
+function IndexSwitcher({ switchIndex }) {
+  const [open, setOpen] = useState(false);
+  const { indexName } = useIndex(); // get current index from context
+  
+  const dropdownRef = useRef();
+  const { instantSearchInstance } = useInstantSearch();
+
+  const options = [
+    { label: "Full", value: "development_api::expert.expert" },
+    { label: "Screening", value: "expert_screening" },
+  ];
+
+    // derive label from current index
+  const selectedLabel = options.find(opt => opt.value === indexName)?.label || "Full Search";
+
+  const handleSelect = (option) => {
+    switchIndex(option.value);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
+      >
+        {selectedLabel}
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleSelect(opt)}
+              className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                selectedLabel === opt.label ? "bg-gray-50 font-semibold" : ""
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
 
 
 export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
   const { hits } = useHits();
   const [selectedSlug, setSelectedSlug] = useState(null);
+  const [searchAttributes, setSearchAttributes] = useState(null); // null = search all
+
+  const { switchIndex } = useIndex();
 
   const tableRef = useRef(null); // ref for table/Card
   const panelRef = useRef(null); // optional, ref for panel itself
@@ -323,7 +485,25 @@ export default function Search() {
           }}
         />
 
+        <select
+        className="border px-2 py-1 rounded"
+        onChange={(e) => {
+          const selected = ATTRIBUTE_OPTIONS.find(opt => opt.label === e.target.value);
+          setSearchAttributes(selected?.value ?? null);
+        }}
+      >
+        {ATTRIBUTE_OPTIONS.map(opt => (
+          <option key={opt.label} value={opt.label}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+        
+
         <div className="flex flex-row items-center gap-3 ml-auto">
+
+          <IndexSwitcher switchIndex={switchIndex} />
+
           <SortBy
             items={[
               { label: 'Latest', value: 'development_api::expert.expert' },
@@ -343,6 +523,7 @@ export default function Search() {
 
       <Configure 
          hitsPerPage={20}
+         {...(searchAttributes ? { restrictSearchableAttributes: searchAttributes } : {})}
       />
 
       <div className="flex-1">

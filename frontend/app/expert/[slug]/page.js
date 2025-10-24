@@ -17,6 +17,7 @@ import Head from 'next/head';
 import toast from 'react-hot-toast';
 
 
+
 const getTypeClass = (type) => {
   switch (type?.toLowerCase()) {
     case 'current': return 'bg-green-100 text-green-800';
@@ -25,6 +26,8 @@ const getTypeClass = (type) => {
     default: return 'bg-blue-100 text-blue-800';
   }
 };
+
+
 
 export default function ExpertPage() {
 
@@ -68,6 +71,7 @@ export default function ExpertPage() {
       );
       const data = res.data.data[0];
       setExpert(data);
+      console.log(data);
       setLoading(false);
 
     } catch (err) {
@@ -417,7 +421,7 @@ export default function ExpertPage() {
     <h2 className="text-xl font-semibold text-gray-800">Expert Screening</h2>
     {!isEditingScreening ? (
       <button
-        className="text-sm text-indigo-600 hover:text-indigo-800"
+        className="text-sm text-indigo-600 hover:text-indigo-800 min-h-[48px]"
         onClick={() => {
           setScreeningValue(expert.screening || '');
           setIsEditingScreening(true);
@@ -434,7 +438,7 @@ export default function ExpertPage() {
     <div className="space-y-3">
       <textarea
         className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
-        rows={4}
+        rows={15}
         value={screeningValue}
         onChange={(e) => setScreeningValue(e.target.value)}
       />
@@ -465,6 +469,9 @@ export default function ExpertPage() {
     </div>
   )}
 </div>
+
+
+
 
 
 
