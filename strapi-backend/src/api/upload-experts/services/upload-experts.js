@@ -324,7 +324,7 @@ async indexExpertsToAlgoliaAll() {
       const transformToBooleanFields = [];
 
       let start=0;
-      const limit=1;
+      const limit=100;
       let allExperts=[];
 
 
