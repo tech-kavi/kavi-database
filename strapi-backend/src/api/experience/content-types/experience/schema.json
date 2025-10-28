@@ -80,9 +80,6 @@
     },
     "company": {
       "type": "string"
-    },
-    "screenings": {
-      "type": "blocks"
     }
   }
 }

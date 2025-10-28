@@ -450,7 +450,6 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     quote: Schema.Attribute.Integer;
-    screenings: Schema.Attribute.Blocks;
     start_date: Schema.Attribute.Date;
     sub_industry: Schema.Attribute.Relation<
       'manyToOne',
