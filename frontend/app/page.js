@@ -51,9 +51,15 @@ export default function Dashboard() {
         recentExpertsCount: resRecent?.data?.count,
       });
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to fetch dashboard data');
-    } finally { setLoading(false); }
+        console.error(err);
+        if (err.response?.status === 401) {
+          toast.error('Session expired. Please log in again.');
+          localStorage.removeItem('token');
+          router.push('/login');
+        } else {
+          toast.error('Failed to fetch dashboard data');
+        }
+      }finally { setLoading(false); }
   };
 
   // if (loading) return (

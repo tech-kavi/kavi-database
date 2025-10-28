@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [showPassword, setShowPassword] = useState(false);
 
    // Forgot password popup
   const [showForgot, setShowForgot] = useState(false)
@@ -35,6 +36,9 @@ export default function LoginPage() {
       console.log(res);
       //alert(res.data.message);
       toast.success(res.data.message);
+      setError(null)
+      setEmail('');
+      setPassword('');
       
     } catch (err) {
       console.error(err)
@@ -96,13 +100,12 @@ export default function LoginPage() {
 
         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
         <input
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={{
             width: '100%',
-            marginBottom: '1.5rem',
             padding: '0.75rem',
             border: '1px solid #ccc',
             borderRadius: '6px',
@@ -110,6 +113,25 @@ export default function LoginPage() {
             fontSize: '1rem',
           }}
         />
+
+
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          style={{
+            display: 'block',
+            background: 'none',
+            border: 'none',
+            color: '#0070f3',
+            marginBottom: '1rem',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            marginLeft: 'auto', 
+          }}
+        >
+          {showPassword ? 'Hide Password' : 'Show Password'}
+        </button>
+        
 
         <button
           type="submit"

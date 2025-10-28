@@ -473,8 +473,6 @@ export default function ExpertPage() {
 
 
 
-
-
   {/* Tags */}
 <div className="bg-white p-6 rounded-xl shadow-md">
   <h2 className="text-lg font-semibold mb-2 flex items-center justify-between">
