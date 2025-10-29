@@ -1000,7 +1000,7 @@ async indexExpertsToAlgoliaAll() {
       const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName } = row;
       if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
       if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
-      if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
+     // if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
       if (!Type || !TYPE_ENUM.includes(Type.trim())) errors.push(`Row ${index + 2}: Invalid Type`);
       if (status && !ENGAGEMENT_ENUM.includes(status.trim())) errors.push(`Row ${index + 2}: Invalid status`);
       if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
@@ -1020,7 +1020,11 @@ async indexExpertsToAlgoliaAll() {
       throw err;
     }
 
-    const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+    //const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+    const linkedinKeys = data
+    .map(row => row.LinkedIn ? normalizeLinkedIn(row.LinkedIn) : null)
+    .filter(Boolean);
+    
     const allExperts = await strapi.entityService.findMany('api::expert.expert', {
       fields: ['id', 'linkedin', 'documentId','tags','ra_comments','source_of_response','original_quote','screening','notes'],
       filters: { linkedin: { $in: linkedinKeys } },
@@ -1068,6 +1072,7 @@ async indexExpertsToAlgoliaAll() {
     let created = 0, updated = 0;
     const rowErrors = [];
     const sheetNamesSet = new Set();
+    const affectedExperts = new Set();
 
     // 🔑 Process each row atomically
     for (let index = 0; index < data.length; index++) {
@@ -1078,10 +1083,13 @@ async indexExpertsToAlgoliaAll() {
 
           if (SheetName) sheetNamesSet.add(SheetName.trim());
 
-          if (!Name || !LinkedIn) throw new Error("Name or LinkedIn missing");
+         // if (!Name || !LinkedIn) throw new Error("Name or LinkedIn missing");
+          
 
-          const linkedinKey = normalizeLinkedIn(LinkedIn);
-          let expert = expertMap.get(linkedinKey);
+          //const linkedinKey = normalizeLinkedIn(LinkedIn);
+          const linkedinKey = LinkedIn ? normalizeLinkedIn(LinkedIn) : null;
+         // let expert = expertMap.get(linkedinKey);
+         let expert = linkedinKey ? expertMap.get(linkedinKey) : null;
           const targetCompany = companyMap.get(TargetCompany?.trim());
           const foundIndustry = industryMap.get(industry?.trim());
           const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
@@ -1106,6 +1114,8 @@ async indexExpertsToAlgoliaAll() {
               });
             }
 
+            affectedExperts.add(expert.id);
+
             await strapi.entityService.create('api::experience.experience', {
               data: {
                 exp_slug: expSlug,
@@ -1126,7 +1136,7 @@ async indexExpertsToAlgoliaAll() {
 
             updated++;
           } else {
-            const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Date.now()}`);
+            const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
             const newExpert = await strapi.entityService.create('api::expert.expert', {
               data: {
                 name: Name,
@@ -1146,7 +1156,7 @@ async indexExpertsToAlgoliaAll() {
               trx,
             });
 
-            expertMap.set(linkedinKey, newExpert);
+           affectedExperts.add(newExpert.id);
 
             await strapi.entityService.create('api::experience.experience', {
               data: {
@@ -1159,12 +1169,14 @@ async indexExpertsToAlgoliaAll() {
                 company: CompanyName,
                 target_company: targetCompany?.documentId || null,
                 quote: negotiatedquote,
-                engagement_status: status || 'Uncontacted',
+                engagement_status: status?.trim() || 'Uncontacted',
                 expert: newExpert.documentId,
                 sub_industry: foundIndustry?.documentId || null,
               },
               trx,
             });
+
+            
 
             created++;
           }
@@ -1176,7 +1188,7 @@ async indexExpertsToAlgoliaAll() {
       }
     }
 
-    const affectedExpertIds = Array.from(expertMap.values()).map(e => e.id);
+    const affectedExpertIds = Array.from(affectedExperts);
 
     // Trigger Algolia reindex in background
     setTimeout(async () => {

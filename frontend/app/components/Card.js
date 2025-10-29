@@ -26,7 +26,7 @@ export default function Card({ hits, onSelectSlug }) {
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, slug: null });
   const menuRef = useRef();
 
-  console.log(hits);
+  // console.log(hits);
 
   // Hide menu on click elsewhere
   useEffect(() => {
@@ -52,6 +52,10 @@ export default function Card({ hits, onSelectSlug }) {
     setMenu({ visible: false, x: 0, y: 0, slug: null });
   };
 
+
+ 
+
+
   return (
     <div className="overflow-x-auto rounded-xl shadow-md bg-white border border-gray-200 relative">
       <table className="w-full table-fixed text-left border-collapse text-sm">
@@ -73,20 +77,22 @@ export default function Card({ hits, onSelectSlug }) {
 
         {/* Table Body */}
         <tbody className="divide-y divide-gray-200">
-         {status === 'loading' || hits.length === 0 && status !== 'idle' ? (
-    <tr>
-      <td colSpan={10} className="py-10 text-center">
-        {status === 'loading' ? (
-          <>
+          {status === 'loading' ? (
+        // 🌀 Loader row
+        <tr>
+          <td colSpan={10} className="py-10 text-center">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
             <p className="text-gray-500 mt-2">Loading experts...</p>
-          </>
-        ) : (
-          <p className="text-gray-500">No experts found.</p>
-        )}
-      </td>
-    </tr>
-  )  : (
+          </td>
+        </tr>
+      ) : hits.length === 0 ? (
+        // 🚫 No results row
+        <tr>
+          <td colSpan={10} className="py-10 text-center text-gray-500">
+            No experts found.
+          </td>
+        </tr>
+      ) :  (
             hits.map((hit) => (
               <tr
                 key={hit.objectID}
@@ -108,14 +114,18 @@ export default function Card({ hits, onSelectSlug }) {
                     : '-'}
               >
                 <td className="px-2 py-3 max-w-[180px] truncate">
-                  <a
-                    href={hit.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline text-blue-600 font-medium"
-                  >
-                    {hit?.name}
-                  </a>
+                  {hit.linkedin ? (
+                    <a
+                      href={hit.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline text-blue-600 font-medium"
+                    >
+                      {hit.name}
+                    </a>
+                  ) : (
+                    <span className="font-medium text-gray-800">{hit.name}</span>
+                  )}
                 </td>
 
                 <td className="px-2 py-3 max-w-[160px] truncate" title={hit?.company}>

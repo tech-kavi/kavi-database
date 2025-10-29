@@ -17,11 +17,18 @@
     "type": {
       "type": "enumeration",
       "enum": [
-        "Former",
         "Competitor",
+        "Consultant",
         "Customer",
+        "Dealer",
+        "Distributor",
+        "Franchisee",
+        "Former",
+        "Industry Expert",
         "Partner",
-        "Industry Expert"
+        "Refrence",
+        "Supplier",
+        "Others"
       ]
     },
     "start_date": {

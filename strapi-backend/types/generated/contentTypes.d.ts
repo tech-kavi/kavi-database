@@ -460,7 +460,20 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
       'api::company.company'
     >;
     type: Schema.Attribute.Enumeration<
-      ['Former', 'Competitor', 'Customer', 'Partner', 'Industry Expert']
+      [
+        'Competitor',
+        'Consultant',
+        'Customer',
+        'Dealer',
+        'Distributor',
+        'Franchisee',
+        'Former',
+        'Industry Expert',
+        'Partner',
+        'Refrence',
+        'Supplier',
+        'Others',
+      ]
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
