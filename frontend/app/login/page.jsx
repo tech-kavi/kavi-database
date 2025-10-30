@@ -79,7 +79,19 @@ export default function LoginPage() {
           maxWidth: '400px'
         }}
       >
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>Login</h2>
+
+                {/* ✅ LOGO */}
+        <img
+          src="/logo.png"
+          alt="KAVI Logo"
+          style={{
+            width: '120px',
+            height: 'auto',
+            margin: '0 auto 1.5rem',
+          }}
+        />
+
+        {/* <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>Login</h2> */}
 
         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
         <input
