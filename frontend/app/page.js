@@ -107,9 +107,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { label: 'Total Experts', value: dashboard?.totalExperts, subtitle: 'Active in database', color: 'from-gray-800 to-gray-700' },
-            { label: 'Average Quote', value: `$${dashboard?.avgQuote}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
+            { label: 'Average Quote', value: `${"₹" + dashboard?.avgQuote}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
             { label: 'Calls Completed', value: dashboard?.callsCompleted, subtitle: 'Total', color: 'from-gray-500 to-gray-400' },
-            { label: 'Avg Call Price', value: `$${dashboard?.avgCallPrice}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
+            { label: 'Avg Call Price', value: `${"₹" + dashboard?.avgCallPrice}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
             { label: 'Recent Uploads', value: dashboard?.recentExpertsCount, subtitle: period, color: 'from-gray-600 to-gray-500' },
           ].map((stat, idx) => (
             <div key={idx} className={`bg-gradient-to-r ${stat.color} text-white p-6 rounded-2xl shadow-md hover:shadow-lg transition`}>

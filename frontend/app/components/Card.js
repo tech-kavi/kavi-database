@@ -36,16 +36,15 @@ export default function Card({ hits, onSelectSlug }) {
   }, []);
 
   // Handle right click
- const handleContextMenu = (e, slug) => {
-  e.preventDefault();
-  const parentRect = e.currentTarget.closest('div.relative').getBoundingClientRect();
-  setMenu({ 
-    visible: true, 
-    x: e.pageX - parentRect.left, 
-    y: e.pageY - parentRect.top, 
-    slug 
-  });
-};
+    const handleContextMenu = (e, slug) => {
+      e.preventDefault();
+      setMenu({
+        visible: true,
+        x: e.clientX,
+        y: e.clientY,
+        slug,
+      });
+    };
 
   const handleOpenInNewTab = () => {
     if (menu.slug) window.open(`/expert/${menu.slug}`, '_blank');
@@ -193,20 +192,22 @@ export default function Card({ hits, onSelectSlug }) {
       </table>
 
       {/* Custom Context Menu */}
+
       {menu.visible && (
-        <div
-          ref={menuRef}
-          style={{ top: menu.y, left: menu.x }}
-          className="absolute z-50 bg-white border border-gray-300 rounded-lg shadow-lg w-40"
+      <div
+        ref={menuRef}
+        style={{ top: menu.y, left: menu.x }}
+        className="fixed z-50 bg-white border border-gray-300 rounded-lg shadow-lg w-40"
+      >
+        <button
+          onClick={handleOpenInNewTab}
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
         >
-          <button
-            onClick={handleOpenInNewTab}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-          >
-            Open in new tab
-          </button>
-        </div>
-      )}
+          Open in new tab
+        </button>
+      </div>
+    )}
+
     </div>
   );
 }

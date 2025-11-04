@@ -102,7 +102,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                         <Badge label={exp.engagement_status} options={ENGAGEMENT_COLORS} truncate />
                       </td>
                       <td className="px-6 py-4 text-gray-600 truncate max-w-[80px]">
-                        {exp.quote || '-'}
+                        {exp.quote? "₹" + exp.quote : '-'}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
