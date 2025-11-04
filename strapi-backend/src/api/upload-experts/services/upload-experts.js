@@ -157,9 +157,52 @@ const SOR=[
 
 module.exports = ({ strapi }) => ({
 
+    async deleteSingleExperienceFromAlgolia(experienceId) {
+    try {
+
+      const strapiAlgolia = strapi.plugin('strapi-algolia');
+      const { applicationId, apiKey } = strapi.config.get('plugin::strapi-algolia');
+
+      const algoliaService = strapiAlgolia.service('algolia');
+      const strapiService = strapiAlgolia.service('strapi');
+      const algoliaClient = await algoliaService.getAlgoliaClient(applicationId, apiKey);
+
+      const contentTypeName = 'api::expert.expert';
+      const indexName = 'development_api::expert.expert';  // your Algolia index name
+      const idPrefix = '';
+      const hideFields = [];
+      const transformToBooleanFields = [];
+
+      // 🧠 Fetch the experience and related expert
+      const experience = await strapi.db.query('api::experience.experience').findOne({
+        where: { id: experienceId },
+        populate: { expert: true },
+      });
+
+      if (!experience) {
+        strapi.log.warn(`Experience with ID ${experienceId} not found for Algolia deletion.`);
+        return;
+      }
+
+      if (!experience.expert?.slug || !experience.exp_slug) {
+        strapi.log.warn(`Missing slug info for experience ID ${experienceId}, skipping Algolia delete.`);
+        return;
+      }
+
+      const objectID = `${experience.expert.slug}_${experience.exp_slug}`;
+
+      // 🔥 Delete from Algolia
+      await strapiAlgolia.service('algolia').createOrDeleteObjects([],[objectID],algoliaClient,indexName);
+      strapi.log.info(`Deleted Algolia record for experience: ${objectID}`);
+    } catch (error) {
+      strapi.log.error(`Failed to delete experience from Algolia: ${error.message}`);
+    }
+  },
+
+
   async deleteSingleExpertFromAlgolia(documentId) {
 
-const strapiAlgolia = strapi.plugin('strapi-algolia');
+  const strapiAlgolia = strapi.plugin('strapi-algolia');
   const { applicationId, apiKey } = strapi.config.get('plugin::strapi-algolia');
 
   const algoliaService = strapiAlgolia.service('algolia');
