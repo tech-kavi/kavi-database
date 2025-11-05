@@ -525,7 +525,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
       ]
     >;
     last_update: Schema.Attribute.Component<'update.update', false>;
-    linkedin: Schema.Attribute.String;
+    linkedin: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

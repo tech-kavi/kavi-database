@@ -71,21 +71,14 @@ function getLinkedInUsername(link) {
   if (!link) return null; // no LinkedIn provided
 
   try {
-    const url = new URL(link.trim());
-    const parts = url.pathname.split('/').filter(Boolean);
-    let username = parts[parts.length - 1] || '';
-
-    // Decode any URL encoding (like %E2%9C%85)
-    username = decodeURIComponent(username);
-
-    // Remove emojis or special characters
-    username = username.replace(/[^\p{L}\p{N}\-_~.]/gu, '');
-
-    // Ensure it’s not empty after sanitization
-    if (!username || username.length < 3) return null;
-
-    return username.toLowerCase();
-  } catch (e) {
+    const decoded = decodeURIComponent(url);
+    const handle = decoded.split('/in/')[1] || '';
+    return handle
+      .replace(/[^A-Za-z0-9-_.~]+/g, '-') // replace invalid chars
+      .replace(/-+/g, '-')                // collapse multiple dashes
+      .replace(/^-|-$/g, '')              // trim starting/ending dashes
+      .toLowerCase();
+  } catch {
     return null;
   }
 }
@@ -101,7 +94,7 @@ function slugify(str) {
     .replace(/-+/g, '-');
 }
 
-function getExpertSlug({ LinkedIn, Designation, CompanyName, Start }) {
+function getExperienceSlug({ LinkedIn, Designation, CompanyName, Start }) {
   const username = getLinkedInUsername(LinkedIn);
   const timePart = Start ? new Date(Start).getTime() : Date.now();
 
@@ -1135,7 +1128,7 @@ async indexExpertsToAlgoliaAll() {
          let expert = linkedinKey ? expertMap.get(linkedinKey) : null;
           const targetCompany = companyMap.get(TargetCompany?.trim());
           const foundIndustry = industryMap.get(industry?.trim());
-          const expSlug = getExpertSlug({ LinkedIn, Designation, CompanyName, Start });
+          const expSlug = getExperienceSlug({ LinkedIn, Designation, CompanyName, Start });
 
           const parseTags = Tags => String(Tags || '').split(',').map(t => t.trim()).filter(Boolean);
 

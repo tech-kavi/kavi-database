@@ -20,7 +20,7 @@
       "type": "string"
     },
     "linkedin": {
-      "type": "string"
+      "type": "text"
     },
     "email": {
       "type": "email"
