@@ -29,6 +29,8 @@ export default function UploadPage() {
   const [selectedCompany, setSelectedCompany] = useState(null)
   const [selectedIndustry, setSelectedIndustry] = useState(null)
   const [isUploadDisabled, setIsUploadDisabled] = useState(false);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [loadingIndustries, setLoadingIndustries] = useState(false);
 
   const fileInputRef = useRef(null);
   const finalTrackerRef = useRef(null);
@@ -50,7 +52,9 @@ export default function UploadPage() {
   // 🧠 Debounced company search
 const searchCompanies = useCallback(
   debounce(async (inputValue) => {
-    if (!inputValue) return; // minimum 2 characters
+    if (!inputValue) return; 
+
+    setLoadingCompanies(true);
 
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies`, {
@@ -64,14 +68,21 @@ const searchCompanies = useCallback(
         },
       });
 
+      console.log(res.data);
+
       const options = res.data.data.map((company) => ({
         label: company.name,
         value: company.comp_slug,
       }));
 
+      console.log(options);
+
       setAllCompanies(options);
     } catch (err) {
       console.error("Error searching companies:", err);
+    }
+     finally {
+      setLoadingCompanies(false); // End loading
     }
   }, 400), // 400ms debounce
   []
@@ -82,6 +93,7 @@ const searchCompanies = useCallback(
 const searchSubIndustries = useCallback(
   debounce(async (inputValue) => {
     if (!inputValue) return;
+    setLoadingIndustries(true);
 
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries`, {
@@ -103,6 +115,8 @@ const searchSubIndustries = useCallback(
       setAllIndstries(options);
     } catch (err) {
       console.error("Error searching sub-industries:", err);
+    }finally {
+      setLoadingIndustries(false);
     }
   }, 400),
   []
@@ -160,9 +174,8 @@ const searchSubIndustries = useCallback(
     return
   }
 
-      // 🕐 Disable upload for 10 seconds after success
+    
     setIsUploadDisabled(true);
-    setTimeout(() => setIsUploadDisabled(false), 10000);
 
     const formData = new FormData()
     formData.append('files', file)
@@ -197,6 +210,8 @@ const searchSubIndustries = useCallback(
       setStatusType('error');
 
         if (fileInputRef.current) fileInputRef.current.value = "";
+    } finally{
+      setIsUploadDisabled(false);
     }
   }
 
@@ -237,13 +252,9 @@ const searchSubIndustries = useCallback(
     setCompanyName('')
     setCompanyTags('')
     setTopic('')
-    setSelectedCompany(null)
-    console.log(res);
-    const createdCompany = {
-      value: res.data.comp_slug,        
-      label: res.data.name,
-    };
-    setAllCompanies((prev) => [...prev, createdCompany]);
+    setSelectedCompany(null);
+
+    searchCompanies("a");
 
   } catch (error) {
     console.error(error)
@@ -286,12 +297,7 @@ const searchSubIndustries = useCallback(
 
     setsubindStatus('✅ Industry created successfully')
     setSelectedIndustry(null)
-    console.log(res);
-    const createdIndustry = {
-      value: res.data.ind_slug,        
-      label: res.data.name,
-    };
-    setAllIndstries((prev) => [...prev, createdIndustry]);
+    searchSubIndustries("a");
   } catch (error) {
     console.error(error)
     setsubindStatus('❌ Failed to create industry')
@@ -389,7 +395,7 @@ const searchSubIndustries = useCallback(
                 Company (select or create)
             </label>
             
-                <CreatableSelect
+              <CreatableSelect
                 isClearable
                 onChange={(option) => setSelectedCompany(option)}
                 onInputChange={(value, { action }) => {
@@ -398,6 +404,9 @@ const searchSubIndustries = useCallback(
                 options={allCompanies}
                 value={selectedCompany}
                 placeholder="Type to search or add new..."
+                isLoading={loadingCompanies} // 👈 Loader when searching
+                menuPortalTarget={document.body} // 👈 Helps prevent clipping in modals
+                menuPlacement="auto"
               />
 
             </div>
@@ -444,6 +453,7 @@ const searchSubIndustries = useCallback(
             options={allIndustries}
             value={selectedIndustry}
             placeholder="Type to search or add new..."
+            isLoading={loadingIndustries}
           />
 
             </div>
