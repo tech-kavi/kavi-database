@@ -103,33 +103,34 @@ export default function CompanyPage() {
     <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8">
       <div className="bg-white shadow-lg rounded-xl p-6 space-y-6">
         {/* Header with gradient */}
-        <div className="flex items-center justify-between border-b pb-4">
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="border border-gray-300 rounded-lg p-2 text-lg w-full"
-              />
-            ) : (
-              company.name
-            )}
-          </h1>
+      <div className="flex items-center justify-between border-b pb-4">
+  {isEditing ? (
+    <input
+      type="text"
+      name="name"
+      value={formData.name}
+      onChange={handleChange}
+      className="border border-gray-300 rounded-lg p-2 text-lg font-extrabold w-full"
+    />
+  ) : (
+    <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+      {company.name}
+    </h1>
+  )}
 
-          {user?.role?.type === 'admin' && !isEditing && (
-            <button
-              onClick={() => {
-                setFormData({ name: company.name || '', tags: company.tags || '' });
-                setIsEditing(true);
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full shadow-md transition duration-200"
-            >
-              Edit
-            </button>
-          )}
-        </div>
+  {user?.role?.type === 'admin' && !isEditing && (
+    <button
+      onClick={() => {
+        setFormData({ name: company.name || '', tags: company.tags || '' });
+        setIsEditing(true);
+      }}
+      className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full shadow-md transition duration-200"
+    >
+      Edit
+    </button>
+  )}
+</div>
+
 
         {/* Tags Section */}
         <section>
