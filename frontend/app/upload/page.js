@@ -5,6 +5,9 @@ import axios from 'axios'
 import { useEffect, useRef } from 'react'
 import { useAuth } from "../components/AuthProvider"
 import dynamic from 'next/dynamic'
+import debounce from "lodash.debounce";
+import { useCallback } from 'react'
+
 
 const CreatableSelect = dynamic(() => import('react-select/creatable'), { ssr: false })
 
@@ -25,6 +28,7 @@ export default function UploadPage() {
   const [allIndustries, setAllIndstries] = useState([])
   const [selectedCompany, setSelectedCompany] = useState(null)
   const [selectedIndustry, setSelectedIndustry] = useState(null)
+  const [isUploadDisabled, setIsUploadDisabled] = useState(false);
 
   const fileInputRef = useRef(null);
   const finalTrackerRef = useRef(null);
@@ -34,8 +38,8 @@ export default function UploadPage() {
   
 
   useEffect(() => {
-  fetchCompanies()
-  fetchIndustries()
+  searchCompanies("a");
+  searchSubIndustries("a");
   }, [])
 
 
@@ -43,43 +47,67 @@ export default function UploadPage() {
   //         document.title = `KAVI | Upload`;
   //   }, []);
 
-const fetchCompanies = async () => {
-  try {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies`,{
-      headers:{
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-      }
-       
-    })
-    console.log(res);
-    const options = res.data.data.map((company) => ({
-      label: company.name,
-      value: company.comp_slug,
-    }))
-    setAllCompanies(options)
-  } catch (err) {
-    console.error('Error fetching companies:', err)
-  }
-}
+  // 🧠 Debounced company search
+const searchCompanies = useCallback(
+  debounce(async (inputValue) => {
+    if (!inputValue) return; // minimum 2 characters
 
-const fetchIndustries = async () => {
-  try {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries`,{
-      headers:{
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-      }
-       
-    })
-    console.log(res);
-    const options = res.data.data.map((industry) => ({
-      label: industry.name,
-      value: industry.ind_slug,
-    }))
-    setAllIndstries(options)
-  } catch (err) {
-    console.error('Error fetching industries:', err)
-  }
-}
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          "filters[name][$containsi]": inputValue, // case-insensitive partial match
+          "pagination[limit]": 10,
+          "sort[0]": "name",
+        },
+      });
+
+      const options = res.data.data.map((company) => ({
+        label: company.name,
+        value: company.comp_slug,
+      }));
+
+      setAllCompanies(options);
+    } catch (err) {
+      console.error("Error searching companies:", err);
+    }
+  }, 400), // 400ms debounce
+  []
+);
+
+
+// 🧠 Debounced sub-industry search
+const searchSubIndustries = useCallback(
+  debounce(async (inputValue) => {
+    if (!inputValue) return;
+
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          "filters[name][$containsi]": inputValue, // partial case-insensitive match
+          "pagination[limit]": 10,
+          "sort[0]": "name",
+        },
+      });
+
+      const options = res.data.data.map((industry) => ({
+        label: industry.name,
+        value: industry.ind_slug,
+      }));
+
+      setAllIndstries(options);
+    } catch (err) {
+      console.error("Error searching sub-industries:", err);
+    }
+  }, 400),
+  []
+);
+
 
 
   const handleFileChange = (e) => {
@@ -131,6 +159,10 @@ const fetchIndustries = async () => {
     setStatusType('error');
     return
   }
+
+      // 🕐 Disable upload for 10 seconds after success
+    setIsUploadDisabled(true);
+    setTimeout(() => setIsUploadDisabled(false), 10000);
 
     const formData = new FormData()
     formData.append('files', file)
@@ -213,7 +245,6 @@ const fetchIndustries = async () => {
     };
     setAllCompanies((prev) => [...prev, createdCompany]);
 
-    fetchCompanies() // refresh the list
   } catch (error) {
     console.error(error)
     setCompanyStatus('❌ Failed to create company')
@@ -261,8 +292,6 @@ const fetchIndustries = async () => {
       label: res.data.name,
     };
     setAllIndstries((prev) => [...prev, createdIndustry]);
-
-    fetchIndustries() // refresh the list
   } catch (error) {
     console.error(error)
     setsubindStatus('❌ Failed to create industry')
@@ -300,11 +329,14 @@ const fetchIndustries = async () => {
           className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg"
         />
         <button
-          onClick={handleUpload}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition"
-        >
-          Upload
-        </button>
+        onClick={handleUpload}
+        disabled={isUploadDisabled}
+        className={`${
+          isUploadDisabled ? "bg-gray-400 cursor-not-allowed cursor-pointer" : "bg-blue-600 hover:bg-blue-700"
+        } text-white font-semibold px-6 py-2 rounded-lg transition cursor-pointer`}
+      >
+        {isUploadDisabled ? "Please wait..." : "Upload"}
+      </button>
          {status && (
           <p
             className={`mt-3 text-sm ${
@@ -331,7 +363,7 @@ const fetchIndustries = async () => {
         />
         <button
           onClick={handleFinalTrackerUpload}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition cursor-pointer"
         >
           Upload
         </button>
@@ -356,13 +388,18 @@ const fetchIndustries = async () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Company (select or create)
             </label>
-            <CreatableSelect
+            
+                <CreatableSelect
                 isClearable
                 onChange={(option) => setSelectedCompany(option)}
+                onInputChange={(value, { action }) => {
+                  if (action === "input-change") searchCompanies(value);
+                }}
                 options={allCompanies}
                 value={selectedCompany}
                 placeholder="Type to search or add new..."
-                />
+              />
+
             </div>
 
           <div>
@@ -399,12 +436,16 @@ const fetchIndustries = async () => {
                 Industry (select or create)
             </label>
             <CreatableSelect
-                isClearable
-                onChange={(option) => setSelectedIndustry(option)}
-                options={allIndustries}
-                value={selectedIndustry}
-                placeholder="Type to search or add new..."
-                />
+            isClearable
+            onChange={(option) => setSelectedIndustry(option)}
+            onInputChange={(value, { action }) => {
+              if (action === "input-change") searchSubIndustries(value);
+            }}
+            options={allIndustries}
+            value={selectedIndustry}
+            placeholder="Type to search or add new..."
+          />
+
             </div>
 
           <button
