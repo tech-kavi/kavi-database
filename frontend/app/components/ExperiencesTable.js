@@ -95,7 +95,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
 
                       <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]" title={exp?.target_company?.name || '-'}>{exp?.target_company?.name || '-'}</td>
                       <td className="px-6 py-4 text-gray-600 truncate">{formatDate(exp.start_date) || '-'}</td>
-                      <td className="px-6 py-4 text-gray-600">{formatDate(exp.end_date) || 'Present'}</td>
+                      <td className="px-6 py-4 text-gray-600">{formatDate(exp.end_date) || '-'}</td>
                       <td className="px-6 py-4 text-gray-600 truncate">{getTenure(exp.start_date, exp.end_date)}</td>
 
                       <td className="px-6 py-4">

@@ -1155,12 +1155,12 @@ async indexExpertsToAlgoliaAll() {
             await strapi.entityService.create('api::experience.experience', {
               data: {
                 exp_slug: expSlug,
-                type: Type,
-                designation: Designation,
+                type: Type.trim(),
+                designation: Designation.trim(),
                 start_date: parseExcelDate(Start),
                 end_date: parseExcelDate(End),
-                upload_file_details: SheetName,
-                company: CompanyName,
+                upload_file_details: SheetName.trim(),
+                company: CompanyName.trim(),
                 target_company: targetCompany?.documentId || null,
                 expert: expert.documentId,
                 quote: negotiatedquote,
@@ -1175,7 +1175,7 @@ async indexExpertsToAlgoliaAll() {
             const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
             const newExpert = await strapi.entityService.create('api::expert.expert', {
               data: {
-                name: Name,
+                name: Name.trim(),
                 linkedin: LinkedIn,
                 phone: String(Phone || '').trim(),
                 slug,
@@ -1197,12 +1197,12 @@ async indexExpertsToAlgoliaAll() {
             await strapi.entityService.create('api::experience.experience', {
               data: {
                 exp_slug: expSlug,
-                type: Type,
-                designation: Designation,
+                type: Type.trim(),
+                designation: Designation.trim(),
                 start_date: parseExcelDate(Start),
                 end_date: parseExcelDate(End),
-                upload_file_details: SheetName,
-                company: CompanyName,
+                upload_file_details: SheetName.trim(),
+                company: CompanyName.trim(),
                 target_company: targetCompany?.documentId || null,
                 quote: negotiatedquote,
                 engagement_status: status?.trim() || 'Uncontacted',

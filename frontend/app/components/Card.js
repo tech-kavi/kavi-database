@@ -5,6 +5,7 @@ import Badge from '../components/Badge';
 import { TYPE_COLORS, ENGAGEMENT_COLORS } from '../constants/options';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from './AuthProvider';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return null;
@@ -25,6 +26,7 @@ export default function Card({ hits, onSelectSlug }) {
   const { status } = useInstantSearch();
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, slug: null });
   const menuRef = useRef();
+  const {loading} = useAuth();
 
   // console.log(hits);
 
@@ -76,7 +78,8 @@ export default function Card({ hits, onSelectSlug }) {
 
         {/* Table Body */}
         <tbody className="divide-y divide-gray-200">
-          {status === 'loading' ? (
+          {
+          (loading || status === 'loading') ? (
         // 🌀 Loader row
         <tr>
           <td colSpan={10} className="py-10 text-center">
@@ -85,7 +88,6 @@ export default function Card({ hits, onSelectSlug }) {
           </td>
         </tr>
       ) : hits.length === 0 ? (
-        // 🚫 No results row
         <tr>
           <td colSpan={10} className="py-10 text-center text-gray-500">
             No experts found.
