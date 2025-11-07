@@ -22,9 +22,6 @@
     "linkedin": {
       "type": "text"
     },
-    "email": {
-      "type": "email"
-    },
     "original_quote": {
       "type": "integer"
     },
@@ -103,6 +100,9 @@
       "type": "string"
     },
     "phone": {
+      "type": "string"
+    },
+    "email": {
       "type": "string"
     }
   }

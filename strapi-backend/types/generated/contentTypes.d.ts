@@ -500,7 +500,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     credits: Schema.Attribute.Decimal;
-    email: Schema.Attribute.Email;
+    email: Schema.Attribute.String;
     expert_experiences: Schema.Attribute.Relation<
       'oneToMany',
       'api::experience.experience'
