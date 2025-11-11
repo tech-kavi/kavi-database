@@ -3,8 +3,10 @@
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
+const slugify = require("slugify");
 const moment = require("moment-timezone");
 const axios = require('axios');
+const { Parser } = require("json2csv");
 
 /**
  * upload-projects service
@@ -215,118 +217,123 @@ module.exports = ({strapi}) => ({
           const slugify = (str) =>
             str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
-          let created=0;
-          const affectedExpertIds = new Set();
-    
-          // Atomic DB Transaction
-          await strapi.db.transaction(async ({ trx }) => {
-            for (let index = 0; index < data.length; index++) {
-              const row = data[index];
-              try {
-                const {
-                  code,
-                  expertlinkedin,
-                  accountholdersname,
-                  investor,
-                  ca,
-                  meetingdate,
-                  email,
-                  phone,
-                  quote,
-                  callduration,
-                  actualamtdue,
-                  accountnumber,
-                  ifsc,
-                  pan,
-                  callrating,
-                  expertrating,
-                  fccallrating,
-                  fcexpertrating,
-                } = row;
-    
-                 
-    
-                const slug = slugify(code);
-                const linkedinKey = normalizeLinkedIn(expertlinkedin);
-                let expert = expertMap.get(linkedinKey);
+          let created = 0;
+const affectedExpertIds = new Set();
+const failedRows = []; // 🔴 to capture failed rows
 
-                 console.log(expert);
+for (let index = 0; index < data.length; index++) {
+  const row = data[index];
+  try {
+    const {
+      code,
+      expertlinkedin,
+      accountholdersname,
+      investor,
+      ca,
+      meetingdate,
+      email,
+      phone,
+      quote,
+      callduration,
+      actualamtdue,
+      accountnumber,
+      ifsc,
+      pan,
+      callrating,
+      expertrating,
+      fccallrating,
+      fcexpertrating,
+    } = row;
 
-                 let updateData = {};
+    const slug = slugify(code);
+    const linkedinKey = normalizeLinkedIn(expertlinkedin);
+    const expert = expertMap.get(linkedinKey);
 
-                 if(email)
-                 {
-                  updateData.email=email;
-                 }
+    if (!expert) {
+      failedRows.push({ index: index + 2, reason: 'Expert not found', code, expertlinkedin });
+      continue;
+    }
 
-                 if(phone)
-                 {
-                  updateData.phone=phone;
-                 }
+    // Update expert details if needed
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
 
-                 if (Object.keys(updateData).length > 0) {
-                    await strapi.documents('api::expert.expert').update({
-                        documentId: expert.documentId,
-                        data: updateData,
-                        status: 'published',   // publish in one go
-                        trx,
-                      });
-                  }
+    if (Object.keys(updateData).length > 0) {
+      await strapi.documents('api::expert.expert').update({
+        documentId: expert.documentId,
+        data: updateData,
+        status: 'published',
+      });
+    }
 
-                  await strapi.entityService.create('api::project.project',{
-                data: {
-                    code,
-                    pro_slug: slug,
-                    investor: investor || null,
-                    ca: ca || null,
-                    date: parseExcelDate(meetingdate), 
-                    final_amount: actualamtdue || null,
-                    duration: callduration || null,
-                    account_number: accountnumber || null,
-                    account_holder_name: accountholdersname || null,
-                    ifsc: ifsc || null,
-                    pan: pan || null,
-                    call_rating: callrating || 0,
-                    expert_rating:expertrating || 0,
-                    fc_call_rating: fccallrating || 0,
-                    fc_expert_rating: fcexpertrating || 0,
-                    quote: quote || 0,
-                    expert: expert.documentId, // always exists due to pre-check
-                },
-                trx,
-                });
+    // Create project
+    await strapi.entityService.create('api::project.project', {
+      data: {
+        code,
+        pro_slug: slug,
+        investor: investor || null,
+        ca: ca || null,
+        date: parseExcelDate(meetingdate),
+        final_amount: actualamtdue || null,
+        duration: callduration || null,
+        account_number: accountnumber || null,
+        account_holder_name: accountholdersname || null,
+        ifsc: ifsc || null,
+        pan: pan || null,
+        call_rating: callrating || 0,
+        expert_rating: expertrating || 0,
+        fc_call_rating: fccallrating || 0,
+        fc_expert_rating: fcexpertrating || 0,
+        quote: quote || 0,
+        expert: expert.documentId,
+      },
+    });
 
-                affectedExpertIds.add(expert.id);
-                created++;
-               
-              } catch (err) {
-                console.error(`❌ Error at row ${index + 2}:`, row);
-                throw err; // triggers rollback
-              }
-            }
-          });
-    
-         const expertIdsArray = Array.from(affectedExpertIds);
+    affectedExpertIds.add(expert.id);
+    created++;
 
-         setTimeout(async () => {
-          try {
-            await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(expertIdsArray);
-            strapi.log.info('✅ Final tracker algolia indexing completed.');
-          } catch (err) {
-            strapi.log.error('❌ Final tracker algolia indexing failed:', err);
-          }
-        }, 0);
-    
-          await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Success - Final Tracker Upload',
-          html: `
-            <h2>Upload Completed</h2>
-            <p>Your Final Tracker file has been processed successfully.</p>
-            
-            <p>If you notice any errors, please recheck your file.</p>
-          `,
-        });
+  } catch (err) {
+    console.error(`❌ Error at row ${index + 2}:`, err.message);
+    failedRows.push({ index: index + 2, reason: err.message, code: row.code });
+    continue;
+  }
+}
+
+// ✅ Reindex only experts that succeeded
+if (affectedExpertIds.size > 0) {
+  const expertIdsArray = Array.from(affectedExpertIds);
+  setTimeout(async () => {
+    try {
+      await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(expertIdsArray);
+      strapi.log.info('✅ Final tracker algolia indexing completed.');
+    } catch (err) {
+      strapi.log.error('❌ Final tracker algolia indexing failed:', err);
+    }
+  }, 0);
+}
+
+// 📧 Send summary email
+let html = `<h2>Final Tracker Upload Summary</h2>`;
+html += `<p><strong>Projects Created:</strong> ${created}</p>`;
+
+if (failedRows.length > 0) {
+  html += `<h3>Failed Rows (${failedRows.length})</h3><ul>`;
+  for (const fail of failedRows) {
+    html += `<li>Row ${fail.index} (Code: ${fail.code || 'N/A'}): ${fail.reason}</li>`;
+  }
+  html += `</ul>`;
+}
+
+await strapi.plugin('email').service('email').send({
+  to: uploaderEmail,
+  subject:
+    failedRows.length > 0
+      ? `Partial Success - Final Tracker Upload`
+      : `Success - Final Tracker Upload`,
+  html,
+});
+
     
         } catch (error) {
           console.error('❌ Background Processing Error:', error);
@@ -346,4 +353,7 @@ module.exports = ({strapi}) => ({
       await strapi.service('api::upload-lock.upload-lock').releaseLock();
     }
       },
-});
+
+  
+})
+

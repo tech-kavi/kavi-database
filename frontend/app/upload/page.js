@@ -155,9 +155,15 @@ const searchSubIndustries = useCallback(
       if (finalTrackerRef.current) finalTrackerRef.current.value = ""; // clear input
     } catch (error) {
       console.error(error);
-      setFinalTracker(null);
-      setFinalTrackerStatus('Upload failed');
       if (finalTrackerRef.current) finalTrackerRef.current.value = ""; // clear input
+      setFinalTracker(null);
+      const errorMessage =
+        error.response?.data?.error?.message ||
+        error.response?.data?.message ||
+        error.message ||
+        'Upload failed';
+      setFinalTrackerStatus(errorMessage);
+      
     }
   }
 
@@ -355,6 +361,9 @@ const searchSubIndustries = useCallback(
         
       </section>
 
+      {user?.role?.type == "admin" && (
+      <>
+
       {/* Upload Final Tracker Section */}
       <section className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
         <h2 className="text-2xl font-semibold mb-4 ">Upload Final Tracker File</h2>
@@ -381,6 +390,8 @@ const searchSubIndustries = useCallback(
           </p>
         )}
       </section>
+        
+      </>)}
 
       {/* Create Company Section */}
 

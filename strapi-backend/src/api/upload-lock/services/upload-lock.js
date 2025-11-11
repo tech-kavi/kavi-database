@@ -17,7 +17,7 @@ module.exports = ({ strapi }) => ({
 
     const existingLock = existingLocks[0]||null;
 
-  console.log(existingLock);
+  //console.log(existingLock);
 
     if (existingLock) {
       return {isLocked:true,lockedBy:existingLock?existingLock.locked_by:null}; // Lock already taken

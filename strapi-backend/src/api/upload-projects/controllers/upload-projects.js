@@ -12,7 +12,7 @@ module.exports = {
 
         // Try to acquire lock
     const gotLock = await strapi.service('api::upload-lock.upload-lock').acquireLock(uploaderEmail);
-    console.log(gotLock);
+    //console.log(gotLock);
     if (gotLock?.isLocked) {
       return ctx.badRequest(`${gotLock.lockedBy}'s upload is already in progress. Please wait until it finishes.`);
     }
@@ -40,6 +40,8 @@ module.exports = {
         },
         files: uploadedFile,
       });
+
+      console.log("file uploaded");
 
       const fileId = uploaded?.[0]?.id;
       if (!fileId) {

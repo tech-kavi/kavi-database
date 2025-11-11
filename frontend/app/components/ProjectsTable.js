@@ -35,7 +35,8 @@ export default function ProjectsTable({ projects, onEdit }) {
                 'Expert Rating',
                 'Date',
                 'Final Amount',
-                'Actions',
+                'Quote',
+                '',
               ].map((header) => (
                 <th
                   key={header}
@@ -67,6 +68,9 @@ export default function ProjectsTable({ projects, onEdit }) {
                     <td className="px-6 py-4 font-semibold text-gray-900">
                       {project.final_amount ? `₹${project.final_amount}` : '-'}
                     </td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">
+                      {project.quote ? `₹${project.quote}` : '-'}
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <button
                         className="px-3 py-1.5 text-xs font-semibold text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition"
@@ -88,7 +92,7 @@ export default function ProjectsTable({ projects, onEdit }) {
                         exit={{ opacity: 0, height: 0 }}
                         className="bg-gray-50"
                       >
-                        <td colSpan={8} className="px-6 py-4 text-gray-700">
+                        <td colSpan={9} className="px-6 py-4 text-gray-700">
                           <div className="grid sm:grid-cols-2 gap-2">
                             <p>
                               <strong className="text-gray-800">FC Call Rating:</strong>{' '}

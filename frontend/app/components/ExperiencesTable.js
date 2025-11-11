@@ -125,7 +125,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                           exit={{ opacity: 0, height: 0 }}
                           className="bg-gray-50"
                         >
-                          <td colSpan={9} className="px-6 py-4 text-gray-700">
+                          <td colSpan={10} className="px-6 py-4 text-gray-700">
                             <div className="grid sm:grid-cols-2 gap-2">
                               <p>
                                 <strong className="text-gray-800">Industry:</strong>{' '}

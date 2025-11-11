@@ -53,7 +53,13 @@ export default function Card({ hits, onSelectSlug }) {
     setMenu({ visible: false, x: 0, y: 0, slug: null });
   };
 
+const [hasSearched, setHasSearched] = useState(false);
 
+useEffect(() => {
+  if (status === 'idle' && hits.length >= 0) {
+    setHasSearched(true);
+  }
+}, [status, hits]);
  
 
 
@@ -87,7 +93,15 @@ export default function Card({ hits, onSelectSlug }) {
             <p className="text-gray-500 mt-2">Loading experts...</p>
           </td>
         </tr>
-      ) : hits.length === 0 ? (
+      ) : (!hasSearched) ? (
+        <tr>
+          <td colSpan={10} className="py-10 text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
+            <p className="text-gray-500 mt-2">Loading experts...</p>
+          </td>
+        </tr>
+        
+      ) : (hits.length === 0) ? (
         <tr>
           <td colSpan={10} className="py-10 text-center text-gray-500">
             No experts found.
