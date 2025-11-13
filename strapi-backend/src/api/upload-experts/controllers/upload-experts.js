@@ -14,6 +14,8 @@ module.exports = {
       return ctx.badRequest(`${gotLock.lockedBy}'s upload is already in progress. Please wait until it finishes.`);
     }
 
+
+
       const rawFiles = ctx.request.files || ctx.request.body.files;
       const topic = ctx.request.topic || ctx.request.body.topic;
 

@@ -7,7 +7,7 @@
 // @ts-ignore
 const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = ({ strapi }) => ({
+module.exports = createCoreService('api::upload-lock.upload-lock',({ strapi }) => ({
      async acquireLock(userEmail) {
 
     const existingLocks = await strapi.entityService.findMany('api::upload-lock.upload-lock',{
@@ -28,10 +28,15 @@ module.exports = ({ strapi }) => ({
       data: {
         islocked: true,
         locked_by: userEmail,
-        lockedAt: new Date()
+        lockedAt: new Date(),
+        progress:0,
+        total_rows:0,
+        process_status:'processing',
+        error_message:null
       }
     });
 
+    
     return {isLocked:false};
   },
 
@@ -43,4 +48,4 @@ module.exports = ({ strapi }) => ({
         data: { islocked: false },
       });
       }
-});
+}));

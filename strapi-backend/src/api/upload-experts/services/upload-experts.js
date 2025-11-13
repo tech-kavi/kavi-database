@@ -1030,6 +1030,24 @@ async indexExpertsToAlgoliaAll() {
     const rawData = XLSX.utils.sheet_to_json(sheet);
     const data = rawData.map(remapRow);
 
+       const existingLocks = await strapi.entityService.findMany('api::upload-lock.upload-lock',{
+        filters: { islocked: true },
+        limit:1,
+      });
+
+      const gotLock = existingLocks?.[0]; // ✅ pick first lock
+      if (!gotLock) throw new Error('No active upload lock found');
+
+      await strapi.documents('api::upload-lock.upload-lock').update({
+      documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+      data: {
+        total_rows: data.length,
+        progress: 0,
+        process_status: 'processing',
+      },
+      status: 'published', // ✅ instantly publishes
+    });
+
     // Basic validations
     const errors = [];
     data.forEach((row, index) => {
@@ -1110,6 +1128,7 @@ async indexExpertsToAlgoliaAll() {
     const sheetNamesSet = new Set();
     const affectedExperts = new Set();
 
+    const batchSize = 25;
     // 🔑 Process each row atomically
     for (let index = 0; index < data.length; index++) {
       const row = data[index];
@@ -1217,6 +1236,20 @@ async indexExpertsToAlgoliaAll() {
             created++;
           }
         });
+
+            // ✅ Progress update after successful transaction
+      if (index % batchSize === 0 || index === data.length - 1) {
+        const progressValue = Math.round(((index + 1) / data.length) * 100);
+
+        await strapi.documents('api::upload-lock.upload-lock').update({
+         documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+        data: {
+          progress: progressValue,
+        },
+        status: 'published', // ✅ instantly publishes
+      });
+      }
+
       } catch (err) {
         console.error(`❌ Error at row ${index + 2}:`, err);
         rowErrors.push(`Row ${index + 2}: ${err.message}`);
@@ -1225,6 +1258,17 @@ async indexExpertsToAlgoliaAll() {
     }
 
     const affectedExpertIds = Array.from(affectedExperts);
+
+    await strapi.documents('api::upload-lock.upload-lock').update({
+         documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+        data: {
+          process_status: 'completed',
+          progress: 100,
+        },
+        status: 'published', // ✅ instantly publishes
+      });
+
+
 
     // Trigger Algolia reindex in background
     setTimeout(async () => {
@@ -1235,6 +1279,8 @@ async indexExpertsToAlgoliaAll() {
         strapi.log.error('❌ Background algolia indexing failed:', err);
       }
     }, 0);
+
+
 
     const sheetNamesList = Array.from(sheetNamesSet);
     const sheetNamesHtml = sheetNamesList.length
@@ -1258,6 +1304,15 @@ async indexExpertsToAlgoliaAll() {
     strapi.log.info(`✅ Processing Completed. Created: ${created}, Updated: ${updated}`);
   } catch (error) {
     console.error('❌ Background Processing Error:', error);
+
+     await strapi.documents('api::upload-lock.upload-lock').update({
+         documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+        data: {
+          process_status: 'failed',
+          error_message: error.message,
+        },
+        status: 'published', // ✅ instantly publishes
+      });
     if (!error.alreadyNotified) {
       await strapi.plugin('email').service('email').send({
         to: uploaderEmail,

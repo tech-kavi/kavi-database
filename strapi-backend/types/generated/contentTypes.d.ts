@@ -730,6 +730,7 @@ export interface ApiUploadLockUploadLock extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    error_message: Schema.Attribute.Text;
     islocked: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -739,7 +740,12 @@ export interface ApiUploadLockUploadLock extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     locked_by: Schema.Attribute.String;
     lockedAt: Schema.Attribute.DateTime;
+    process_status: Schema.Attribute.Enumeration<
+      ['processing', 'completed', 'failed']
+    >;
+    progress: Schema.Attribute.BigInteger & Schema.Attribute.DefaultTo<'0'>;
     publishedAt: Schema.Attribute.DateTime;
+    total_rows: Schema.Attribute.BigInteger;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

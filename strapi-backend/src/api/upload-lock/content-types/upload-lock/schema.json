@@ -19,6 +19,24 @@
     },
     "lockedAt": {
       "type": "datetime"
+    },
+    "progress": {
+      "type": "biginteger",
+      "default": "0"
+    },
+    "total_rows": {
+      "type": "biginteger"
+    },
+    "process_status": {
+      "type": "enumeration",
+      "enum": [
+        "processing",
+        "completed",
+        "failed"
+      ]
+    },
+    "error_message": {
+      "type": "text"
     }
   }
 }
