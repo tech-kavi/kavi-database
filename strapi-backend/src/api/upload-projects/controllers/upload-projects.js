@@ -51,7 +51,7 @@ module.exports = {
       // Kick off background processing (non-blocking)
       setTimeout(async () => {
         try {
-          await strapi.service('api::upload-projects.upload-projects').processProjectFileInBackground(fileId,uploaderEmail);
+          await strapi.service('api::upload-projects.upload-projects').processProjectFileInBackground(fileId,uploaderEmail,gotLock.lock);
           strapi.log.info('✅ Background processing completed.');
         } catch (err) {
           strapi.log.error('❌ Background processing failed:', err);

@@ -37,7 +37,7 @@ module.exports = createCoreService('api::upload-lock.upload-lock',({ strapi }) =
     });
 
     
-    return {isLocked:false};
+    return {isLocked:false,lock:lock};
   },
 
   async releaseLock() {

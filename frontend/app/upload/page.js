@@ -79,7 +79,6 @@ export default function UploadPage() {
 
         // Stop polling if complete
         if (progressVal >= 100) {
-          clearInterval(intervalId);
           setTimeout(() => {
             setIsUploadingGlobal(false);
             setUploadProgress(null);
@@ -204,6 +203,7 @@ export default function UploadPage() {
       setFinalTracker(null);
 
       if (finalTrackerRef.current) finalTrackerRef.current.value = ""; // clear input
+      setIsUploadingGlobal(true);
     } catch (error) {
       console.error(error);
       if (finalTrackerRef.current) finalTrackerRef.current.value = ""; // clear input
@@ -370,6 +370,32 @@ export default function UploadPage() {
         Upload
       </h1> */}
 
+       {isUploadingGlobal && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm text-white">Upload in progress...</p>
+              <button
+                onClick={fetchProgress}
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors cursor-pointer"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div className="w-full bg-white rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                style={{ width: `${uploadProgress || 0}%` }}
+              ></div>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {uploadProgress !== null ? `${uploadProgress}% completed` : "Starting..."}
+            </p>
+          </div>
+        )}
+
+
       {/* Upload Section */}
       <section className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
         <h2 className="text-2xl font-semibold mb-4 ">Upload Excel File</h2>
@@ -409,31 +435,7 @@ export default function UploadPage() {
           </p>
         )}
 
-        {isUploadingGlobal && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-sm text-gray-600">Upload in progress...</p>
-              <button
-                onClick={fetchProgress}
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors cursor-pointer"
-              >
-                Refresh
-              </button>
-            </div>
-
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-blue-600 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${uploadProgress || 0}%` }}
-              ></div>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-1">
-              {uploadProgress !== null ? `${uploadProgress}% completed` : "Starting..."}
-            </p>
-          </div>
-        )}
-
+       
 
       </section>
 

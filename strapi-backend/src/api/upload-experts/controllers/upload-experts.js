@@ -49,7 +49,7 @@ module.exports = {
       //Kick off background processing (non-blocking)
       setTimeout(async () => {
         try {
-          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic);
+          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic,gotLock.lock);
           strapi.log.info('✅ Background processing completed.');
         } catch (err) {
           strapi.log.error('❌ Background processing failed:', err);
