@@ -281,8 +281,16 @@ export default function UploadPage() {
       return
     }
 
+      // 👉 Trim the company name
+  const trimmedName = selectedCompany.label.trim();
+
+  if (!trimmedName) {
+    setCompanyStatus('Company name cannot be empty');
+    return;
+  }
+
     const companyExists = allCompanies.some(
-      (comp) => comp.label.toLowerCase() === selectedCompany.label.toLowerCase()
+      (comp) => comp.label.toLowerCase() === trimmedName.toLowerCase()
     )
 
     if (companyExists) {
@@ -295,7 +303,7 @@ export default function UploadPage() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies`,
         {
           data: {
-            name: selectedCompany.label,
+            name: trimmedName,
             tags: companyTags,
           },
         },
@@ -329,8 +337,16 @@ export default function UploadPage() {
       return
     }
 
+          // 👉 Trim the company name
+  const trimmedName = selectedIndustry.label.trim();
+
+  if (!trimmedName) {
+    setCompanyStatus('Company name cannot be empty');
+    return;
+  }
+
     const industryExists = allIndustries.some(
-      (comp) => comp.label.toLowerCase() === selectedIndustry.label.toLowerCase()
+      (comp) => comp.label.toLowerCase() === trimmedName.toLowerCase()
     )
 
     if (industryExists) {
@@ -343,7 +359,7 @@ export default function UploadPage() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sub-industries`,
         {
           data: {
-            name: selectedIndustry.label,
+            name: trimmedName,
           },
         },
         {
