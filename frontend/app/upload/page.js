@@ -102,7 +102,8 @@ export default function UploadPage() {
   // 🧠 Debounced company search
   const searchCompanies = useCallback(
     debounce(async (inputValue) => {
-      if (!inputValue) return;
+      const trimmed = inputValue.trim()
+      if (!trimmed) return;
 
       setLoadingCompanies(true);
 
@@ -112,20 +113,20 @@ export default function UploadPage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           params: {
-            "filters[name][$containsi]": inputValue, // case-insensitive partial match
+            "filters[name][$containsi]": trimmed, // case-insensitive partial match
             "pagination[limit]": 10,
             "sort[0]": "name",
           },
         });
 
-        console.log(res.data);
+        //console.log(res.data);
 
         const options = res.data.data.map((company) => ({
           label: company.name,
           value: company.comp_slug,
         }));
 
-        console.log(options);
+        //console.log(options);
 
         setAllCompanies(options);
       } catch (err) {
@@ -142,7 +143,8 @@ export default function UploadPage() {
   // 🧠 Debounced sub-industry search
   const searchSubIndustries = useCallback(
     debounce(async (inputValue) => {
-      if (!inputValue) return;
+      const trimmed = inputValue.trim();
+      if (!trimmed) return;
       setLoadingIndustries(true);
 
       try {
@@ -151,7 +153,7 @@ export default function UploadPage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           params: {
-            "filters[name][$containsi]": inputValue, // partial case-insensitive match
+            "filters[name][$containsi]": trimmed, // partial case-insensitive match
             "pagination[limit]": 10,
             "sort[0]": "name",
           },

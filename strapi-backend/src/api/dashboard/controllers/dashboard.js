@@ -105,20 +105,24 @@ expertDetails: async (ctx) => {
   try {
     const knex = strapi.db.connection;
 
-    // Total experts
-    // const [{ count: totalExperts }] = await knex("experts").whereNotNull('published_at').count("id");
+   
 
-    // // Average original_quote (ignoring null/0)
-    // const [{ avg: avgQuote }] = await knex("experts")
-    //   .whereNotNull("original_quote")
-    //   .andWhere("original_quote", ">", 0)
-    //   .avg("original_quote as avg");
+    // const [{ totalExperts, avgQuote }] = await knex("experts")
+    // .whereNotNull('published_at')
+    // .andWhere(builder => builder.where('original_quote', '>', 0).orWhereNull('original_quote'))
+    // .count("id as totalExperts")
+    // .avg("original_quote as avgQuote");
 
-    const [{ totalExperts, avgQuote }] = await knex("experts")
-    .whereNotNull('published_at')
-    .andWhere(builder => builder.where('original_quote', '>', 0).orWhereNull('original_quote'))
-    .count("id as totalExperts")
-    .avg("original_quote as avgQuote");
+        // 1. Total experts (including quote = 0)
+    const [{ totalExperts }] = await knex("experts")
+      .whereNotNull("published_at")
+      .count("id as totalExperts");
+
+    // 2. Average quote (only > 0)
+    const [{ avgQuote }] = await knex("experts")
+      .whereNotNull("published_at")
+      .andWhere("original_quote", ">", 0)
+      .avg("original_quote as avgQuote");
 
 
     // Count experiences by type
