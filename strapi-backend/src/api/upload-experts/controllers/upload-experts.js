@@ -9,7 +9,7 @@ module.exports = {
 
       // Try to acquire lock
     const gotLock = await strapi.service('api::upload-lock.upload-lock').acquireLock(uploaderEmail);
-    console.log(gotLock);
+    //console.log(gotLock);
     if (gotLock?.isLocked) {
       return ctx.badRequest(`${gotLock.lockedBy}'s upload is already in progress. Please wait until it finishes.`);
     }
@@ -43,6 +43,8 @@ module.exports = {
 
       const fileId = uploaded?.[0]?.id;
       if (!fileId) {
+        console.log('inside file upload error');
+        await strapi.service('api::upload-lock.upload-lock').releaseLock();
         return ctx.internalServerError('File upload failed to generate URL.');
       }
 
@@ -60,6 +62,7 @@ module.exports = {
 
     } catch (error) {
       console.error('❌ Error:', error);
+      await strapi.service('api::upload-lock.upload-lock').releaseLock();
       return ctx.internalServerError('Failed to upload and process file');
     }
   },

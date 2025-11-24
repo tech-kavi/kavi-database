@@ -73,7 +73,7 @@ export default function CompanyPage() {
     } catch (err) {
       console.error('Failed to update company:', err);
       //alert('❌ Failed to update company');
-      toast.success('Failed to update company');
+      toast.error('Failed to update company');
     } finally {
       setSaving(false);
     }

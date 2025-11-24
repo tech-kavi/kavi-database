@@ -62,6 +62,7 @@ module.exports = {
 
     } catch (error) {
       console.error('❌ Error:', error);
+      await strapi.service('api::upload-lock.upload-lock').releaseLock();
       return ctx.internalServerError('Failed to upload and process file');
     }
   }
