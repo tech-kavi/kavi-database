@@ -169,7 +169,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <label>RA Comments</label>
             <textarea
               className="input-field"
@@ -177,7 +177,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               value={formData.ra_comments}
               onChange={(e) => handleChange('ra_comments', e.target.value)}
             ></textarea>
-          </div>
+          </div> */}
 
           {/* <div>
             <label>Notes</label>

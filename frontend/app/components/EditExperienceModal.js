@@ -323,6 +323,7 @@ useEffect(() => {
 
         <label>Quote</label>
         <input
+        type='number'
           name="quote"
           value={formData.quote}
           onChange={handleChange}
