@@ -297,7 +297,7 @@ export default function ExpertPage() {
         <p className="font-semibold">{expert.phone || '-'}</p>
 
         <p className="text-gray-400">Original Quote</p>
-        <p className="font-semibold">{"₹" + expert?.original_quote || '-'}</p>
+        <p className="font-semibold"> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}</p>
 
         <p className="text-gray-400">Source Of Response</p>
         <p className="font-semibold">{expert?.source_of_response || '-'}</p>

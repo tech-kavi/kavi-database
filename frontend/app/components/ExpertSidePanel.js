@@ -240,7 +240,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
             <p><span className='font-semibold'>Email:</span> {expert.email}</p>
             <p><span className='font-semibold'>Phone:</span> {expert.phone}</p>
             <p><span className='font-semibold'>Source Of Response:</span> {expert.source_of_response}</p>
-            <p><span className='font-semibold'>Quote:</span> {"₹" + expert.original_quote}</p>
+            <p><span className='font-semibold'>Quote:</span> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}</p>
            
           </div>
         </div>

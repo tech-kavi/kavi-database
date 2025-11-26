@@ -467,7 +467,7 @@ export default function Search() {
       console.log('refresh');
       setTimeout(() => {
         refresh();
-      }, 1000); // 200ms delay, adjust as needed
+      }, 5000); // 200ms delay, adjust as needed
 
       console.log(hits);
     }
