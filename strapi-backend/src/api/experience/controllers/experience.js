@@ -139,7 +139,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
       //console.log(sanitizedExpert);
 
       
-        await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+        strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
       
 
       return ctx.send(sanitizedExpert);
