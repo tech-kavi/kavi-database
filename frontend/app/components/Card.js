@@ -28,7 +28,10 @@ export default function Card({ hits, onSelectSlug }) {
   const menuRef = useRef();
   const {loading} = useAuth();
 
-  // console.log(hits);
+
+
+
+ // console.log(hits);
 
   // Hide menu on click elsewhere
   useEffect(() => {

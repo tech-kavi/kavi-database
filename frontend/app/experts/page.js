@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch} from 'react-instantsearch-hooks-web';
+import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements} from 'react-instantsearch-hooks-web';
 import Card from '../components/Card';
 import ExpertSidePanel from '../components/ExpertSidePanel';
 import Head from 'next/head';
@@ -447,9 +447,12 @@ export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
   const { hits } = useHits();
   const [selectedSlug, setSelectedSlug] = useState(null);
-  const [searchAttributes, setSearchAttributes] = useState(null); // null = search all
+  const [searchAttributes, setSearchAttributes] = useState(null); 
 
-  const { switchIndex } = useIndex();
+  const { refine: clearAllRefinements } = useClearRefinements();
+
+
+  //const { switchIndex } = useIndex();
 
   const tableRef = useRef(null); // ref for table/Card
   const panelRef = useRef(null); // optional, ref for panel itself
@@ -458,12 +461,16 @@ export default function Search() {
   //   document.title = 'KAVI | Search';
   // }, []);
 
+    const { refresh, instantSearchInstance} = useInstantSearch();
 
-    const {refresh} = useInstantSearch();
+    function refreshHits(){
+      console.log('refresh');
+      setTimeout(() => {
+        refresh();
+      }, 1000); // 200ms delay, adjust as needed
 
-  const refetchHits=()=>{
-    refresh();
-  }
+      console.log(hits);
+    }
 
 
 
@@ -498,6 +505,7 @@ export default function Search() {
           </option>
         ))}
       </select>
+
         
 
         <div className="flex flex-row items-center gap-3 ml-auto">
@@ -518,6 +526,16 @@ export default function Search() {
           />
 
           <DropdownFilters open={showFilters} setOpen={setShowFilters} setSelectedSlug={setSelectedSlug}/>
+
+          <div className="flex gap-2">
+
+            <button
+            onClick={() => clearAllRefinements()}
+            className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium cursor-pointer"
+          >
+            Clear All Filters
+          </button>
+          </div>
         </div>
       </div>
 
@@ -531,7 +549,7 @@ export default function Search() {
           <StatsHeader />
         </div>
 
-        <Card hits={hits} onSelectSlug={setSelectedSlug} />
+        <Card hits={hits} onSelectSlug={setSelectedSlug}   refreshHits={refreshHits}/>
 
         <div className="mt-6 flex justify-center">
           <Pagination
@@ -551,7 +569,8 @@ export default function Search() {
             hits={hits}
             onClose={() => setSelectedSlug(null)}
             onSelectSlug={setSelectedSlug}
-            refetchHits={refetchHits}
+            refreshHits={refreshHits}
+            
           />
         )}
       </div>

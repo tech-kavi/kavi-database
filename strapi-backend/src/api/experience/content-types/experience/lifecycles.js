@@ -1,12 +1,14 @@
-module.exports = {
-  async beforeDelete(event) {
-    const { params } = event;
-    
-    if (params?.soft) return; // ignore unpublish
-    // console.log(event);
+// module.exports = {
+//   beforeDelete(event) {
+//     const { where } = event.params;
+//     console.log(where);
+//     const experienceId = where.documentId || where.id;
+//     console.log(experienceId);
 
-     //console.log(params);
+//     if (!experienceId) return;
 
-    await strapi.service('api::upload-experts.upload-experts').deleteSingleExperienceFromAlgolia(params?.where?.id);
-  },
-};
+//     strapi
+//       .service('api::upload-experts.upload-experts')
+//       .deleteSingleExperienceFromAlgolia(experienceId);
+//   },
+// };

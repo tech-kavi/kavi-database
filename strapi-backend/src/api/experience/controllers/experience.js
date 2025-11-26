@@ -99,7 +99,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
         status: 'published',
       });
 
-      console.log(updatedExperience);
+      //console.log(updatedExperience);
 
       const expertId = updatedExperience.expert?.documentId;
       if (!expertId) {
@@ -136,12 +136,11 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
      
 
       const sanitizedExpert = await this.sanitizeOutput(updatedExpert, ctx);
-      // console.log(sanitizedExpert);
+      //console.log(sanitizedExpert);
 
-      setTimeout(async () => {
-        await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia();
-        strapi.log.info('Background task completed.');
-      }, 0);
+      
+        await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+      
 
       return ctx.send(sanitizedExpert);
 

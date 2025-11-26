@@ -152,7 +152,7 @@ module.exports = ({ strapi }) => ({
 
   async deleteSingleExperienceFromAlgolia(experienceId) {
     try {
-
+        console.log('inside delete experience');
       const strapiAlgolia = strapi.plugin('strapi-algolia');
       const { applicationId, apiKey } = strapi.config.get('plugin::strapi-algolia');
 
@@ -194,7 +194,7 @@ module.exports = ({ strapi }) => ({
 
 
   async deleteSingleExpertFromAlgolia(documentId) {
-
+      console.log('inside delete expert');
     const strapiAlgolia = strapi.plugin('strapi-algolia');
     const { applicationId, apiKey } = strapi.config.get('plugin::strapi-algolia');
 
@@ -256,6 +256,8 @@ module.exports = ({ strapi }) => ({
 
 
   async indexSingleExpert(documentId) {
+
+     console.log('inside update single expert');
     const strapiAlgolia = strapi.plugin('strapi-algolia');
     const { applicationId, apiKey } = strapi.config.get('plugin::strapi-algolia');
 

@@ -40,7 +40,7 @@ const formatDate = (dateStr) => {
   return `${month}-${year}`; // e.g., "Dec-21"
 };
 
-export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, refetchHits }) {
+export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, refreshHits }) {
   const [expert, setExpert] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expertCache, setExpertCache] = useState({});
@@ -117,7 +117,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
 
   const handleSave = async (updatedExp) => {
 
-    console.log(updatedExp);
+    //console.log(updatedExp);
 
 
     try {
@@ -150,7 +150,8 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
       //alert('Update Successful.');
       toast.success('Update Successful!');
       setEditingExp(null);
-      refetchHits();
+      //console.log('refetch');
+      refreshHits();
 
 
     } catch (err) {
