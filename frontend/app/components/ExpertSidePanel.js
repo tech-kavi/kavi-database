@@ -147,6 +147,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
 
       setExpert(updatedExpert)
 
+
       //alert('Update Successful.');
       toast.success('Update Successful!');
       setEditingExp(null);

@@ -88,7 +88,7 @@ useEffect(() => {
         {/* Table Body */}
         <tbody className="divide-y divide-gray-200">
           {
-          (loading || status === 'loading') ? (
+          (status === 'loading') ? (
         // 🌀 Loader row
         <tr>
           <td colSpan={10} className="py-10 text-center">
@@ -96,15 +96,7 @@ useEffect(() => {
             <p className="text-gray-500 mt-2">Loading experts...</p>
           </td>
         </tr>
-      ) : (!hasSearched) ? (
-        <tr>
-          <td colSpan={10} className="py-10 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
-            <p className="text-gray-500 mt-2">Loading experts...</p>
-          </td>
-        </tr>
-        
-      ) : (hits.length === 0) ? (
+      )  : (status === 'idle' && hits.length === 0) ? (
         <tr>
           <td colSpan={10} className="py-10 text-center text-gray-500">
             No experts found.

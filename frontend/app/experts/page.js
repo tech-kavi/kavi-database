@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements} from 'react-instantsearch-hooks-web';
 import Card from '../components/Card';
 import ExpertSidePanel from '../components/ExpertSidePanel';
@@ -448,8 +448,10 @@ export default function Search() {
   const { hits } = useHits();
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [searchAttributes, setSearchAttributes] = useState(null); 
-
+ 
   const { refine: clearAllRefinements } = useClearRefinements();
+
+
 
 
   //const { switchIndex } = useIndex();
@@ -469,8 +471,9 @@ export default function Search() {
         refresh();
       }, 5000); // 200ms delay, adjust as needed
 
-      console.log(hits);
+      //console.log(hits);
     }
+
 
 
 
@@ -570,7 +573,6 @@ export default function Search() {
             onClose={() => setSelectedSlug(null)}
             onSelectSlug={setSelectedSlug}
             refreshHits={refreshHits}
-            
           />
         )}
       </div>
