@@ -7,6 +7,7 @@ import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useAuth } from './components/AuthProvider';
 import toast from 'react-hot-toast';
+import { TYPE_COLORS } from './constants/options';
 
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -70,16 +71,44 @@ export default function Dashboard() {
 
   const typeLabels = dashboard ? Object.keys(dashboard?.typeCounts):[];
   const typeData = dashboard ? Object.values(dashboard?.typeCounts):[];
-  const pieData = dashboard? { labels: typeLabels, datasets: [{ label: 'Expert Distribution', data: typeData, backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'] }] } : {
+  const pieData = dashboard? { labels: typeLabels, datasets: [{ label: 'Expert Distribution', data: typeData, backgroundColor: [
+  '#ef4444', // Competitor - red
+  '#3b82f6', // Consultant - blue
+  '#10b981', // Customer - green
+  '#f59e0b', // Dealer - amber
+  '#8b5cf6', // Distributor - violet
+  '#ec4899', // Franchisee - pink
+  '#14b8a6', // Former - teal
+  '#6366f1', // Industry Expert - indigo
+  '#f472b6', // Partner - rose
+  '#0ea5e9', // Reference - sky
+  '#84cc16', // Supplier - lime
+  '#a3a3a3'  // Others - neutral gray
+] }] } : {
   labels: typeLabels,
   datasets: [
     {
       label: 'Expert Distribution',
       data: typeData,
-      backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'],
+      backgroundColor: [
+  '#ef4444', // Competitor - red
+  '#3b82f6', // Consultant - blue
+  '#10b981', // Customer - green
+  '#f59e0b', // Dealer - amber
+  '#8b5cf6', // Distributor - violet
+  '#ec4899', // Franchisee - pink
+  '#14b8a6', // Former - teal
+  '#6366f1', // Industry Expert - indigo
+  '#f472b6', // Partner - rose
+  '#0ea5e9', // Reference - sky
+  '#84cc16', // Supplier - lime
+  '#a3a3a3'  // Others - neutral gray
+],
     },
   ],
 };
+
+
 
   return (
     <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8">
