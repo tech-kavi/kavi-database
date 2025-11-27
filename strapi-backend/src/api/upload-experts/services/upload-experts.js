@@ -146,6 +146,13 @@ const SOR = [
   "Others"
 ]
 
+const toNumberOrNull = (value) => {
+  if (value === undefined || value === null) return null;
+  if (value === "") return null;
+  const num = Number(value);
+  return isNaN(num) ? null : num;
+};
+
 
 
 module.exports = ({ strapi }) => ({
@@ -1031,10 +1038,36 @@ module.exports = ({ strapi }) => ({
         buffer = Buffer.from(response.data);
       }
 
+      // const workbook = XLSX.read(buffer, { type: 'buffer' });
+      // const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      // const rawData = XLSX.utils.sheet_to_json(sheet);
+      // const data = rawData.map(remapRow);
+
+      let rawData = [];
+
+    if (file.ext === '.csv') {
+      // CSV HANDLING
+      const csvString = buffer.toString('utf8');
+
+      const workbook = XLSX.read(csvString, { type: 'string' });
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      rawData = XLSX.utils.sheet_to_json(sheet, {
+        defval: "" // Prevent undefined values
+      });
+
+    } else {
+      // XLSX HANDLING
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData = XLSX.utils.sheet_to_json(sheet);
-      const data = rawData.map(remapRow);
+
+      rawData = XLSX.utils.sheet_to_json(sheet, {
+        defval: ""
+      });
+    }
+
+    const data = rawData.map(remapRow);
 
 
 
@@ -1182,7 +1215,7 @@ module.exports = ({ strapi }) => ({
                   company: CompanyName.trim(),
                   target_company: targetCompany?.documentId || null,
                   expert: expert.documentId,
-                  quote: negotiatedquote,
+                  quote: toNumberOrNull(negotiatedquote),
                   engagement_status: status?.trim() || 'Uncontacted',
                   sub_industry: foundIndustry?.documentId || null,
                 },
@@ -1202,7 +1235,7 @@ module.exports = ({ strapi }) => ({
                   companies: targetCompany?.documentId || null,
                   tags: parseTags(Tags),
                   ra_comments: Comments || null,
-                  original_quote: originalquote,
+                  original_quote: toNumberOrNull(originalquote),
                   source_of_response: sourceofresponse?.trim() || null,
                   expert_status: status?.trim() || 'Uncontacted',
                   screening: screening?.trim() || '',
@@ -1223,7 +1256,7 @@ module.exports = ({ strapi }) => ({
                   upload_file_details: SheetName.trim(),
                   company: CompanyName.trim(),
                   target_company: targetCompany?.documentId || null,
-                  quote: negotiatedquote,
+                  quote: toNumberOrNull(negotiatedquote),
                   engagement_status: status?.trim() || 'Uncontacted',
                   expert: newExpert.documentId,
                   sub_industry: foundIndustry?.documentId || null,

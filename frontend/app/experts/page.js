@@ -15,7 +15,7 @@ const ATTRIBUTE_OPTIONS = [
   { label: "Name", value: ["name"] },
   { label: "Designation", value: ["designation"] },
   { label: "Company", value: ["company"] },
-  { label: "Target Company", value: ["target_company.name"] },
+  { label: "Topic", value: ["target_company.name"] },
   { label: "Notes", value: ["notes"] },
   { label: "Screening", value: ["screening"] },
   { label: "Email", value: ["email"] },
