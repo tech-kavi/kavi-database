@@ -126,7 +126,7 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
 
         // console.log(slug);
         // Filter out empty values
-         const allowNullFields = ['original_quote', 'ra_comments', 'screening', 'credits','notes'];
+         const allowNullFields = ['original_quote', 'ra_comments', 'screening', 'credits','notes',"email","phone"];
 
           const cleanedData = {};
           for (const key in body) {
