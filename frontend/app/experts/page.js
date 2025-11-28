@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements} from 'react-instantsearch-hooks-web';
+import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements, ToggleRefinement } from 'react-instantsearch-hooks-web';
 import Card from '../components/Card';
 import ExpertSidePanel from '../components/ExpertSidePanel';
 import Head from 'next/head';
@@ -152,7 +152,6 @@ function OriginalQuoteFilter({ attribute }) {
 
 
 
-
 function DropdownFilters({ open, setOpen,setSelectedSlug }) {
   const containerRef = useRef(null);
 
@@ -183,6 +182,16 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
           
       >
         <div className="flex flex-col gap-6 text-sm max-h-[400px] overflow-y-auto">
+
+          <ToggleRefinement attribute="has_phone" label='Has Phone' on={true} 
+            classNames={{
+              checkbox: 'form-checkbox h-4 w-4 text-blue-600',
+              list: 'space-y-1 max-h-32 overflow-y-auto',
+              item: 'flex items-center justify-between text-sm text-gray-800 hover:bg-gray-50 p-1 rounded',
+              label: 'flex items-center gap-2 cursor-pointer',
+              count: 'text-gray-500 text-xs',
+            }}
+          />
           
             <h3 className="text-gray-700 font-semibold text-base border-b border-gray-200 pb-1">Type</h3>
             <RefinementList

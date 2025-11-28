@@ -297,6 +297,7 @@ module.exports = ({ strapi }) => ({
     if (!expert) return;
 
     // Transform expert into Algolia record(s)
+    const hasPhone = expert.phone && expert.phone.trim() !== "" ? true : false;
     const transformedExperts = expert.expert_experiences?.length
       ? expert.expert_experiences.map(exp => ({
         objectID: `${expert.slug}_${exp.exp_slug}`,
@@ -306,6 +307,7 @@ module.exports = ({ strapi }) => ({
         email: expert.email,
         linkedin: expert.linkedin,
         phone: expert.phone,
+        has_phone: hasPhone,
         tags: expert.tags,
         last_update: expert.last_update,
         original_quote: expert.original_quote,
@@ -329,6 +331,7 @@ module.exports = ({ strapi }) => ({
         email: expert.email,
         linkedin: expert.linkedin,
         phone: expert.phone,
+        has_phone: hasPhone,
         tags: expert.tags,
         original_quote: Number(expert.original_quote),
         createdAt: expert.createdAt,
@@ -391,6 +394,7 @@ module.exports = ({ strapi }) => ({
 
 
     const transformedExperts = allExperts.flatMap(expert => {
+      const hasPhone = expert.phone && expert.phone.trim() !== "" ? true : false;
       if (expert.expert_experiences?.length > 0) {
         return expert.expert_experiences.map(exp => ({
           objectID: `${expert.slug}_${exp.exp_slug}`,  // unique record
@@ -405,6 +409,7 @@ module.exports = ({ strapi }) => ({
           notes: expert.notes,
           linkedin: expert.linkedin,
           phone: expert.phone,
+          has_phone: hasPhone,
           original_quote: Number(expert.original_quote),
           project: expert.projects,
           screening: expert.screening,
@@ -440,6 +445,7 @@ module.exports = ({ strapi }) => ({
         tags: expert.tags,
         linkedin: expert.linkedin,
         phone: expert.phone,
+        has_phone: hasPhone,
         original_quote: expert.original_quote,
         createdAt: expert.createdAt,
         updatedAt: expert.updatedAt,
@@ -496,6 +502,7 @@ module.exports = ({ strapi }) => ({
 
 
     const transformedExperts = allExperts.flatMap(expert => {
+      const hasPhone = expert.phone && expert.phone.trim() !== "" ? true : false;
       if (expert.expert_experiences?.length > 0) {
         return expert.expert_experiences.map(exp => ({
           objectID: `${expert.slug}_${exp.exp_slug}`,  // unique record
@@ -510,6 +517,7 @@ module.exports = ({ strapi }) => ({
           notes: expert.notes,
           linkedin: expert.linkedin,
           phone: expert.phone,
+          has_phone: hasPhone,
           original_quote: Number(expert.original_quote),
           project: expert.projects,
           screening: expert.screening,
@@ -545,6 +553,7 @@ module.exports = ({ strapi }) => ({
         tags: expert.tags,
         linkedin: expert.linkedin,
         phone: expert.phone,
+        has_phone: hasPhone,
         original_quote: expert.original_quote,
         createdAt: expert.createdAt,
         updatedAt: expert.updatedAt,
