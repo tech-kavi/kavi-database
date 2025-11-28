@@ -165,6 +165,36 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
   }
 
 
+   const handleExpertSave = async (updatedData) => {
+      console.log('inside expert save');
+      console.log(updatedData);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
+        {
+          data: updatedData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updatedExpert = res.data;
+      setExpert(updatedExpert);
+      console.log(updatedExpert);
+      setShowEditDetailsModal(false);
+
+    } catch (err) {
+      console.error("error",err);
+      //alert('Failed to update expert details.');
+      toast.error(err.response.data.message);
+    }
+    
+  };
+
+
   const showPrev = () => {
     if (currentIndex > 0) {
       const prevSlug = hits[currentIndex - 1].slug;
@@ -224,7 +254,15 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
         {!loading && expert && (
          <>
         <div className="space-y-2">
+          <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">{expert.name}</h2>
+          <button
+            className="text-blue-600 hover:text-blue-800 text-sm border px-2 py-1 rounded"
+            onClick={() => setShowEditDetailsModal(true)}
+          >
+            ✏️ Edit
+          </button>
+        </div>
 
           {expert.linkedin && (
             <a
@@ -324,6 +362,14 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
                 onSave={handleSave}
               />
             )}
+
+              {showEditDetailsModal && (
+                  <EditExpertDetailsModal
+                    expert={expert}
+                    onClose={() => setShowEditDetailsModal(false)}
+                    onSave={handleExpertSave}
+                  />
+                )}
   </>
   );
 }
