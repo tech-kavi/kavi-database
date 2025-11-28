@@ -47,9 +47,11 @@ export default function ExpertPage() {
 
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [isEditingScreening, setIsEditingScreening] = useState(false);
+  const [isEditingBank, setIsEditingBank] = useState(false);
   const [notesValue, setNotesValue] = useState('');
   const [screeningValue, setScreeningValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [bankValue,setBankValue] = useState('');
 
 
 
@@ -431,6 +433,60 @@ export default function ExpertPage() {
   )}
 </div>
 
+
+<div className="bg-white p-6 rounded-xl shadow-md">
+  <div className="flex justify-between items-center border-b pb-2 mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">Bank Details</h2>
+    {!isEditingBank ? (
+      <button
+        className="text-sm text-indigo-600 hover:text-indigo-800 min-h-[48px]"
+        onClick={() => {
+          setBankValue(expert.bank_details || '');
+          setIsEditingBank(true);
+        }}
+      >
+        ✏️ Edit
+      </button>
+    ) : null}
+  </div>
+
+  {!isEditingBank ? (
+    <p className="text-gray-600 whitespace-pre-line">{expert.bank_details || '-'}</p>
+  ) : (
+    <div className="space-y-3">
+      <textarea
+        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+        rows={15}
+        value={bankValue}
+        onChange={(e) => setBankValue(e.target.value)}
+      />
+      <div className="flex justify-end gap-3">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          onClick={() => setIsEditingBank(false)}
+          disabled={isSaving}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2"
+          onClick={async () => {
+            setIsSaving(true);
+            await handleExpertSave({ bank_details: bankValue });
+            setIsSaving(false);
+            setIsEditingBank(false);
+          }}
+          disabled={isSaving}
+        >
+          {isSaving && (
+            <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
+          Save
+        </button>
+      </div>
+    </div>
+  )}
+</div>
 
 
 

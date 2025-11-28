@@ -257,7 +257,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
           <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">{expert.name}</h2>
           <button
-            className="text-blue-600 hover:text-blue-800 text-sm border px-2 py-1 rounded"
+            className="text-blue-600 hover:text-blue-800 text-sm border px-2 py-1 rounded cursor-pointer"
             onClick={() => setShowEditDetailsModal(true)}
           >
             ✏️ Edit

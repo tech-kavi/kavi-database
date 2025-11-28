@@ -203,7 +203,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               onChange={(e) => handleChange('screening', e.target.value)}
             ></textarea>
           </div> */}
-
+{/* 
           <div>
             <label>Bank Details</label>
             <textarea
@@ -212,7 +212,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               value={formData.bank_details}
               onChange={(e) => handleChange('bank_details', e.target.value)}
             ></textarea>
-          </div>
+          </div> */}
 
           <div>
             <label>Credits</label>
