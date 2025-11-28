@@ -483,7 +483,8 @@ module.exports = ({ strapi }) => ({
       filters: { id: { $in: expertIds } },
       populate: {
         expert_experiences: {
-          populate: ['target_company', 'sub_industry']
+          populate: ['target_company', 'sub_industry'],
+          limit:-1
         },
         projects: true,
         companies: true,
@@ -1243,6 +1244,8 @@ module.exports = ({ strapi }) => ({
                 },
                 trx,
               });
+
+              expertMap.set(normalizeLinkedIn(newExpert.linkedin), newExpert);
 
               affectedExperts.add(newExpert.id);
 
