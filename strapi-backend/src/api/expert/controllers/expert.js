@@ -1,6 +1,5 @@
 // @ts-nocheck
 'use strict';
-
 // @ts-ignore
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -126,18 +125,26 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
 
         // console.log(slug);
         // Filter out empty values
-         const allowNullFields = ['original_quote', 'ra_comments', 'screening', 'credits','notes',"email","phone"];
+        const allowNullFields = ['original_quote', 'ra_comments', 'screening', 'credits','notes',"email","phone","bank_details","source_of_response","compliance"];
 
-          const cleanedData = {};
-          for (const key in body) {
-            if (body[key] !== undefined) {
-              if (body[key] === '' && allowNullFields.includes(key)) {
-                cleanedData[key] = null; // ✅ use null instead of empty string
-              } else if (body[key] !== '') {
-                cleanedData[key] = body[key];
+        const cleanedData = {};
+        for (const key in body) {
+          if (body[key] !== undefined) {
+            
+            if (body[key] === '' || body[key] === null) {
+              // If the field is empty or null
+              if (allowNullFields.includes(key)) {
+                cleanedData[key] = null; // ✅ allowed, convert empty string to null
+              } else {
+                // ❌ Not allowed, throw error
+                throw new Error(`Field "${key}" cannot be empty or null`);
               }
+            } else {
+              cleanedData[key] = body[key]; // normal value
             }
+
           }
+        }
 
           const expertDetails = await strapi.db.query('api::expert.expert').findOne({
             where: { slug: slug },
@@ -183,6 +190,10 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
         
     }catch(err){
         console.log(err);
+
+        return ctx.send({error:true,
+          message:err.message || 'Failed to update expert details',
+        },400);
     }
   
 

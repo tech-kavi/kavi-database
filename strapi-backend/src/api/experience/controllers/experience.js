@@ -27,7 +27,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
         'end_date',
         'source_of_response',
         'engagement_status',
-        'quote',
+        "quote",
       ];
 
       const updateData = {};
@@ -62,6 +62,8 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
           updateData[field] = value;
         }
       });
+
+
 
       // ✅ Handle relation update
     if (body.target_company) {
@@ -146,6 +148,9 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
     } catch (err) {
       console.log(err);
+      return ctx.send({error:true,
+          message:err.message || 'Failed to update expert details',
+        },400);
     }
 
   }

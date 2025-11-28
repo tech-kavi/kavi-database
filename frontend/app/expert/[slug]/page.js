@@ -87,7 +87,7 @@ export default function ExpertPage() {
 
   const handleSave = async (updatedExp) => {
     console.log("inside exp save");
-    console.log(updatedExp);
+   
     try {
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experiences/${updatedExp.exp_slug}`,
@@ -96,14 +96,17 @@ export default function ExpertPage() {
       );
       const updatedExpert = res.data;
       setExpert(updatedExpert);
-      console.log(updatedExpert);
+     // console.log(updatedExpert);
       setEditingExp(null);
       //alert('Experience updated successfully!');
       toast.success('Experience updated successfully!');
     } catch (err) {
-      console.error(err);
       //alert('Failed to update experience');
-      toast.error('Failed to update experience');
+      console.log("error",err);
+    
+
+    toast.error(err.response.data.message);
+
     }
   };
 
@@ -144,49 +147,7 @@ export default function ExpertPage() {
     setEditingExp(experience)
   }
 
-  // const handleExpUpdate = async (updatedExp) => {
 
-  //   console.log(updatedExp);
-
-
-  //   try {
-  //     const res = await axios.put(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experiences/${updatedExp.exp_slug}`,
-  //       {
-  //         data: {
-  //           experienceId: updatedExp.id,
-  //           designation: updatedExp.designation,
-  //           type: updatedExp.type,
-  //           start_date: updatedExp.start_date,
-  //           end_date: updatedExp.end_date,
-  //           engagement_status: updatedExp.engagement_status,
-  //           source_of_response: updatedExp.source_of_response,
-  //           quote: updatedExp.quote,
-  //         },
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem('token')}`, // or remove if public
-  //         }
-  //       }
-  //     );
-
-  //     const updatedExpert = res.data;
-
-
-  //     setExpert(updatedExpert)
-
-  //     alert('Update Successful.');
-  //     setEditingExp(null);
-  //     refetchHits();
-
-
-  //   } catch (err) {
-  //     console.error('Failed to update experience:', err)
-  //     alert('Update failed.')
-  //   }
-  //   setEditingExp(null)
-  // }
 
 
   const handleExpertSave = async (updatedData) => {
@@ -211,9 +172,9 @@ export default function ExpertPage() {
       setShowEditDetailsModal(false);
 
     } catch (err) {
-      console.error(err);
+      console.error("error",err);
       //alert('Failed to update expert details.');
-      toast.error('Failed to update expert details');
+      toast.error(err.response.data.message);
     }
     
   };

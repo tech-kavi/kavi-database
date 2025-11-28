@@ -26,6 +26,7 @@ import { ENGAGEMENT_OPTIONS } from '../constants/options';
 import { SOURCE_OF_RESPONSE } from '../constants/options';
 
 export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
+
   const [formData, setFormData] = useState({
     email: expert.email || '',
     linkedin: expert.linkedin || '',
@@ -41,6 +42,8 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     credits: expert.credits || 0,
     compliance: expert.compliance || '',
   });
+
+
 
   // const [tagsInput, setTagsInput] = useState(formData.tags.join(', '));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -158,15 +161,17 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             <select
               name="source_of_response"
               className="input-field"
-              value={formData.source_of_response || ''}
-              onChange={(e) => handleChange('source_of_response', e.target.value || null)}
+              value={formData.source_of_response || ''} // keeps controlled
+              onChange={(e) => handleChange('source_of_response', e.target.value)}
             >
+              <option value="">Select source</option> {/* Add a default blank option */}
               {SOURCE_OF_RESPONSE.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
             </select>
+
           </div>
 
           {/* <div>
