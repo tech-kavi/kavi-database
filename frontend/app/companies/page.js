@@ -108,7 +108,7 @@ export default function Companies() {
               <div className="border border-gray-200 p-5 rounded-3xl bg-white shadow-md hover:shadow-lg transition duration-200">
                 <h2 className="text-xl font-semibold mb-2 text-gray-800">{company.name}</h2>
                 <p className="text-gray-700 mt-2">
-                  <span className="font-semibold">Tags:</span>{' '}
+                  <span className="font-semibold">Experts:</span>{' '}
                   {company.expertCount}
                 </p>
                 <p className="text-gray-700 mt-2">
