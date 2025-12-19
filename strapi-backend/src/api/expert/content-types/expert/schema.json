@@ -82,7 +82,8 @@
         "Not interested at all",
         "Not interested in project",
         "Call scheduled",
-        "Call done"
+        "Call done",
+        "Not relevant"
       ]
     },
     "tags": {

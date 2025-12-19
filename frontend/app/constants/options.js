@@ -2,7 +2,7 @@
 
 export const ENGAGEMENT_COLORS = {
   'Uncontacted': 'bg-gray-200 text-gray-800',
-  'No response': 'bg-red-100 text-red-700',
+  'No response': 'bg-red-100 text-red-400',
   'Contacted but not screened': 'bg-yellow-100 text-yellow-700',
   'Contacted & screened': 'bg-blue-100 text-blue-700',
   'Sent to client': 'bg-indigo-100 text-indigo-700',
@@ -15,7 +15,8 @@ export const ENGAGEMENT_COLORS = {
   'Not interested in project': 'bg-yellow-300 text-yellow-800',
   'Call scheduled': 'bg-green-100 text-green-700',
   'Call done': 'bg-green-200 text-green-800',
-  'Call again': 'bg-blue-200 text-blue-800'
+  'Call again': 'bg-blue-200 text-blue-800',
+  'Not relevant': 'bg-red-300 text-red-800'
 };
 
 export const TYPE_COLORS = {
@@ -64,6 +65,7 @@ export const ENGAGEMENT_OPTIONS = [
   'Sent to client',
   'Six mos rule',
   'Uncontacted',
+  'Not relevant'
 ];
 
 
