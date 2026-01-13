@@ -527,10 +527,7 @@ export default function Search() {
           <SortBy
             items={[
               { label: 'Latest', value: 'development_api::expert.expert' },
-              { label: 'Name (A-Z)', value: 'experts_by_name' },
               { label: 'Original Quote (1-*)', value: 'experts_by_original_quote' },
-              { label: 'Normal Status (A-Z)', value: 'experts_by_normal_status' },
-              { label: 'Type (A-Z)', value: 'experts_by_type' },
               { label: 'End Date(*-0)', value: 'expert_by_enddate' },
             ]}
             defaultValue="development_api::expert.expert"
