@@ -438,6 +438,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
         'Not interested in project',
         'Call scheduled',
         'Call done',
+        'Not relevant',
       ]
     >;
     exp_slug: Schema.Attribute.UID<'designation'> & Schema.Attribute.Required;
@@ -522,6 +523,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
         'Not interested in project',
         'Call scheduled',
         'Call done',
+        'Not relevant',
       ]
     >;
     last_update: Schema.Attribute.Component<'update.update', false>;

@@ -467,6 +467,457 @@ module.exports = ({ strapi }) => ({
     strapi.log.info(`Algolia re-indexing completed for Experts.`);
   },
 
+  // async indexExpertsToAlgolia(expertIds = []) {
+  //   const strapiAlgolia = strapi.plugin('strapi-algolia');
+  //   const { applicationId, apiKey, contentTypes, indexPrefix = "", transformerCallback } = strapi.config.get('plugin::strapi-algolia');
+
+  //   const algoliaService = strapiAlgolia.service('algolia');
+  //   const strapiService = strapiAlgolia.service('strapi');
+
+  //   const client = await algoliaService.getAlgoliaClient(applicationId, apiKey);
+
+
+  //   const contentTypeName = 'api::expert.expert';
+  //   const indexName = 'development_api::expert.expert';  // your Algolia index name
+  //   const idPrefix = '';
+  //   const hideFields = [];
+  //   const transformToBooleanFields = [];
+
+
+
+  //   const allExperts = await strapi.documents('api::expert.expert').findMany({
+  //     filters: { id: { $in: expertIds } },
+  //     populate: {
+  //       expert_experiences: {
+  //         populate: ['target_company', 'sub_industry'],
+  //       },
+  //       projects: true,
+  //       companies: true,
+  //       last_update: true,
+  //     },
+  //     status: 'published',
+  //     limit: -1,
+  //   });
+
+
+  //   const transformedExperts = allExperts.flatMap(expert => {
+  //     const hasPhone = expert.phone && expert.phone.trim() !== "" ? true : false;
+  //     if (expert.expert_experiences?.length > 0) {
+  //       return expert.expert_experiences.map(exp => ({
+  //         objectID: `${expert.slug}_${exp.exp_slug}`,  // unique record
+  //         slug: expert.slug,                   // for distinct
+  //         expertId: expert.id,
+  //         name: expert.name,
+  //         email: expert.email,
+  //         tags: expert.tags,
+  //         last_update: expert.last_update,
+  //         expert_status: expert.expert_status,
+  //         source_of_response: expert.source_of_response,
+  //         notes: expert.notes,
+  //         linkedin: expert.linkedin,
+  //         phone: expert.phone,
+  //         has_phone: hasPhone,
+  //         original_quote: Number(expert.original_quote),
+  //         project: expert.projects,
+  //         screening: expert.screening,
+
+  //         // spread all fields from experience (so you keep createdAt, updatedAt, etc.)
+  //         ...exp,
+
+  //         // normalize relations inside exp
+  //         company: exp.company,
+  //         target_company: exp.target_company
+  //           ? { id: exp.target_company.id, name: exp.target_company.name, comp_slug: exp.target_company.comp_slug }
+  //           : null,
+
+  //         sub_industry: exp.sub_industry ? { id: exp.sub_industry.id, name: exp.sub_industry.name, ind_slug: exp.sub_industry.ind_slug } : null,
+
+  //         // Add timestamps as numeric fields (for easier range filters/sorting)
+  //         start_date_ts: exp.start_date
+  //           ? Math.floor(new Date(exp.start_date).getTime() / 1000)
+  //           : 0,
+  //         end_date_ts: exp.end_date
+  //           ? Math.floor(new Date(exp.end_date).getTime() / 1000)
+  //           : 0,
+  //       }));
+  //     }
+
+  //     // fallback when no experiences exist
+  //     return [{
+  //       objectID: `${expert.slug}_noexp`,
+  //       slug: expert.slug,
+  //       expertId: expert.id,
+  //       name: expert.name,
+  //       email: expert.email,
+  //       tags: expert.tags,
+  //       linkedin: expert.linkedin,
+  //       phone: expert.phone,
+  //       has_phone: hasPhone,
+  //       original_quote: expert.original_quote,
+  //       createdAt: expert.createdAt,
+  //       updatedAt: expert.updatedAt,
+  //     }];
+  //   });
+
+
+  //   await strapiService.afterUpdateAndCreateAlreadyPopulate(
+  //     contentTypeName,
+  //     transformedExperts,
+  //     idPrefix,
+  //     client,
+  //     indexName,
+  //     transformToBooleanFields,
+  //     hideFields,
+  //     transformerCallback
+  //   );
+
+  //   strapi.log.info(`Algolia re-indexing completed for Experts.`);
+  // },
+
+
+
+
+  // async processExpertFileInBackground(fileId, uploaderEmail, topic,gotLock) {
+ 
+  //   if (!gotLock) throw new Error('No active upload lock found');
+
+
+  //   try {
+  //     const file = await strapi.entityService.findOne('plugin::upload.file', fileId);
+  //     if (!file) throw new Error('Uploaded file not found in Media Library');
+
+  //     let buffer;
+  //     if (file.provider === 'local') {
+  //       const localPath = `public${file.url}`;
+  //       buffer = fs.readFileSync(localPath);
+  //     } else {
+  //       const response = await axios.get(file.url, { responseType: 'arraybuffer' });
+  //       buffer = Buffer.from(response.data);
+  //     }
+
+  //     // const workbook = XLSX.read(buffer, { type: 'buffer' });
+  //     // const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  //     // const rawData = XLSX.utils.sheet_to_json(sheet);
+  //     // const data = rawData.map(remapRow);
+
+  //     let rawData = [];
+
+  //   if (file.ext === '.csv') {
+  //     // CSV HANDLING
+  //     const csvString = buffer.toString('utf8');
+
+  //     const workbook = XLSX.read(csvString, { type: 'string' });
+
+  //     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  //     rawData = XLSX.utils.sheet_to_json(sheet, {
+  //       defval: "" // Prevent undefined values
+  //     });
+
+  //   } else {
+  //     // XLSX HANDLING
+  //     const workbook = XLSX.read(buffer, { type: 'buffer' });
+  //     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  //     rawData = XLSX.utils.sheet_to_json(sheet, {
+  //       defval: ""
+  //     });
+  //   }
+
+  //   const data = rawData.map(remapRow);
+
+
+
+  //     await strapi.documents('api::upload-lock.upload-lock').update({
+  //       documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+  //       data: {
+  //         total_rows: data.length,
+  //         progress: 0,
+  //         process_status: 'processing',
+  //       },
+  //       status: 'published', // ✅ instantly publishes
+  //     });
+
+  //     // Basic validations
+  //     const errors = [];
+  //     data.forEach((row, index) => {
+  //       const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName } = row;
+  //       if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
+  //       if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
+  //       // if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
+  //       if (!Type || !TYPE_ENUM.includes(Type.trim())) errors.push(`Row ${index + 2}: Invalid Type`);
+  //       if (status && !ENGAGEMENT_ENUM.includes(status.trim())) errors.push(`Row ${index + 2}: Invalid status`);
+  //       if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
+  //       if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
+  //       if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
+  //       if (!industry) errors.push(`Row ${index + 2}: Industry is missing`);
+  //     });
+
+  //     if (errors.length > 0) {
+  //       await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Validation Errors',
+  //         html: `<p>Errors found before processing:</p><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`
+  //       });
+  //       const err = new Error('Validation failed.');
+  //       err.alreadyNotified = true;
+  //       throw err;
+  //     }
+
+  //     //const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+  //     const linkedinKeys = data
+  //       .map(row => row.LinkedIn ? normalizeLinkedIn(row.LinkedIn) : null)
+  //       .filter(Boolean);
+
+  //     const allExperts = await strapi.entityService.findMany('api::expert.expert', {
+  //       fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes'],
+  //       filters: { linkedin: { $in: linkedinKeys } },
+  //       limit: linkedinKeys.length,
+  //     });
+  //     const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
+
+  //     const industriesArray = Array.from(new Set(data.map(r => r.industry?.trim()).filter(Boolean)));
+  //     const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
+  //       fields: ['id', 'name'],
+  //       filters: { name: { $in: industriesArray } },
+  //     });
+  //     const industryMap = new Map(allindustries.map(c => [c.name.trim(), c]));
+  //     const missingIndustries = industriesArray.filter(name => !industryMap.has(name));
+  //     if (missingIndustries.length > 0) {
+  //       await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Missing Sub-Industries',
+  //         html: `<h2>Upload Failed</h2><p>Missing sub-industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
+  //       });
+  //       const err = new Error('Missing SubIndustries');
+  //       err.alreadyNotified = true;
+  //       throw err;
+  //     }
+
+  //     const companyNamesArray = Array.from(new Set(data.map(r => r.TargetCompany?.trim()).filter(Boolean)));
+  //     const allCompanies = await strapi.entityService.findMany('api::company.company', {
+  //       fields: ['id', 'name'],
+  //       filters: { name: { $in: companyNamesArray } },
+  //     });
+  //     const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
+  //     const missingCompanies = companyNamesArray.filter(name => !companyMap.has(name));
+  //     if (missingCompanies.length > 0) {
+  //       await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Upload Failed - Missing Companies',
+  //         html: `<h2>Upload Failed</h2><p>Missing companies:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
+  //       });
+  //       const err = new Error('Missing Companies');
+  //       err.alreadyNotified = true;
+  //       throw err;
+  //     }
+
+  //     const slugify = str => str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+  //     let created = 0, updated = 0;
+  //     const rowErrors = [];
+  //     const sheetNamesSet = new Set();
+  //     const affectedExperts = new Set();
+
+  //     const batchSize = 25;
+  //     // 🔑 Process each row atomically
+  //     for (let index = 0; index < data.length; index++) {
+  //       const row = data[index];
+  //       try {
+  //         await strapi.db.transaction(async ({ trx }) => {
+  //           const { SheetName, CompanyName, LinkedIn, Start, End, TargetCompany, Name, Type, Designation, Tags, Comments, negotiatedquote, sourceofresponse, screening, notes, status, Phone, originalquote, Email, industry } = row;
+
+  //           if (SheetName) sheetNamesSet.add(SheetName.trim());
+
+  //           // if (!Name || !LinkedIn) throw new Error("Name or LinkedIn missing");
+
+
+  //           //const linkedinKey = normalizeLinkedIn(LinkedIn);
+  //           const linkedinKey = LinkedIn ? normalizeLinkedIn(LinkedIn) : null;
+  //           // let expert = expertMap.get(linkedinKey);
+  //           let expert = linkedinKey ? expertMap.get(linkedinKey) : null;
+  //           const targetCompany = companyMap.get(TargetCompany?.trim());
+  //           const foundIndustry = industryMap.get(industry?.trim());
+  //           const expSlug = getExperienceSlug({ LinkedIn, Designation, CompanyName, Start });
+
+  //           const parseTags = Tags => String(Tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
+  //           if (expert) {
+  //             let updateData = {};
+  //             if (Tags) updateData.tags = [...new Set([...(expert.tags || []), ...parseTags(Tags)])];
+  //             if (Comments) updateData.ra_comments = [Comments, expert.ra_comments].filter(Boolean).join('\n');
+  //             if (originalquote) updateData.original_quote = originalquote;
+  //             if (sourceofresponse) updateData.source_of_response = sourceofresponse?.trim();
+  //             if (screening) updateData.screening = [screening?.trim(), expert.screening || ''].filter(Boolean).join('\n');
+  //             if (notes) updateData.notes = [notes?.trim(), expert.notes || ''].filter(Boolean).join('\n');
+
+  //             if (Object.keys(updateData).length > 0) {
+  //               await strapi.documents('api::expert.expert').update({
+  //                 documentId: expert.documentId,
+  //                 data: updateData,
+  //                 status: 'published',
+  //                 trx,
+  //               });
+  //             }
+
+  //             affectedExperts.add(expert.id);
+
+  //             await strapi.entityService.create('api::experience.experience', {
+  //               data: {
+  //                 exp_slug: expSlug,
+  //                 type: Type.trim(),
+  //                 designation: Designation.trim(),
+  //                 start_date: parseExcelDate(Start),
+  //                 end_date: parseExcelDate(End),
+  //                 upload_file_details: SheetName.trim(),
+  //                 company: CompanyName.trim(),
+  //                 target_company: targetCompany?.documentId || null,
+  //                 expert: expert.documentId,
+  //                 quote: toNumberOrNull(negotiatedquote),
+  //                 engagement_status: status?.trim() || 'Uncontacted',
+  //                 sub_industry: foundIndustry?.documentId || null,
+  //               },
+  //               trx,
+  //             });
+
+  //             updated++;
+  //           } else {
+  //             const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
+  //             const newExpert = await strapi.entityService.create('api::expert.expert', {
+  //               data: {
+  //                 name: Name.trim(),
+  //                 linkedin: LinkedIn,
+  //                 phone: String(Phone || '').trim(),
+  //                 slug,
+  //                 email: Email,
+  //                 companies: targetCompany?.documentId || null,
+  //                 tags: parseTags(Tags),
+  //                 ra_comments: Comments || null,
+  //                 original_quote: toNumberOrNull(originalquote),
+  //                 source_of_response: sourceofresponse?.trim() || null,
+  //                 expert_status: status?.trim() || 'Uncontacted',
+  //                 screening: screening?.trim() || '',
+  //                 notes: notes?.trim() || '',
+  //               },
+  //               trx,
+  //             });
+
+  //             expertMap.set(normalizeLinkedIn(newExpert.linkedin), newExpert);
+
+  //             affectedExperts.add(newExpert.id);
+
+  //             await strapi.entityService.create('api::experience.experience', {
+  //               data: {
+  //                 exp_slug: expSlug,
+  //                 type: Type.trim(),
+  //                 designation: Designation.trim(),
+  //                 start_date: parseExcelDate(Start),
+  //                 end_date: parseExcelDate(End),
+  //                 upload_file_details: SheetName.trim(),
+  //                 company: CompanyName.trim(),
+  //                 target_company: targetCompany?.documentId || null,
+  //                 quote: toNumberOrNull(negotiatedquote),
+  //                 engagement_status: status?.trim() || 'Uncontacted',
+  //                 expert: newExpert.documentId,
+  //                 sub_industry: foundIndustry?.documentId || null,
+  //               },
+  //               trx,
+  //             });
+
+
+
+  //             created++;
+  //           }
+  //         });
+
+  //         // ✅ Progress update after successful transaction
+  //         if ((index+1) % batchSize === 0 || (index+1) === data.length - 1) {
+  //           const progressValue = Math.round(((index + 1) / data.length) * 100);
+
+  //           await strapi.documents('api::upload-lock.upload-lock').update({
+  //             documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+  //             data: {
+  //               progress: progressValue,
+  //             },
+  //             status: 'published', // ✅ instantly publishes
+  //           });
+  //         }
+
+  //       } catch (err) {
+  //         console.error(`❌ Error at row ${index + 2}:`, err);
+  //         rowErrors.push(`Row ${index + 2}: ${err.message}`);
+  //         continue; // move to next row
+  //       }
+  //     }
+
+  //     const affectedExpertIds = Array.from(affectedExperts);
+
+  //     await strapi.documents('api::upload-lock.upload-lock').update({
+  //       documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+  //       data: {
+  //         process_status: 'completed',
+  //         progress: 100,
+  //       },
+  //       status: 'published', // ✅ instantly publishes
+  //     });
+
+
+
+  //     // Trigger Algolia reindex in background
+  //     setTimeout(async () => {
+  //       try {
+  //         await strapi.service('api::upload-experts.upload-experts').indexExpertsToAlgolia(affectedExpertIds);
+  //         strapi.log.info('✅ Background algolia indexing completed.');
+  //       } catch (err) {
+  //         strapi.log.error('❌ Background algolia indexing failed:', err);
+  //       }
+  //     }, 0);
+
+
+
+  //     const sheetNamesList = Array.from(sheetNamesSet);
+  //     const sheetNamesHtml = sheetNamesList.length
+  //       ? `<p><strong>Sheet Names Found:</strong></p><ul>${sheetNamesList.map(name => `<li>${name}</li>`).join('')}</ul>`
+  //       : `<p><em>No sheet names detected in rows.</em></p>`;
+
+  //     await strapi.plugin('email').service('email').send({
+  //       to: uploaderEmail,
+  //       subject: `Expert Upload Result ${rowErrors.length > 0 ? '⚠️ - Errors Found' : ''}`,
+  //       html: `
+  //       <h2>Upload Completed</h2>
+  //       <ul>
+  //         <li>✅ Experts Created: ${created}</li>
+  //         <li>🔄 Experts Updated: ${updated}</li>
+  //       </ul>
+  //       ${rowErrors.length > 0 ? `<p>⚠️ Errors:</p><ul>${rowErrors.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+  //       ${sheetNamesHtml}
+  //     `,
+  //     });
+
+  //     strapi.log.info(`✅ Processing Completed. Created: ${created}, Updated: ${updated}`);
+  //   } catch (error) {
+  //     console.error('❌ Background Processing Error:', error);
+
+  //     await strapi.documents('api::upload-lock.upload-lock').update({
+  //       documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
+  //       data: {
+  //         process_status: 'failed',
+  //         error_message: error.message,
+  //       },
+  //       status: 'published', // ✅ instantly publishes
+  //     });
+  //     if (!error.alreadyNotified) {
+  //       await strapi.plugin('email').service('email').send({
+  //         to: uploaderEmail,
+  //         subject: 'Expert Upload Failed',
+  //         html: `<h2>Upload Failed</h2><p>Error: ${error.stack}</p>`
+  //       });
+  //     }
+  //   } finally {
+  //     await strapi.service('api::upload-lock.upload-lock').releaseLock();
+  //   }
+  // }
+
+
   async indexExpertsToAlgolia(expertIds = []) {
     const strapiAlgolia = strapi.plugin('strapi-algolia');
     const { applicationId, apiKey, contentTypes, indexPrefix = "", transformerCallback } = strapi.config.get('plugin::strapi-algolia');
@@ -486,7 +937,7 @@ module.exports = ({ strapi }) => ({
 
 
     const allExperts = await strapi.documents('api::expert.expert').findMany({
-      filters: { id: { $in: expertIds } },
+      filters: { documentId: { $in: expertIds } },
       populate: {
         expert_experiences: {
           populate: ['target_company', 'sub_industry'],
@@ -759,7 +1210,7 @@ module.exports = ({ strapi }) => ({
                 });
               }
 
-              affectedExperts.add(expert.id);
+              affectedExperts.add(expert.documentId);
 
               await strapi.entityService.create('api::experience.experience', {
                 data: {
@@ -803,7 +1254,7 @@ module.exports = ({ strapi }) => ({
 
               expertMap.set(normalizeLinkedIn(newExpert.linkedin), newExpert);
 
-              affectedExperts.add(newExpert.id);
+              affectedExperts.add(newExpert.documentId);
 
               await strapi.entityService.create('api::experience.experience', {
                 data: {
@@ -916,6 +1367,5 @@ module.exports = ({ strapi }) => ({
       await strapi.service('api::upload-lock.upload-lock').releaseLock();
     }
   }
-
 
 });
