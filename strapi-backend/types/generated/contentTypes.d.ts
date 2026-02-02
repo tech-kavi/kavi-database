@@ -471,7 +471,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
         'Former',
         'Industry Expert',
         'Partner',
-        'Refrence',
+        'Reference',
         'Supplier',
         'Others',
       ]
