@@ -116,11 +116,21 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
         field: "Updated Experience",
       };
 
+      // Prepare expert update data
+      const expertUpdateData = {
+        last_update: lastUpdate,
+      };
+
+      // ✅ Add target company to expert.companies relation
+      if (body.target_company) {
+        expertUpdateData.companies = {
+          connect: [{ documentId: body.target_company }],
+        };
+      }
+
       const updatedExpert = await strapi.documents('api::expert.expert').update({
         documentId: expertId,
-        data: {
-          last_update: lastUpdate,
-        },
+        data: expertUpdateData,
           populate: {
           expert_experiences: {
             populate: {
