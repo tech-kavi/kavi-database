@@ -91,6 +91,22 @@ function parseExcelDate(excelDate) {
   return null; // if all parsing fails
 }
 
+function toStringOrNull(value) {
+  if (value === undefined || value === null || value === '') return null;
+  return String(value).trim();
+}
+
+function toNumberOrNull(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const num = Number(value);
+  return isNaN(num) ? null : num;
+}
+
+function toEmailOrNull(value) {
+  if (!value) return null;
+  return String(value).trim().toLowerCase();
+}
+
 module.exports = ({ strapi }) => ({
   async processProjectFileInBackground(fileId, uploaderEmail,gotLock) {
 
@@ -270,8 +286,8 @@ module.exports = ({ strapi }) => ({
 
           // Update expert details if needed
           const updateData = {};
-          if (email) updateData.email = email;
-          if (phone) updateData.phone = phone;
+          if (email) updateData.email = toEmailOrNull(email);
+          if (phone) updateData.phone = toStringOrNull(phone);
 
           if (Object.keys(updateData).length > 0) {
             await strapi.documents('api::expert.expert').update({
