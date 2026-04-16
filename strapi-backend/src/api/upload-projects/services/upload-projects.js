@@ -285,7 +285,9 @@ module.exports = ({ strapi }) => ({
           }
 
           // Update expert details if needed
-          const updateData = {};
+          const updateData = {
+            expert_status:'Call done',
+          };
           if (email) updateData.email = toEmailOrNull(email);
           if (phone) updateData.phone = toStringOrNull(phone);
 
