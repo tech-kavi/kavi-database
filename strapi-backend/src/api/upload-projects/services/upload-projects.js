@@ -322,7 +322,7 @@ module.exports = ({ strapi }) => ({
             },
           });
 
-          affectedExpertIds.add(expert.id);
+          affectedExpertIds.add(expert.documentId);
           created++;
 
           if ((index+1) % batchSize === 0 || (index+1) === data.length - 1) {
