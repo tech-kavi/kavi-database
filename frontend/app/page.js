@@ -17,14 +17,17 @@ export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [period, setPeriod] = useState('week');
   const [loading, setLoading] = useState(true);
+  const [reIndex,setreIndex] = useState(false);
 
   const {user}=useAuth();
+
 
   useEffect(() => { document.title = `KAVI | Home`; }, []);
   useEffect(() => { const token = localStorage.getItem('token'); if (!token) router.push('/login'); }, []);
   useEffect(() => { fetchDashboard(); }, [period]);
 
   const handleReindex = async () => {
+    setreIndex(true);
     try {
       await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reindex-experts`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -36,21 +39,37 @@ export default function Dashboard() {
       //alert('Failed to start reindexing.');
       toast.error('Failed to start reindexing');
     } 
+    finally{
+      setreIndex(false);
+    }
   };
 
   const fetchDashboard = async () => {
-    setLoading(true);
+   // setLoading(true);
     try {
-      const resStats = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/expert-details`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      const resRecent = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recent-experts-count?period=${period}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+          const [resStats, resRecent] = await Promise.all([
+      axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/expert-details`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      ),
+      axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recent-experts-count?period=${period}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      ),
+    ]);
       setDashboard({
         ...resStats.data,
         recentExpertsCount: resRecent?.data?.count,
       });
+      
     } catch (err) {
         console.error(err);
         if (err.response?.status === 401) {
@@ -60,14 +79,11 @@ export default function Dashboard() {
         } else {
           toast.error('Failed to fetch dashboard data');
         }
-      }finally { setLoading(false); }
+      }finally { 
+       // setLoading(false);
+       }
   };
 
-  // if (loading) return (
-  //   <div className="flex items-center justify-center h-screen bg-gray-100">
-  //     <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
-  //   </div>
-  // );
 
   const typeLabels = dashboard ? Object.keys(dashboard?.typeCounts):[];
   const typeData = dashboard ? Object.values(dashboard?.typeCounts):[];
@@ -108,6 +124,14 @@ export default function Dashboard() {
   ],
 };
 
+  
+  if (!dashboard) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+      </div>
+    );
+  }
 
 
   return (
@@ -122,12 +146,12 @@ export default function Dashboard() {
          {user?.role?.type == "admin" && (
         <button
           onClick={handleReindex}
-          disabled={loading}
+          disabled={!reIndex}
           className={`mt-4 md:mt-0 px-6 py-3 rounded-lg text-white font-semibold shadow-md transition 
-            ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`
+            ${reIndex ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`
           }
         >
-          {loading ? "Reindexing..." : "Reindex Experts"}
+          {reIndex ? "Reindexing..." : "Reindex Experts"}
         </button>
          )}
       </div>
@@ -136,10 +160,10 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { label: 'Total Experts', value: dashboard?.totalExperts, subtitle: 'Active in database', color: 'from-gray-800 to-gray-700' },
-            { label: 'Average Quote', value: `${"₹" + dashboard?.avgQuote}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
-            { label: 'Calls Completed', value: dashboard?.callsCompleted, subtitle: 'Total', color: 'from-gray-500 to-gray-400' },
-            { label: 'Avg Call Price', value: `${"₹" + dashboard?.avgCallPrice}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
-            { label: 'Recent Uploads', value: dashboard?.recentExpertsCount, subtitle: period, color: 'from-gray-600 to-gray-500' },
+            { label: 'Average Quote', value: `${"₹" + dashboard?.avgQuote||''}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
+            { label: 'Calls Completed', value: dashboard?.callsCompleted ||'', subtitle: 'Total', color: 'from-gray-500 to-gray-400' },
+            { label: 'Avg Call Price', value: `${"₹" + dashboard?.avgCallPrice||''}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
+            { label: 'Recent Uploads', value: dashboard?.recentExpertsCount || '', subtitle: period, color: 'from-gray-600 to-gray-500' },
           ].map((stat, idx) => (
             <div key={idx} className={`bg-gradient-to-r ${stat.color} text-white p-6 rounded-2xl shadow-md hover:shadow-lg transition`}>
               <p className="text-sm opacity-80">{stat.label}</p>
