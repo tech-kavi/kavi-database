@@ -258,7 +258,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
   return (
     <>
       <div
-      className='fixed top-0 right-0 h-full w-96 bg-gray-200 shadow-2xl z-[9999] flex flex-col border-l border-gray-200'>
+      className='fixed top-0 right-0 h-full w-96 bg-gray-100 shadow-2xl z-[9999] flex flex-col border-l border-gray-200'>
 
       <div className={`flex justify-end items-center px-3 pt-4  pb-3 border-b sticky top-0 bg-white z-10 transform transition-transform duration-1000 ease-in-out ${
         isOpen ? "translate-x-0" : "translate-x-full"
@@ -321,7 +321,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
             <p><span className='font-semibold'>Phone:</span> {expert.phone}</p>
             <p><span className='font-semibold'>Source Of Response:</span> {expert.source_of_response}</p>
             <div className="flex items-center gap-2 text-gray-700 text-sm">
-                <span>Key Status:</span>
+                <span className='font-semibold'>Key Status:</span>
                 <Badge
                   label={expert.expert_status}
                   options={ENGAGEMENT_COLORS}
