@@ -474,11 +474,12 @@ export default function Search() {
 
     const { refresh, instantSearchInstance} = useInstantSearch();
 
+
     function refreshHits(){
       console.log('refresh');
       setTimeout(() => {
         refresh();
-      }, 5000); // 200ms delay, adjust as needed
+      }, 500); // 200ms delay, adjust as needed
 
       //console.log(hits);
     }

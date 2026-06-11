@@ -10,7 +10,8 @@ import AddProjectModal from './AddProjectModal'
 import EditExpertDetailsModal from './EditExpertDetailsModal'
 import { FiX, FiChevronLeft, FiChevronRight, FiExternalLink } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-
+import Badge from '../components/Badge';
+import { TYPE_COLORS, ENGAGEMENT_COLORS } from '../constants/options';
 
 
 const getTypeClass = (type) => {
@@ -45,6 +46,10 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
   const [loading, setLoading] = useState(false);
   const [expertCache, setExpertCache] = useState({});
   const [isOpen, setIsOpen] = useState(!!slug);
+
+const [isEditingScreening, setIsEditingScreening] = useState(false);
+const [screeningValue, setScreeningValue] = useState('');
+const [isSavingScreening, setIsSavingScreening] = useState(false);
 
   // Track current index in hits array
   const currentIndex = hits.findIndex(hit => hit.slug === slug);
@@ -194,6 +199,42 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
     
   };
 
+  const handleScreeningSave = async () => {
+  try {
+    setIsSavingScreening(true);
+
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts/${expert.slug}`,
+      {
+        data: {
+          screening: screeningValue,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    const updatedExpert = res.data;
+
+    setExpert(updatedExpert);
+
+    toast.success('Screening updated successfully!');
+
+    setIsEditingScreening(false);
+
+    refreshHits();
+
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to update screening');
+  } finally {
+    setIsSavingScreening(false);
+  }
+};
+
 
   const showPrev = () => {
     if (currentIndex > 0) {
@@ -279,6 +320,14 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
             <p><span className='font-semibold'>Email:</span> {expert.email}</p>
             <p><span className='font-semibold'>Phone:</span> {expert.phone}</p>
             <p><span className='font-semibold'>Source Of Response:</span> {expert.source_of_response}</p>
+            <div className="flex items-center gap-2 text-gray-700 text-sm">
+                <span>Key Status:</span>
+                <Badge
+                  label={expert.expert_status}
+                  options={ENGAGEMENT_COLORS}
+                  truncate={true}
+                />
+              </div>
             <p><span className='font-semibold'>Quote:</span> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}</p>
            
           </div>
@@ -292,7 +341,7 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
               {expert.expert_experiences.map((exp, index) => (
                 <div key={exp.id || index} className="p-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 bg-gray-50">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="font-medium text-gray-900">{exp.designation}</p>
+                    <p className="text-sm font-semibold text-gray-900">{exp.designation}</p>
                     <button className="text-blue-600 hover:text-blue-800 text-sm cursor-pointer" onClick={() => handleEdit(exp)}>
                       ✏️ Edit
                     </button>
@@ -301,7 +350,15 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
                     <span className={`px-2 py-0.5 rounded text-white ${getTypeClass(exp.type)}`}>{exp.type}</span>
                     <span>{formatDate(exp.start_date)} – {formatDate(exp.end_date) || 'Present'}</span>
                   </div>
-                  {exp.engagement_status && <p className="text-gray-700 text-sm">Status: {exp.engagement_status}</p>}
+                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                <span>Status:</span>
+                <Badge
+                  label={exp.engagement_status}
+                  options={ENGAGEMENT_COLORS}
+                  truncate={true}
+                />
+              </div>
+                  
                 </div>
               ))}
             </div>
@@ -347,6 +404,61 @@ export default function ExpertSidePanel({ slug, hits, onClose, onSelectSlug, ref
             <p className="text-gray-500">No tags</p>
           )}
         </div>
+
+          {/* Screening */}
+{/* <div className="space-y-2">
+  <div className="flex items-center justify-between border-b pb-1">
+    <h3 className="text-lg font-semibold text-gray-800">
+      Screening
+    </h3>
+
+    {!isEditingScreening && (
+      <button
+        className="text-blue-600 hover:text-blue-800 text-sm border px-2 py-1 rounded cursor-pointer"
+        onClick={() => {
+          setScreeningValue(expert.screening || '');
+          setIsEditingScreening(true);
+        }}
+      >
+        ✏️ Edit
+      </button>
+    )}
+  </div>
+
+  {!isEditingScreening ? (
+    <div className="text-sm text-gray-700 whitespace-pre-line">
+      {expert.screening || '-'}
+    </div>
+  ) : (
+    <div className="space-y-3">
+      <textarea
+        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+        rows={12}
+        value={screeningValue}
+        onChange={(e) => setScreeningValue(e.target.value)}
+      />
+
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+          onClick={() => setIsEditingScreening(false)}
+          disabled={isSavingScreening}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+          onClick={handleScreeningSave}
+          disabled={isSavingScreening}
+        >
+          {isSavingScreening ? 'Saving...' : 'Save'}
+        </button>
+      </div>
+    </div>
+  )}
+</div> */}
+
       </>
         )}
 
