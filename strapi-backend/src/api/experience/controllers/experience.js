@@ -151,7 +151,19 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
       //console.log(sanitizedExpert);
 
       
-        strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+      //  strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+
+    setTimeout(async () => {
+      try {
+        await strapi
+          .service('api::upload-experts.upload-experts')
+          .indexSingleExpert(sanitizedExpert.documentId);
+
+        strapi.log.info('Background indexing completed');
+      } catch (err) {
+        strapi.log.error('Background indexing failed', err);
+      }
+    }, 0);
       
 
       return ctx.send(sanitizedExpert);

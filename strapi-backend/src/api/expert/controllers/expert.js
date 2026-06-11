@@ -179,12 +179,11 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
         const sanitizedExpert = await this.sanitizeOutput(updatedExpert, ctx);
        // console.log(sanitizedExpert);
         
-        await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+       // await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
 
-        // setTimeout(async () => {
-        //   await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
-        //   strapi.log.info('Background task completed.');
-        // }, 0);
+        setTimeout(async () => {
+          await strapi.service('api::upload-experts.upload-experts').indexSingleExpert(sanitizedExpert.documentId);
+        }, 0);
 
         return ctx.send(sanitizedExpert);
         
