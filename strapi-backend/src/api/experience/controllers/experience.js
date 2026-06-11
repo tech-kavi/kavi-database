@@ -15,7 +15,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
 
 
-      const exp_slug = ctx.params.id; // ← This is actually your `documentId`
+      const exp_slug = ctx.params.id;
       const body = ctx.request.body?.data || ctx.request.body;
 
       //console.log(body);
@@ -90,14 +90,15 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
       const experienceDetails = await strapi.db.query('api::experience.experience').findOne({
             where: { exp_slug: exp_slug },
+            select:['documentId'],
           });
 
-      console.log(updateData);
+   //   console.log(updateData);
 
       const updatedExperience = await strapi.documents('api::experience.experience').update({
         documentId:experienceDetails.documentId,
         data: updateData,
-        populate: ['expert'],
+        populate: {expert:{fields:['documentId']}},
         status: 'published',
       });
 

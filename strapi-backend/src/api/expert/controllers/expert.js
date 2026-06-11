@@ -148,6 +148,7 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
 
           const expertDetails = await strapi.db.query('api::expert.expert').findOne({
             where: { slug: slug },
+            select:['documentId'],
           });
 
          // console.log(expertDetails);
