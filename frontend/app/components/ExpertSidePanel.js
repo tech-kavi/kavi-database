@@ -288,7 +288,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
       </div>
 
       <div className='flex-1 overflow-y-auto p-6 space-y-6 text-gray-800'>
-        {loading && <div className="flex items-start justify-center py-4 bg-gray-200">
+        {loading && <div className="flex items-start justify-center py-4 bg-gray-100">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
         </div>}
 
