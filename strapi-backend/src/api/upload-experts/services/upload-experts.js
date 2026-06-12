@@ -28,7 +28,12 @@ function normalizeKey(key) {
 
 function normalizeLinkedIn(link) {
   if (!link) return '';
-  return link.trim().toLowerCase().replace(/\/+$/, '');
+
+  return link
+    .trim()
+    .toLowerCase()
+    .replace(/\?.*$/, '') // remove query params
+    .replace(/\/+$/, ''); // remove trailing slashes
 }
 
 const columnMap = {
