@@ -375,7 +375,7 @@ module.exports = ({ strapi }) => ({
     const limit = 100;
     let allExperts = [];
 
-
+    console.log('reindexing started');
     while (true) {
       const expertsBatch = await strapi.documents('api::expert.expert').findMany({
         populate: { expert_experiences: { populate: ['target_company', 'sub_industry'] }, projects: true, companies: true, last_update: true },
@@ -463,6 +463,8 @@ module.exports = ({ strapi }) => ({
       hideFields,
       transformerCallback
     );
+
+    console.log('reindexing completed');
 
     strapi.log.info(`Algolia re-indexing completed for Experts.`);
   },
@@ -1236,7 +1238,7 @@ module.exports = ({ strapi }) => ({
               const newExpert = await strapi.entityService.create('api::expert.expert', {
                 data: {
                   name: Name.trim(),
-                  linkedin: LinkedIn,
+                  linkedin: LinkedIn ? normalizeLinkedIn(LinkedIn) : null,
                   phone: String(Phone || '').trim(),
                   slug,
                   email: Email,

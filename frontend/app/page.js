@@ -146,12 +146,12 @@ export default function Dashboard() {
          {user?.role?.type == "admin" && (
         <button
           onClick={handleReindex}
-          disabled={!reIndex}
+          disabled={reIndex}
           className={`mt-4 md:mt-0 px-6 py-3 rounded-lg text-white font-semibold shadow-md transition 
             ${reIndex ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`
           }
         >
-          {reIndex ? "Reindexing..." : "Reindex Experts"}
+          {reIndex ? "Reindexing" : "Reindex"}
         </button>
          )}
       </div>
