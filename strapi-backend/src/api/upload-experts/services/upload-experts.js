@@ -140,7 +140,8 @@ const ENGAGEMENT_ENUM = [
   "Not interested in project",
   "Call scheduled",
   "Call done",
-  "Call again"
+  "Call again",
+  "Not relevant",
 ];
 
 const SOR = [
