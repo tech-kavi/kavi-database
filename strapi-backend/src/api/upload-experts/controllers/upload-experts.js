@@ -58,14 +58,14 @@ module.exports = {
       }
 
       //Kick off background processing (non-blocking)
-      // setTimeout(async () => {
-      //   try {
-      //     await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic,gotLock.lock);
-      //     strapi.log.info('✅ Background processing completed.');
-      //   } catch (err) {
-      //     strapi.log.error('❌ Background processing failed:', err);
-      //   }
-      // }, 0);
+      setTimeout(async () => {
+        try {
+          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic,gotLock.lock);
+          strapi.log.info('✅ Background processing completed.');
+        } catch (err) {
+          strapi.log.error('❌ Background processing failed:', err);
+        }
+      }, 0);
 
       return ctx.send({ message: 'File uploaded successfully. Processing will continue in background.' });
 
