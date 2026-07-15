@@ -30,11 +30,20 @@ module.exports = {
       const filePath = uploadedFile.filepath;
       const originalFilename = uploadedFile.originalFilename;
 
+      const sanitizedFilename = originalFilename
+      .normalize("NFKC")
+      .replace(/\u00A0/g, " ")        // Replace non-breaking spaces
+      .replace(/[^\x20-\x7E]/g, "")   // Remove other non-ASCII chars (optional)
+      .trim();
+
+    // Override the filename used by the upload provider
+    uploadedFile.originalFilename = sanitizedFilename;
+
       // Upload file to Strapi Upload plugin (or Supabase if you are using Supabase storage)
       const uploaded = await strapi.service('plugin::upload.upload').upload({
         data: {
           fileInfo: {
-            name: originalFilename,
+            name: sanitizedFilename,
             caption: 'Expert Data',
           },
         },
@@ -49,14 +58,14 @@ module.exports = {
       }
 
       //Kick off background processing (non-blocking)
-      setTimeout(async () => {
-        try {
-          await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic,gotLock.lock);
-          strapi.log.info('✅ Background processing completed.');
-        } catch (err) {
-          strapi.log.error('❌ Background processing failed:', err);
-        }
-      }, 0);
+      // setTimeout(async () => {
+      //   try {
+      //     await strapi.service('api::upload-experts.upload-experts').processExpertFileInBackground(fileId,uploaderEmail,topic,gotLock.lock);
+      //     strapi.log.info('✅ Background processing completed.');
+      //   } catch (err) {
+      //     strapi.log.error('❌ Background processing failed:', err);
+      //   }
+      // }, 0);
 
       return ctx.send({ message: 'File uploaded successfully. Processing will continue in background.' });
 
