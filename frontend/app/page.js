@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Pie } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useAuth } from './components/AuthProvider';
 import toast from 'react-hot-toast';
@@ -20,7 +21,6 @@ export default function Dashboard() {
   const [reIndex,setreIndex] = useState(false);
 
   const {user}=useAuth();
-
 
   useEffect(() => { document.title = `KAVI | Home`; }, []);
   useEffect(() => { const token = localStorage.getItem('token'); if (!token) router.push('/login'); }, []);
@@ -124,6 +124,31 @@ export default function Dashboard() {
   ],
 };
 
+const doughnutOptions = {
+  responsive: true,
+  cutout: '65%', // this is what makes it a doughnut vs a pie — bigger = thinner ring
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        boxWidth: 12,
+        boxHeight: 12,
+        padding: 16,
+        font: { size: 13 },
+        usePointStyle: true,
+        pointStyle: 'circle',
+      },
+    },
+    tooltip: {
+      backgroundColor: '#111827',
+      titleFont: { size: 13 },
+      bodyFont: { size: 13 },
+      padding: 10,
+      cornerRadius: 8,
+    },
+  },
+};
+
   
   if (!dashboard) {
     return (
@@ -176,11 +201,12 @@ export default function Dashboard() {
 
       {/* Expert Distribution */}
       <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition flex flex-col items-center">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-700">Expert Distribution by Type</h2>
-        <div className="w-full md:w-1/2 lg:w-1/3">
-          <Pie data={pieData} />
-        </div>
-      </div>
+  <h2 className="text-2xl font-semibold mb-6 text-gray-700">Expert Distribution by Type</h2>
+  <div className="w-full md:w-1/2 lg:w-1/3 relative">
+    <Doughnut data={pieData} options={doughnutOptions} />
+    
+  </div>
+</div>
     </div>
   );
 }
