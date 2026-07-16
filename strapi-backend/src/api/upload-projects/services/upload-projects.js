@@ -988,7 +988,7 @@ const missing = excelLinkedins.filter(
               date: parseExcelDate(meetingdate),
               final_amount: actualamtdue || null,
               duration: callduration || null,
-              account_number: accountnumber || null,
+              accountnumber: accountnumber != null ? String(accountnumber).trim() : null,
               account_holder_name: accountholdersname || null,
               ifsc: ifsc || null,
               pan: pan || null,
