@@ -302,7 +302,7 @@ export default function ExpertPage() {
                 expert.projects.reduce((sum, p) => sum + (p.expert_rating || 0), 0) /
                 expert.projects.length
               ).toFixed(1)
-            : '-'} / 5
+            : '-'} 
         </p>
       </div>
       <div>

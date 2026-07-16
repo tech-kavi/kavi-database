@@ -1,6 +1,13 @@
 'use client';
 import { useState, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RATING_LABELS } from '../constants/options';
+
+
+const formatRating = (rating) => {
+  if (rating === null || rating === undefined || rating === "") return "-";
+  return RATING_LABELS[rating] || rating;
+};
 
 export default function ProjectsTable({ projects, onEdit }) {
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -62,8 +69,8 @@ export default function ProjectsTable({ projects, onEdit }) {
                     <td className="px-6 py-4 font-medium text-gray-900">{project.code}</td>
                     <td className="px-6 py-4 text-gray-600">{project.investor || '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{project.ca || '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{project.call_rating || '-'}/5</td>
-                    <td className="px-6 py-4 text-gray-600">{project.expert_rating || '-'}/5</td>
+                    <td className="px-6 py-4 text-gray-600">{formatRating(project.call_rating)}</td>
+                    <td className="px-6 py-4 text-gray-600">{formatRating(project.expert_rating)}</td>
                     <td className="px-6 py-4 text-gray-600">{project.date || '-'}</td>
                     <td className="px-6 py-4 font-semibold text-gray-900">
                       {project.final_amount ? `₹${project.final_amount}` : '-'}
@@ -96,11 +103,11 @@ export default function ProjectsTable({ projects, onEdit }) {
                           <div className="grid sm:grid-cols-2 gap-2">
                             <p>
                               <strong className="text-gray-800">FC Call Rating:</strong>{' '}
-                              {project.fc_call_rating || '-'}
+                              {formatRating(project.fc_call_rating)}
                             </p>
                             <p>
                               <strong className="text-gray-800">FC Expert Rating:</strong>{' '}
-                              {project.fc_expert_rating || '-'}
+                              {formatRating(project.fc_expert_rating)}
                             </p>
                             <p>
                               <strong className="text-gray-800">Duration:</strong>{' '}

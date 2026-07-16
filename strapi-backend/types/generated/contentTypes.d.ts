@@ -630,6 +630,7 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
   attributes: {
     account_holder_name: Schema.Attribute.String;
     account_number: Schema.Attribute.BigInteger;
+    accountnumber: Schema.Attribute.String;
     ca: Schema.Attribute.String;
     call_rating: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<

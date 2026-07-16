@@ -76,3 +76,11 @@ export const SOURCE_OF_RESPONSE = [
   'Reference',
   'Others'
 ];
+
+export const RATING_LABELS = {
+  1: "1 - Great",
+  2: "2 - Good",
+  3: "3 - Above Average",
+  4: "4 - Average",
+  5: "5 - Below Average",
+};

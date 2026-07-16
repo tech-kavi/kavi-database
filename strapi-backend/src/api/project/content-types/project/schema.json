@@ -70,6 +70,9 @@
       "relation": "manyToOne",
       "target": "api::expert.expert",
       "inversedBy": "projects"
+    },
+    "accountnumber": {
+      "type": "string"
     }
   }
 }
