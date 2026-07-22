@@ -148,11 +148,12 @@ expertDetails: async (ctx) => {
     //   .andWhere("final_amount",">",0)
     //   .avg("final_amount as avgfinal");
 
-    const [{ callsCompleted, avgCallPrice }] = await knex("projects")
-    .whereNotNull("published_at")
-    .andWhere("final_amount", ">", 0)
-    .count("id as callsCompleted")
-    .avg("final_amount as avgCallPrice");
+const [{ callsCompleted, avgCallPrice }] = await knex("projects")
+  .whereNotNull("published_at")
+  .select(
+    knex.raw(`COUNT(id) as "callsCompleted"`),
+    knex.raw(`AVG(CASE WHEN final_amount > 0 THEN final_amount END) as "avgCallPrice"`)
+  );
 
 
     ctx.send({
