@@ -113,21 +113,21 @@ export default function UploadPage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           params: {
-            "filters[name][$containsi]": trimmed, 
-            "filters[tags][$containsi]": trimmed,
+            "filters[$or][0][name][$containsi]": trimmed, 
+            "filters[$or][1][tags][$containsi]": trimmed, 
             "pagination[limit]": 10,
             "sort[0]": "name",
           },
         });
 
-        //console.log(res.data);
+        console.log(res.data.data);
 
         const options = res.data.data.map((company) => ({
           label: company.name,
           value: company.comp_slug,
         }));
 
-        //console.log(options);
+        console.log(options);
 
         setAllCompanies(options);
       } catch (err) {
@@ -515,6 +515,7 @@ export default function UploadPage() {
                     isLoading={loadingCompanies} // 👈 Loader when searching
                     menuPortalTarget={document.body} // 👈 Helps prevent clipping in modals
                     menuPlacement="auto"
+                    filterOption={() => true}   // <-- add this
                   />
 
                 </div>
