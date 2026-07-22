@@ -113,7 +113,8 @@ export default function UploadPage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           params: {
-            "filters[name][$containsi]": trimmed, // case-insensitive partial match
+            "filters[name][$containsi]": trimmed, 
+            "filters[tags][$containsi]": trimmed,
             "pagination[limit]": 10,
             "sort[0]": "name",
           },
