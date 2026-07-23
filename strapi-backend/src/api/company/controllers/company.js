@@ -16,6 +16,10 @@ function generateSlug(name) {
     .replace(/^-+|-+$/g, '');     // trim leading/trailing hyphens
 }
 
+function normalizeName(name = "") {
+  return name.toLowerCase().replace(/[\s-_]+/g, "");
+}
+
 const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::company.company', ({ strapi }) => ({
@@ -31,6 +35,20 @@ module.exports = createCoreController('api::company.company', ({ strapi }) => ({
         if (!data.comp_slug && data.name) {
             data.comp_slug = generateSlug(data.name);
         }
+
+        const normalized = normalizeName(data.name);
+        
+            const tags = (data.tags || "")
+            .split(",")
+            .map(tag => tag.trim())
+            .filter(Boolean);
+
+            // Avoid duplicates
+            if (!tags.some(tag => tag.toLowerCase() === normalized)) {
+            tags.push(normalized);
+            }
+
+            data.tags = tags.join(", ");
 
         // ✅ Create the company using Document Service (Strapi v5)
         const createdCompany = await strapi.documents('api::company.company').create({
