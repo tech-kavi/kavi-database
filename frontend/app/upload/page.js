@@ -496,11 +496,11 @@ export default function UploadPage() {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <section className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
-              <h2 className="text-2xl font-semibold mb-4 ">Create New Company</h2>
+              <h2 className="text-2xl font-semibold mb-4 ">Create New Topic</h2>
               <form onSubmit={handleCompanySubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Company (select or create)
+                    Topic (select or create)
                   </label>
 
                   <CreatableSelect
@@ -537,6 +537,10 @@ export default function UploadPage() {
                 >
                   Create Company
                 </button>
+
+                 <label className="block text-sm font-medium text-yellow-700 mb-1">
+                    <strong>Note:-</strong> If project is on industry, then put biggest company of the industry as topic or talk to <strong>Team Lead</strong> 
+                  </label>
 
                 {companyStatus && <p className="mt-3 text-sm text-gray-700">{companyStatus}</p>}
               </form>
