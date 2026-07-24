@@ -19,12 +19,13 @@ export default function Dashboard() {
   const [period, setPeriod] = useState('week');
   const [loading, setLoading] = useState(true);
   const [reIndex,setreIndex] = useState(false);
+  const [projectType, setProjectType] = useState("all");
 
   const {user}=useAuth();
 
   useEffect(() => { document.title = `KAVI | Home`; }, []);
   useEffect(() => { const token = localStorage.getItem('token'); if (!token) router.push('/login'); }, []);
-  useEffect(() => { fetchDashboard(); }, [period]);
+  useEffect(() => { fetchDashboard(); }, [period,projectType]);
 
   const handleReindex = async () => {
     setreIndex(true);
@@ -51,6 +52,7 @@ export default function Dashboard() {
       axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/expert-details`,
         {
+          params: projectType === "all" ? {} : {type: projectType},
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -149,6 +151,12 @@ const doughnutOptions = {
   },
 };
 
+const filterLabel = {
+  all: "Total",
+  internal: "Internal",
+  external: "External",
+}[projectType];
+
   
   if (!dashboard) {
     return (
@@ -162,41 +170,128 @@ const doughnutOptions = {
   return (
     <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+  <div>
+    <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">
+      Expert Dashboard
+    </h1>
+    <p className="text-gray-500 mt-1">
+      Overview of all experts empanelled with KAVI
+    </p>
+  </div>
+
+  {user?.role?.type === "admin" && (
+    <button
+      onClick={handleReindex}
+      disabled={reIndex}
+      className={`px-6 py-3 rounded-xl text-white font-semibold shadow-md transition
+      ${
+        reIndex
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-600 hover:bg-blue-700"
+      }`}
+    >
+      {reIndex ? "Reindexing..." : "Reindex"}
+    </button>
+  )}
+</div>
+
+{/* Global Stats */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+  {[
+    {
+      label: "Total Experts",
+      value: dashboard?.totalExperts,
+      subtitle: "Active in database",
+      color: "bg-slate-800",
+    },
+    {
+      label: "Average Quote",
+      value: `₹${dashboard?.avgQuote}`,
+      subtitle: "Per screened expert",
+      color: "bg-slate-700",
+    },
+    {
+      label: "Recent Uploads",
+      value: dashboard?.recentExpertsCount,
+      subtitle: period,
+      color: "bg-slate-600",
+    },
+  ].map((stat, idx) => (
+    <div
+      key={idx}
+      className={`bg-gradient-to-r ${stat.color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition`}
+    >
+      <p className="text-sm opacity-80">{stat.label}</p>
+      <p className="text-3xl font-bold mt-2">{stat.value}</p>
+      <p className="text-sm opacity-70 mt-2">{stat.subtitle}</p>
+    </div>
+  ))}
+</div>
+
+{/* Call Metrics */}
+<div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div>
+      <h2 className="text-xl font-semibold text-gray-800">
+        Call Metrics
+      </h2>
+      <p className="text-sm text-gray-500">
+        Filter applies only to the metrics below
+      </p>
+    </div>
+
+    <select
+      value={projectType}
+      onChange={(e) => setProjectType(e.target.value)}
+      className="border border-gray-300 rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+    >
+      <option value="all">All Calls</option>
+      <option value="internal">Internal Calls</option>
+      <option value="external">External Calls</option>
+    </select>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="rounded-2xl bg-gradient-to-r bg-indigo-600 text-white p-6 shadow-md">
+      <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text">Expert Dashboard</h1>
-          <p className="text-gray-500 mt-1">Overview of all experts empanelled with KAVI</p>
+          <p className="text-sm opacity-80">Calls Completed</p>
+          <p className="text-3xl font-bold mt-2">
+            {dashboard?.callsCompleted}
+          </p>
         </div>
 
-         {user?.role?.type == "admin" && (
-        <button
-          onClick={handleReindex}
-          disabled={reIndex}
-          className={`mt-4 md:mt-0 px-6 py-3 rounded-lg text-white font-semibold shadow-md transition 
-            ${reIndex ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`
-          }
-        >
-          {reIndex ? "Reindexing" : "Reindex"}
-        </button>
-         )}
+        <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+          {filterLabel}
+        </span>
       </div>
 
-      {/* Top Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { label: 'Total Experts', value: dashboard?.totalExperts, subtitle: 'Active in database', color: 'from-gray-800 to-gray-700' },
-            { label: 'Average Quote', value: `${"₹" + dashboard?.avgQuote||''}`, subtitle: 'Per screened expert', color: 'from-gray-600 to-gray-500' },
-            { label: 'Calls Completed', value: dashboard?.callsCompleted ||'', subtitle: 'Total', color: 'from-gray-500 to-gray-400' },
-            { label: 'Avg Call Price', value: `${"₹" + dashboard?.avgCallPrice||''}`, subtitle: 'Per call', color: 'from-gray-700 to-gray-600' },
-            { label: 'Recent Uploads', value: dashboard?.recentExpertsCount || '', subtitle: period, color: 'from-gray-600 to-gray-500' },
-          ].map((stat, idx) => (
-            <div key={idx} className={`bg-gradient-to-r ${stat.color} text-white p-6 rounded-2xl shadow-md hover:shadow-lg transition`}>
-              <p className="text-sm opacity-80">{stat.label}</p>
-              <p className="text-2xl font-bold mt-1">{stat.value}</p>
-              <p className="text-sm opacity-70 mt-1">{stat.subtitle}</p>
-            </div>
-          ))}
+      <p className="text-sm opacity-80 mt-4">
+        {filterLabel} calls
+      </p>
+    </div>
+
+    <div className="rounded-2xl bg-gradient-to-r bg-indigo-500 text-white p-6 shadow-md">
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm opacity-80">Average Call Price</p>
+          <p className="text-3xl font-bold mt-2">
+            ₹{dashboard?.avgCallPrice}
+          </p>
         </div>
+
+        <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+          {filterLabel}
+        </span>
+      </div>
+
+      <p className="text-sm opacity-80 mt-4">
+        {filterLabel} calls
+      </p>
+    </div>
+  </div>
+</div>
 
 
       {/* Expert Distribution */}

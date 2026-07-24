@@ -104,7 +104,7 @@ module.exports = {
 expertDetails: async (ctx) => {
   try {
     const knex = strapi.db.connection;
-
+    const {type} = ctx.query;
    
 
     // const [{ totalExperts, avgQuote }] = await knex("experts")
@@ -148,13 +148,26 @@ expertDetails: async (ctx) => {
     //   .andWhere("final_amount",">",0)
     //   .avg("final_amount as avgfinal");
 
-const [{ callsCompleted, avgCallPrice }] = await knex("projects")
-  .whereNotNull("published_at")
-  .select(
-    knex.raw(`COUNT(id) as "callsCompleted"`),
-    knex.raw(`AVG(CASE WHEN final_amount > 0 THEN final_amount END) as "avgCallPrice"`)
-  );
+    const projectQuery = knex("projects").whereNotNull("published_at");
 
+    if (type === "external") {
+      projectQuery.andWhere("code", "like", "E%");
+      // or "project_code" if that's your column name
+    } else if (type === "internal") {
+      projectQuery.andWhereNot("code", "like", "E%");
+    }
+
+
+    const [{ callsCompleted, avgCallPrice }] = await projectQuery.select(
+      knex.raw(`COUNT(id) as "callsCompleted"`),
+      knex.raw(`
+        AVG(
+          CASE
+            WHEN final_amount > 0 THEN final_amount
+          END
+        ) as "avgCallPrice"
+      `)
+    );
 
     ctx.send({
       totalExperts: Number(totalExperts),
