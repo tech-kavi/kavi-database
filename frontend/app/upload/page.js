@@ -317,7 +317,7 @@ export default function UploadPage() {
         }
       );
 
-      setCompanyStatus('✅ Company created successfully')
+      setCompanyStatus('✅ Topic created successfully')
       setCompanyName('')
       setCompanyTags('')
       setTopic('')
@@ -535,7 +535,7 @@ export default function UploadPage() {
                   type="submit"
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition cursor-pointer"
                 >
-                  Create Company
+                  Create Topic
                 </button>
 
                  <label className="block text-sm font-medium text-yellow-700 mb-1">
