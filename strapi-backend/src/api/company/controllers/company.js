@@ -63,6 +63,64 @@ module.exports = createCoreController('api::company.company', ({ strapi }) => ({
         }
   },
 
+  async find(ctx) {
+         try {
+            const { filters, populate } = ctx.query;
+
+            const companies = await strapi
+            .documents("api::company.company")
+            .findMany({
+                filters,
+                populate,
+            });
+
+            if (!companies || companies.length === 0) {
+            return ctx.notFound("Company not found");
+            }
+
+            const enrichedCompanies = await Promise.all(
+            companies.map(async (company) => {
+                const experts = await strapi
+                .documents("api::expert.expert")
+                .findMany({
+                    filters: {
+                    expert_experiences: {
+                        target_company: {
+                        documentId: {
+                            $eq: company.documentId,
+                        },
+                        },
+                    },
+                    },
+                    fields: ["documentId"],
+                    limit: 10000,
+                });
+
+                const uniqueExpertIds = new Set(
+                experts.map((expert) => expert.documentId)
+                );
+
+                return {
+                ...company,
+                expertCount: uniqueExpertIds.size,
+                };
+            })
+            );
+
+            ctx.body = {
+            data: enrichedCompanies,
+            };
+        } catch (err) {
+            console.error("Error fetching company:", err);
+
+            ctx.status = 500;
+            ctx.body = {
+            error: "Internal server error",
+            };
+        }
+        
+  },
+
 //   async update(ctx) {
 //     const { data } = ctx.request.body;
 

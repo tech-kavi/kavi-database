@@ -44,7 +44,11 @@ module.exports = {
         companies.map(async (company) => {
           const expertCount = await strapi.documents("api::expert.expert").count({
             filters: {
-              companies: { id: company.id },
+              expert_experiences:{
+                target_company:{
+                  id:company.id,
+                }
+              }
             },
           });
 

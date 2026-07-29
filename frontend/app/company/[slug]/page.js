@@ -163,7 +163,7 @@ export default function CompanyPage() {
         <section>
           <h2 className="text-lg font-semibold mb-2 text-gray-600">Experts</h2>
           <p className="text-gray-700 text-lg">
-            {company.experts?.length || 0} expert(s) associated with this company
+            {company.expertCount} expert(s) associated with this company
           </p>
         </section>
 
