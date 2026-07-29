@@ -1129,12 +1129,7 @@ module.exports = ({ strapi }) => ({
         .filter(Boolean);
 
       const allExperts = await strapi.entityService.findMany('api::expert.expert', {
-        fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes','companies'],
-        populate:{
-          companies:{
-            fields:['id','documentId']
-          }
-        },
+        fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes'],
         filters: { linkedin: { $in: linkedinKeys } },
         limit: linkedinKeys.length,
       });
@@ -1207,24 +1202,6 @@ module.exports = ({ strapi }) => ({
 
             if (expert) {
               let updateData = {};
-
-                // Add target company without removing existing companies
-                if (targetCompany?.documentId) {
-                  const existingCompanies = expert.companies || [];
-
-                  const companyIds = existingCompanies.map(company =>
-                    typeof company === 'object'
-                      ? company.documentId
-                      : company
-                  );
-
-                  if (!companyIds.includes(targetCompany.documentId)) {
-                    updateData.companies = [
-                      ...companyIds,
-                      targetCompany.documentId
-                    ];
-                  }
-                }
               if (Tags) updateData.tags = [...new Set([...(expert.tags || []), ...parseTags(Tags)])];
               if (Comments) updateData.ra_comments = [Comments, expert.ra_comments].filter(Boolean).join('\n');
               if (originalquote) updateData.original_quote = originalquote;
