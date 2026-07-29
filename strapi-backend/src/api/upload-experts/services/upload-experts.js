@@ -1129,7 +1129,12 @@ module.exports = ({ strapi }) => ({
         .filter(Boolean);
 
       const allExperts = await strapi.entityService.findMany('api::expert.expert', {
-        fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes'],
+        fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes','companies'],
+        populate:{
+          companies:{
+            fields:['id','documentId']
+          }
+        },
         filters: { linkedin: { $in: linkedinKeys } },
         limit: linkedinKeys.length,
       });
@@ -1145,10 +1150,10 @@ module.exports = ({ strapi }) => ({
       if (missingIndustries.length > 0) {
         await strapi.plugin('email').service('email').send({
           to: uploaderEmail,
-          subject: 'Upload Failed - Missing Sub-Industries',
-          html: `<h2>Upload Failed</h2><p>Missing sub-industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
+          subject: 'Upload Failed - Missing Industries',
+          html: `<h2>Upload Failed</h2><p>Missing industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
         });
-        const err = new Error('Missing SubIndustries');
+        const err = new Error('Missing Industries');
         err.alreadyNotified = true;
         throw err;
       }
@@ -1163,10 +1168,10 @@ module.exports = ({ strapi }) => ({
       if (missingCompanies.length > 0) {
         await strapi.plugin('email').service('email').send({
           to: uploaderEmail,
-          subject: 'Upload Failed - Missing Companies',
-          html: `<h2>Upload Failed</h2><p>Missing companies:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
+          subject: 'Upload Failed - Missing Topic',
+          html: `<h2>Upload Failed</h2><p>Missing Topic:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
         });
-        const err = new Error('Missing Companies');
+        const err = new Error('Missing Topic');
         err.alreadyNotified = true;
         throw err;
       }
@@ -1202,6 +1207,24 @@ module.exports = ({ strapi }) => ({
 
             if (expert) {
               let updateData = {};
+
+                // Add target company without removing existing companies
+                if (targetCompany?.documentId) {
+                  const existingCompanies = expert.companies || [];
+
+                  const companyIds = existingCompanies.map(company =>
+                    typeof company === 'object'
+                      ? company.documentId
+                      : company
+                  );
+
+                  if (!companyIds.includes(targetCompany.documentId)) {
+                    updateData.companies = [
+                      ...companyIds,
+                      targetCompany.documentId
+                    ];
+                  }
+                }
               if (Tags) updateData.tags = [...new Set([...(expert.tags || []), ...parseTags(Tags)])];
               if (Comments) updateData.ra_comments = [Comments, expert.ra_comments].filter(Boolean).join('\n');
               if (originalquote) updateData.original_quote = originalquote;
