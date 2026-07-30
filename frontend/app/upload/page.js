@@ -237,6 +237,11 @@ export default function UploadPage() {
 
     setIsUploadDisabled(true);
 
+      // Re-enable after 5 seconds
+  const enableButtonTimer = setTimeout(() => {
+    setIsUploadDisabled(false);
+  }, 5000);
+
     const formData = new FormData()
     formData.append('files', file)
     formData.append('topic', topic)
