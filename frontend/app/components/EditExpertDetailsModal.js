@@ -28,6 +28,7 @@ import { SOURCE_OF_RESPONSE } from '../constants/options';
 export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
 
   const [formData, setFormData] = useState({
+    // name: expert.name || '',
     email: expert.email || '',
     linkedin: expert.linkedin || '',
     phone: expert.phone || '',
@@ -97,6 +98,14 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
           Edit Expert Details
         </div>
         <div className="flex-1 overflow-y-auto space-y-4">
+          {/* <div>
+            <label>Name</label>
+            <input
+              className="input-field"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+            />
+          </div> */}
           <div>
             <label>Email</label>
             <input

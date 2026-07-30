@@ -1102,13 +1102,13 @@ module.exports = ({ strapi }) => ({
       data.forEach((row, index) => {
         const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName } = row;
         if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
-        if (!Name) errors.push(`Row ${index + 2}: Name is missing`);
+        if (!Name || !String(Name).trim() || String(Name).trim().toUpperCase() === '#VALUE!') errors.push(`Row ${index + 2}: Name is missing`);
         // if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
         if (!Type || !TYPE_ENUM.includes(Type.trim())) errors.push(`Row ${index + 2}: Invalid Type`);
         if (status && !ENGAGEMENT_ENUM.includes(status.trim())) errors.push(`Row ${index + 2}: Invalid status`);
         if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
-        if (!Designation) errors.push(`Row ${index + 2}: Designation is missing`);
-        if (!CompanyName) errors.push(`Row ${index + 2}: CompanyName is missing`);
+        if (!Designation || !String(Designation).trim()) errors.push(`Row ${index + 2}: Designation is missing`);
+        if (!CompanyName || !String(CompanyName).trim()) errors.push(`Row ${index + 2}: CompanyName is missing`);
         if (!industry) errors.push(`Row ${index + 2}: Industry is missing`);
       });
 
