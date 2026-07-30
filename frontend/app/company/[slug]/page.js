@@ -22,11 +22,13 @@ export default function CompanyPage() {
     fetchCompany();
   }, [slug]);
 
+  // process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies?filters[comp_slug][$eq]=${slug}&populate=experts
+
   const fetchCompany = async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies?filters[comp_slug][$eq]=${slug}&populate=experts`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/${slug}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -34,7 +36,8 @@ export default function CompanyPage() {
         }
       );
 
-      const data = res.data.data[0];
+  
+      const data = res.data.data;
       setCompany(data);
       setLoading(false);
     } catch (err) {
