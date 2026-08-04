@@ -1189,6 +1189,7 @@ module.exports = ({ strapi }) => ({
 
             // if (!Name || !LinkedIn) throw new Error("Name or LinkedIn missing");
 
+            
 
             //const linkedinKey = normalizeLinkedIn(LinkedIn);
             const linkedinKey = LinkedIn ? normalizeLinkedIn(LinkedIn) : null;
