@@ -382,7 +382,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
                   <p><strong>FC Call Rating:</strong> {project.fc_call_rating} / 5</p>
                   <p><strong>FC Expert Rating:</strong> {project.fc_expert_rating} / 5</p>
                   <p><strong>Date:</strong> {project.date}</p>
-                  <p><strong>Final Amount:</strong> ${project.final_amount}</p>
+                  <p><strong>Final Amount:</strong> ₹{project.final_amount}</p>
                 </div>
               ))}
             </div>

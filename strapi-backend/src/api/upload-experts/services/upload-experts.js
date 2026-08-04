@@ -1100,7 +1100,7 @@ module.exports = ({ strapi }) => ({
       // Basic validations
       const errors = [];
       data.forEach((row, index) => {
-        const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName } = row;
+        const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName, TargetCompany } = row;
         if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
         if (!Name || !String(Name).trim() || String(Name).trim().toUpperCase() === '#VALUE!') errors.push(`Row ${index + 2}: Name is missing`);
         // if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
@@ -1109,6 +1109,7 @@ module.exports = ({ strapi }) => ({
         if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
         if (!Designation || !String(Designation).trim()) errors.push(`Row ${index + 2}: Designation is missing`);
         if (!CompanyName || !String(CompanyName).trim()) errors.push(`Row ${index + 2}: CompanyName is missing`);
+        if (!TargetCompany || !String(TargetCompany).trim()) errors.push(`Row ${index + 2}: Topic is missing`);
         if (!industry) errors.push(`Row ${index + 2}: Industry is missing`);
       });
 
@@ -1155,11 +1156,13 @@ module.exports = ({ strapi }) => ({
 
       const companyNamesArray = Array.from(new Set(data.map(r => r.TargetCompany?.trim()).filter(Boolean)));
       const allCompanies = await strapi.entityService.findMany('api::company.company', {
-        fields: ['id', 'name'],
+        fields: ['id', 'name','documentId'],
         filters: { name: { $in: companyNamesArray } },
       });
       const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
       const missingCompanies = companyNamesArray.filter(name => !companyMap.has(name));
+
+      //stop everything if even one company/topic is missing
       if (missingCompanies.length > 0) {
         await strapi.plugin('email').service('email').send({
           to: uploaderEmail,
@@ -1196,6 +1199,11 @@ module.exports = ({ strapi }) => ({
             // let expert = expertMap.get(linkedinKey);
             let expert = linkedinKey ? expertMap.get(linkedinKey) : null;
             const targetCompany = companyMap.get(TargetCompany?.trim());
+            if (!targetCompany) {
+              throw new Error(
+                `Topic "${TargetCompany}" was not found`
+              );
+            }
             const foundIndustry = industryMap.get(industry?.trim());
             const expSlug = getExperienceSlug({ LinkedIn, Designation, CompanyName, Start });
 
@@ -1230,7 +1238,7 @@ module.exports = ({ strapi }) => ({
                   end_date: parseExcelDate(End),
                   upload_file_details: SheetName.trim(),
                   company: CompanyName.trim(),
-                  target_company: targetCompany?.documentId || null,
+                  target_company: targetCompany?.documentId,
                   expert: expert.documentId,
                   quote: toNumberOrNull(negotiatedquote),
                   engagement_status: status?.trim() || 'Uncontacted',
@@ -1249,7 +1257,7 @@ module.exports = ({ strapi }) => ({
                   phone: String(Phone || '').trim(),
                   slug,
                   email: Email,
-                  companies: targetCompany?.documentId || null,
+                  companies: targetCompany?.documentId,
                   tags: parseTags(Tags),
                   ra_comments: Comments || null,
                   original_quote: toNumberOrNull(originalquote),
