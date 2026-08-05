@@ -68,7 +68,7 @@ export default function ExpertPage() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts?filters[slug][$eq]=${slug}&populate[expert_experiences][populate]=target_company&populate[expert_experiences][populate]=sub_industry&populate[projects][populate]&populate[last_update]=*`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/experts?filters[slug][$eq]=${slug}&populate[expert_experiences][populate]=target_company&populate[expert_experiences][populate]=sub_industry&populate[expert_experiences][sort][0]=createdAt:desc&populate[projects][populate]&populate[last_update]=*`,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       const data = res.data.data[0];
