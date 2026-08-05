@@ -15,7 +15,7 @@ export const ENGAGEMENT_COLORS = {
   'Not interested in project': 'bg-yellow-300 text-yellow-800',
   'Call scheduled': 'bg-green-100 text-green-700',
   'Call done': 'bg-green-200 text-green-800',
-  'Call done but scrapped':'bg-brown-200 text-brown-800',
+  'Call done but scrapped':'bg-amber-500 text-amber-800',
   'Call again': 'bg-blue-200 text-blue-800',
   'Not relevant': 'bg-red-300 text-red-800'
 };

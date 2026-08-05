@@ -230,25 +230,6 @@ export default function ExpertPage() {
   {/* Latest Data + Contact & Status */}
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     
-    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Latest Data</h2>
-      <div className="space-y-2">
-        <p className="text-gray-400">Designation</p>
-        <p className="font-semibold">{expert.expert_experiences[0]?.designation || '-'}</p>
-
-        <p className="text-gray-400">Company</p>
-        <p className="font-semibold">{expert.expert_experiences[0]?.company || '-'}</p>
-
-        <p className="text-gray-400">Topic</p>
-        <p className="font-semibold">{expert.expert_experiences[0]?.target_company?.name || '-'}</p>
-
-        <p className="text-gray-400">Type</p>
-        <Badge label={expert.expert_experiences[0]?.type} options={TYPE_COLORS} />
-
-         <p className="text-gray-400">Status</p>
-        <Badge label={expert.expert_experiences[0]?.engagement_status} options={ENGAGEMENT_COLORS} />
-      </div>
-    </div>
 
     <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
       <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Contact & Status</h2>
@@ -268,6 +249,27 @@ export default function ExpertPage() {
         
         <p className="text-gray-400">Status</p>
         <Badge label={expert.expert_status} options={ENGAGEMENT_COLORS} />
+      </div>
+    </div>
+
+    
+    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Latest Data</h2>
+      <div className="space-y-2">
+        <p className="text-gray-400">Designation</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.designation || '-'}</p>
+
+        <p className="text-gray-400">Company</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.company || '-'}</p>
+
+        <p className="text-gray-400">Topic</p>
+        <p className="font-semibold">{expert.expert_experiences[0]?.target_company?.name || '-'}</p>
+
+        <p className="text-gray-400">Type</p>
+        <Badge label={expert.expert_experiences[0]?.type} options={TYPE_COLORS} />
+
+         <p className="text-gray-400">Status</p>
+        <Badge label={expert.expert_experiences[0]?.engagement_status} options={ENGAGEMENT_COLORS} />
       </div>
     </div>
 
