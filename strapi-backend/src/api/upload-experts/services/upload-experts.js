@@ -48,7 +48,7 @@ const columnMap = {
   startdate: 'Start',
   enddate: 'End',
   tags: 'Tags',
-  comments: 'Comments',
+  comments: 'RA Comments',
   email: 'Email',
   contactnumber: 'Phone',
   originalquote: 'originalquote',
@@ -1060,6 +1060,7 @@ module.exports = ({ strapi }) => ({
       // const data = rawData.map(remapRow);
 
       let rawData = [];
+      let uploadedHeaders;
 
     if (file.ext === '.csv') {
       // CSV HANDLING
@@ -1069,14 +1070,29 @@ module.exports = ({ strapi }) => ({
 
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-      rawData = XLSX.utils.sheet_to_json(sheet, {
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        header:1,
         defval: "" // Prevent undefined values
+      });
+
+      uploadedHeaders = rows[0]||[];
+
+      rawData  = XLSX.utils.sheet_to_json(sheet,{
+        defval:''
       });
 
     } else {
       // XLSX HANDLING
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+      header: 1,
+      defval: ''
+    });
+
+    uploadedHeaders = rows[0] || [];
+
 
       rawData = XLSX.utils.sheet_to_json(sheet, {
         defval: ""
@@ -1085,48 +1101,51 @@ module.exports = ({ strapi }) => ({
 
         //check headers
 
-    // const requiredHeaders = [
-    //   'Sheet_Name',
-    //   'LinkedIn Link',
-    //   'Name',
-    //   'Industry',
-    //   'Topic',
-    //   'Expert Type',
-    //   'Company Name',
-    //   'Designation',
-    //   'Start Date',
-    //   'End Date',
-    //   'Tenure',
-    //   'RA Comments',
-    //   'Tags',
-    //   'Email',
-    //   'Contact Number',
-    //   'Status',
-    //   'Source of Response',
-    //   'Notes',
-    //   'Screening',
-    //   'Original Quote',
-    //   'Negotiated Quote',
-    //   'Project Code'
-    // ];
+    const requiredHeaders = [
+      'Sheet_Name',
+      'LinkedIn Link',
+      'Name',
+      'Industry',
+      'Topic',
+      'Expert Type',
+      'Company Name',
+      'Designation',
+      'Start Date',
+      'End Date',
+      'Tenure',
+      'RA Comments',
+      'Tags',
+      'Email',
+      'Contact Number',
+      'Status',
+      'Source of Response',
+      'Notes',
+      'Screening',
+      'Original Quote',
+      'Negotiated Quote',
+      'Project Code'
+    ];
 
-    // // Normalize: trim + lowercase
-    // const normalizeHeader = header =>
-    //   String(header || '').trim().toLowerCase();
+    // Normalize: trim + lowercase
+    const normalizeHeader = header =>
+    String(header || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '');
 
-    // const normalizedUploadedHeaders = new Set(
-    //   uploadedHeaders.map(normalizeHeader)
-    // );
+    const normalizedUploadedHeaders = new Set(
+      uploadedHeaders.map(normalizeHeader)
+    );
 
-    // const missingHeaders = requiredHeaders.filter(
-    //   header => !normalizedUploadedHeaders.has(normalizeHeader(header))
-    // );
+    const missingHeaders = requiredHeaders.filter(
+      header => !normalizedUploadedHeaders.has(normalizeHeader(header))
+    );
 
-    // if (missingHeaders.length > 0) {
-    //   throw new Error(
-    //     `Missing required columns: ${missingHeaders.join(', ')}`
-    //   );
-    // }
+    if (missingHeaders.length > 0) {
+      throw new Error(
+        `Missing required columns: ${missingHeaders.join(', ')}`
+      );
+    }
 
     const data = rawData.map(remapRow);
 
@@ -1148,7 +1167,7 @@ module.exports = ({ strapi }) => ({
         const { Name, LinkedIn, Type, sourceofresponse, Designation, CompanyName, status, industry, SheetName, TargetCompany } = row;
         if (!SheetName) errors.push(`Row ${index + 2}: Sheet Name is missing`);
         if (!Name || !String(Name).trim() || String(Name).trim().toUpperCase() === '#VALUE!') errors.push(`Row ${index + 2}: Name is missing`);
-        // if (!LinkedIn) errors.push(`Row ${index + 2}: LinkedIn is missing`);
+        if (!LinkedIn || !String(LinkedIn).trim()) errors.push(`Row ${index + 2}: LinkedIn is missing`);
         if (!Type || !TYPE_ENUM.includes(Type.trim())) errors.push(`Row ${index + 2}: Invalid Type`);
         if (status && !ENGAGEMENT_ENUM.includes(status.trim())) errors.push(`Row ${index + 2}: Invalid status`);
         if (sourceofresponse && !SOR.includes(sourceofresponse.trim())) errors.push(`Row ${index + 2}: Invalid source of response`);
@@ -1176,6 +1195,11 @@ module.exports = ({ strapi }) => ({
 
       const allExperts = await strapi.entityService.findMany('api::expert.expert', {
         fields: ['id', 'linkedin', 'documentId', 'tags', 'ra_comments', 'source_of_response', 'original_quote', 'screening', 'notes'],
+        populate:{
+          companies:{
+            fields:['id','documentId','name'],
+          },
+        },
         filters: { linkedin: { $in: linkedinKeys } },
         limit: linkedinKeys.length,
       });
@@ -1262,6 +1286,17 @@ module.exports = ({ strapi }) => ({
               if (sourceofresponse) updateData.source_of_response = sourceofresponse?.trim();
               if (screening) updateData.screening = [screening?.trim(), expert.screening || ''].filter(Boolean).join('\n');
               if (notes) updateData.notes = [notes?.trim(), expert.notes || ''].filter(Boolean).join('\n');
+
+              const existingCompanyIds = (expert.companies || []).map(
+              company => company.documentId
+            );
+
+            if (!existingCompanyIds.includes(targetCompany.documentId)) {
+              updateData.companies = [
+                ...existingCompanyIds,
+                targetCompany.documentId,
+              ];
+            }
 
               if (Object.keys(updateData).length > 0) {
                 await strapi.documents('api::expert.expert').update({
