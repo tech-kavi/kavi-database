@@ -1085,48 +1085,48 @@ module.exports = ({ strapi }) => ({
 
         //check headers
 
-    const requiredHeaders = [
-      'Sheet_Name',
-      'LinkedIn Link',
-      'Name',
-      'Industry',
-      'Topic',
-      'Expert Type',
-      'Company Name',
-      'Designation',
-      'Start Date',
-      'End Date',
-      'Tenure',
-      'RA Comments',
-      'Tags',
-      'Email',
-      'Contact Number',
-      'Status',
-      'Source of Response',
-      'Notes',
-      'Screening',
-      'Original Quote',
-      'Negotiated Quote',
-      'Project Code'
-    ];
+    // const requiredHeaders = [
+    //   'Sheet_Name',
+    //   'LinkedIn Link',
+    //   'Name',
+    //   'Industry',
+    //   'Topic',
+    //   'Expert Type',
+    //   'Company Name',
+    //   'Designation',
+    //   'Start Date',
+    //   'End Date',
+    //   'Tenure',
+    //   'RA Comments',
+    //   'Tags',
+    //   'Email',
+    //   'Contact Number',
+    //   'Status',
+    //   'Source of Response',
+    //   'Notes',
+    //   'Screening',
+    //   'Original Quote',
+    //   'Negotiated Quote',
+    //   'Project Code'
+    // ];
 
-    // Normalize: trim + lowercase
-    const normalizeHeader = header =>
-      String(header || '').trim().toLowerCase();
+    // // Normalize: trim + lowercase
+    // const normalizeHeader = header =>
+    //   String(header || '').trim().toLowerCase();
 
-    const normalizedUploadedHeaders = new Set(
-      uploadedHeaders.map(normalizeHeader)
-    );
+    // const normalizedUploadedHeaders = new Set(
+    //   uploadedHeaders.map(normalizeHeader)
+    // );
 
-    const missingHeaders = requiredHeaders.filter(
-      header => !normalizedUploadedHeaders.has(normalizeHeader(header))
-    );
+    // const missingHeaders = requiredHeaders.filter(
+    //   header => !normalizedUploadedHeaders.has(normalizeHeader(header))
+    // );
 
-    if (missingHeaders.length > 0) {
-      throw new Error(
-        `Missing required columns: ${missingHeaders.join(', ')}`
-      );
-    }
+    // if (missingHeaders.length > 0) {
+    //   throw new Error(
+    //     `Missing required columns: ${missingHeaders.join(', ')}`
+    //   );
+    // }
 
     const data = rawData.map(remapRow);
 
