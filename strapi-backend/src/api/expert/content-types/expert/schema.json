@@ -83,6 +83,7 @@
         "Not interested in project",
         "Call scheduled",
         "Call done",
+        "Call done but scrapped",
         "Not relevant"
       ]
     },

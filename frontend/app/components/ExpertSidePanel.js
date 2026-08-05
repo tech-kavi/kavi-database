@@ -335,7 +335,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
 
         {/* Experiences */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold border-b pb-1 text-gray-800">Experiences</h3>
+          <h3 className="text-lg font-semibold border-b pb-1 text-gray-800">Project(s)</h3>
           {expert?.expert_experiences?.length > 0 ? (
             <div className="space-y-3">
               {expert.expert_experiences.map((exp, index) => (
@@ -369,7 +369,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
 
         {/* Projects */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold border-b pb-1 text-gray-800">Projects</h3>
+          <h3 className="text-lg font-semibold border-b pb-1 text-gray-800">Call(s) Done</h3>
           {expert?.projects?.length > 0 ? (
             <div className="space-y-3">
               {expert.projects.map((project, index) => (

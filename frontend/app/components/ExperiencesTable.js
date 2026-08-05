@@ -49,7 +49,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
 
   return (
     <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Experiences</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Project(s)</h2>
 
       <div className="overflow-x-auto rounded-lg border border-gray-100">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -126,10 +126,15 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                           className="bg-gray-50"
                         >
                           <td colSpan={10} className="px-6 py-4 text-gray-700">
-                            <div className="grid sm:grid-cols-2 gap-2">
+                            <div className="grid sm:grid-cols-6 gap-2">
                               <p>
                                 <strong className="text-gray-800">Industry:</strong>{' '}
                                 {exp.sub_industry?.name || '-'}
+                              </p>
+
+                              <p>
+                                <strong className="text-gray-800">Sheet:</strong>{' '}
+                                {exp.upload_file_details || '-'}
                               </p>
                              
                               

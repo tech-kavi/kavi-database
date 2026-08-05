@@ -21,14 +21,14 @@ export default function ProjectsTable({ projects, onEdit }) {
   if (!projects || projects.length === 0)
     return (
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Projects</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Call Done</h2>
         <p className="text-gray-500">No project data available.</p>
       </section>
     );
 
   return (
     <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Projects</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Call(s) Done</h2>
 
       <div className="overflow-x-auto rounded-lg border border-gray-100">
         <table className="min-w-full divide-y divide-gray-200 text-sm">

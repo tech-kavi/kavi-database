@@ -140,6 +140,7 @@ const ENGAGEMENT_ENUM = [
   "Not interested in project",
   "Call scheduled",
   "Call done",
+  "Call done but scrapped",
   "Call again",
   "Not relevant",
 ];

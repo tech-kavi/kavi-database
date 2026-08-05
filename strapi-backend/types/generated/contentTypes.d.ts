@@ -438,6 +438,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
         'Not interested in project',
         'Call scheduled',
         'Call done',
+        'Call done but scrapped',
         'Not relevant',
       ]
     >;
@@ -523,6 +524,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
         'Not interested in project',
         'Call scheduled',
         'Call done',
+        'Call done but scrapped',
         'Not relevant',
       ]
     >;
