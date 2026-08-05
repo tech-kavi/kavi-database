@@ -79,7 +79,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
 
           <tbody className="divide-y divide-gray-100">
             {expert.expert_experiences?.length ? (
-              expert.expert_experiences.map((exp) => {
+              [...expert.expert_experiences] .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) .map((exp) => {
                 const isExpanded = expandedRows.has(exp.id);
                 return (
                   <Fragment key={exp.id}>

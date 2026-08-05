@@ -338,7 +338,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
           <h3 className="text-lg font-semibold border-b pb-1 text-gray-800">Project(s)</h3>
           {expert?.expert_experiences?.length > 0 ? (
             <div className="space-y-3">
-              {expert.expert_experiences.map((exp, index) => (
+             {[...expert.expert_experiences] .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) .map((exp, index) => (
                 <div key={exp.id || index} className="p-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 bg-gray-50">
                   <div className="flex justify-between items-center mb-1">
                     <p className="text-sm font-semibold text-gray-900">{exp.designation}</p>
