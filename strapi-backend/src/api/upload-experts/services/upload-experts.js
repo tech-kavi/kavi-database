@@ -1142,11 +1142,32 @@ module.exports = ({ strapi }) => ({
       header => !normalizedUploadedHeaders.has(normalizeHeader(header))
     );
 
+    // if (missingHeaders.length > 0) {
+    //   throw new Error(
+    //     `Missing required columns: ${missingHeaders.join(', ')}`
+    //   );
+    // }
+
+  
     if (missingHeaders.length > 0) {
-      throw new Error(
-        `Missing required columns: ${missingHeaders.join(', ')}`
-      );
+      await strapi.plugin('email').service('email').send({
+        to: uploaderEmail,
+        subject: 'Upload Failed - Missing Headers',
+        html: `
+          <h2>Upload Failed</h2>
+          <p>The following required columns are missing:</p>
+          <ul>
+            ${missingHeaders.map(header => `<li>${header}</li>`).join('')}
+          </ul>
+        `
+      });
+
+      const err = new Error('Missing required columns');
+      err.alreadyNotified = true;
+      throw err;
     }
+
+
 
     const data = rawData.map(remapRow);
 
