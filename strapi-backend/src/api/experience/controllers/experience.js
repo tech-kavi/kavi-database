@@ -14,7 +14,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
     try {
 
 
-
+      const now = new Date();
       const exp_slug = ctx.params.id;
       const body = ctx.request.body?.data || ctx.request.body;
 
@@ -95,6 +95,14 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
 
    //   console.log(updateData);
 
+   const expLastUpdate = {
+        name: ctx.state.user?.username || "system",
+        time: now.toISOString(),
+        field: "Updated Experience",
+      };
+
+      updateData.latest_update_details=expLastUpdate;
+
       const updatedExperience = await strapi.documents('api::experience.experience').update({
         documentId:experienceDetails.documentId,
         data: updateData,
@@ -110,7 +118,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
       }
 
       // ✅ Update last_update of expert
-      const now = new Date();
+    
       const lastUpdate = {
         name: ctx.state.user?.username || "system",
         time: now.toISOString(),

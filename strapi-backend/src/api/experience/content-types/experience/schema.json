@@ -89,6 +89,11 @@
     },
     "company": {
       "type": "string"
+    },
+    "latest_update_details": {
+      "type": "component",
+      "component": "update.update",
+      "repeatable": false
     }
   }
 }

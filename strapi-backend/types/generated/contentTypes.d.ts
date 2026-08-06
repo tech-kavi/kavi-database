@@ -444,6 +444,7 @@ export interface ApiExperienceExperience extends Struct.CollectionTypeSchema {
     >;
     exp_slug: Schema.Attribute.UID<'designation'> & Schema.Attribute.Required;
     expert: Schema.Attribute.Relation<'manyToOne', 'api::expert.expert'>;
+    latest_update_details: Schema.Attribute.Component<'update.update', false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
