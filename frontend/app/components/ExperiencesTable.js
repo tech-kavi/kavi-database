@@ -126,7 +126,7 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                           className="bg-gray-50"
                         >
                           <td colSpan={10} className="px-6 py-4 text-gray-700">
-                            <div className="grid sm:grid-cols-6 gap-2">
+                            <div className="grid sm:grid-cols-3 gap-4">
                               <p>
                                 <strong className="text-gray-800">Industry:</strong>{' '}
                                 {exp.sub_industry?.name || '-'}
@@ -135,6 +135,11 @@ export default function ExperiencesTable({ expert, handleEdit }) {
                               <p>
                                 <strong className="text-gray-800">Sheet:</strong>{' '}
                                 {exp.upload_file_details || '-'}
+                              </p>
+
+                              <p>
+                                <strong className="text-gray-800">Last Update:</strong>{' '}
+                                {exp.latest_update_details?.name || '-'}
                               </p>
                              
                               

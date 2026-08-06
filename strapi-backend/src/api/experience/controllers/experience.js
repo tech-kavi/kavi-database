@@ -145,6 +145,7 @@ module.exports = createCoreController('api::experience.experience', ({ strapi })
             populate: {
               target_company: true,
               sub_industry: true, 
+              latest_update_details:true,
             },
           },
           projects: true,

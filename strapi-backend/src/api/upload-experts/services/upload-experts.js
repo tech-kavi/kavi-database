@@ -1421,11 +1421,22 @@ module.exports = ({ strapi }) => ({
 
       const affectedExpertIds = Array.from(affectedExperts);
 
+      const sheetNamesList = Array.from(sheetNamesSet);
+
+      let message = `Successfully processed ${sheetNamesList.length} sheet(s): ${sheetNamesList.join(', ')}.`;
+
+      if (rowErrors.length > 0) {
+        message += ` ${rowErrors.length} row error(s) were found. Please check your email for details.`;
+      } else {
+        message += ` No row errors found.`;
+      }
+
       await strapi.documents('api::upload-lock.upload-lock').update({
         documentId: gotLock.documentId, // ⚠️ not `id` — use documentId
         data: {
           process_status: 'completed',
           progress: 100,
+          error_message: message,
         },
         status: 'published', // ✅ instantly publishes
       });
@@ -1444,7 +1455,7 @@ module.exports = ({ strapi }) => ({
 
 
 
-      const sheetNamesList = Array.from(sheetNamesSet);
+      
       const sheetNamesHtml = sheetNamesList.length
         ? `<p><strong>Sheet Names Found:</strong></p><ul>${sheetNamesList.map(name => `<li>${name}</li>`).join('')}</ul>`
         : `<p><em>No sheet names detected in rows.</em></p>`;
