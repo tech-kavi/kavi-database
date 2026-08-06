@@ -28,6 +28,8 @@ module.exports = createCoreController('api::sub-industry.sub-industry',({strapi}
             data.ind_slug = generateSlug(data.name);
         }
 
+        data.creator = ctx.state.user?.username;
+
         // ✅ Create the industry using Document Service (Strapi v5)
         const createdIndustry = await strapi.documents('api::sub-industry.sub-industry').create({
             data,

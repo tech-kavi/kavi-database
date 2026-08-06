@@ -50,6 +50,8 @@ module.exports = createCoreController('api::company.company', ({ strapi }) => ({
 
             data.tags = tags.join(", ");
 
+            data.creator = ctx.state.user?.username;
+
         // ✅ Create the company using Document Service (Strapi v5)
         const createdCompany = await strapi.documents('api::company.company').create({
             data,

@@ -27,6 +27,9 @@
       "type": "uid",
       "targetField": "name",
       "required": true
+    },
+    "creator": {
+      "type": "string"
     }
   }
 }

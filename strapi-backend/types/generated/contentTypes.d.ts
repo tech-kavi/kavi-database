@@ -388,6 +388,7 @@ export interface ApiCompanyCompany extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    creator: Schema.Attribute.String;
     experts: Schema.Attribute.Relation<'manyToMany', 'api::expert.expert'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -703,6 +704,7 @@ export interface ApiSubIndustrySubIndustry extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    creator: Schema.Attribute.String;
     experiences: Schema.Attribute.Relation<
       'oneToMany',
       'api::experience.experience'

@@ -35,6 +35,7 @@ export default function UploadPage() {
 
   const [uploadProgress, setUploadProgress] = useState(null);
   const [isUploadingGlobal, setIsUploadingGlobal] = useState(false);
+  const [uploadBy, setUploadBy] = useState('Someone');
 
   const fileInputRef = useRef(null);
   const finalTrackerRef = useRef(null);
@@ -76,7 +77,7 @@ export default function UploadPage() {
         const progressVal = Number(activeLock.progress) || 0;
         setUploadProgress(progressVal);
         setIsUploadingGlobal(true);
-
+        setUploadBy(activeLock.locked_by);
         // Stop polling if complete
         if (progressVal >= 100) {
           setTimeout(() => {
@@ -397,10 +398,10 @@ export default function UploadPage() {
        {isUploadingGlobal && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-sm text-white">Upload in progress...</p>
+              <p className="text-sm text-gray-500">Please wait! {uploadBy} is uploading a sheet.</p>
               <button
                 onClick={fetchProgress}
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors cursor-pointer"
+                className="text-sm bg-blue-600 hover:bg-blue-700 active:font-bold text-white px-3 py-1 rounded-md transition-colors cursor-pointer"
               >
                 Refresh
               </button>
