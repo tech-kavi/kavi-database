@@ -25,6 +25,9 @@ export default function EditProjectModal({ project, expertId, onClose, onSave })
     fc_expert_rating: '',
     date: '',
     final_amount: '',
+    notes:'',
+    duration:'',
+    quote:'',
   });
 
   useEffect(() => {
@@ -43,7 +46,7 @@ export default function EditProjectModal({ project, expertId, onClose, onSave })
         final_amount: project.final_amount || '',
         duration: project.duration ||'',
         quote: project.quote || '',
-
+        notes: project.notes || '',
       });
     }
   }, [project, expertId]);
@@ -185,6 +188,16 @@ export default function EditProjectModal({ project, expertId, onClose, onSave })
           onChange={handleChange}
           className="input-field"
           placeholder="Enter Quote"
+        />
+
+        <label>Notes</label>
+        <textarea
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          className="input-field"
+          placeholder="Enter notes"
+          rows={4}
         />
 
         <div className="modal-actions py-3 px-4 border-t bg-white sticky bottom-0 z-10 flex justify-end gap-3">

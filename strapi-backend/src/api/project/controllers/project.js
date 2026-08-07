@@ -98,16 +98,31 @@ module.exports = createCoreController('api::project.project',({strapi})=>({
         'call_rating',
         'date',
         'final_amount',
+        'notes',
+        'duration',
+        'quote',
       ];
 
       const updateData = {};
+      // allowedFields.forEach((field) => {
+      //   const value = body[field];
+      //   if (value !== undefined && value !== '') {
+      //     updateData[field] =
+      //       (field === 'date') && value === ''
+      //         ? null
+      //         : value;
+      //   }
+      // });
+
       allowedFields.forEach((field) => {
         const value = body[field];
-        if (value !== undefined && value !== '') {
+
+        if (
+          value !== undefined &&
+          (value !== '' || field === 'notes')
+        ) {
           updateData[field] =
-            (field === 'date') && value === ''
-              ? null
-              : value;
+            field === 'date' && value === '' ? null : value;
         }
       });
 
@@ -171,12 +186,24 @@ module.exports = createCoreController('api::project.project',({strapi})=>({
       const sanitizedExpert = await this.sanitizeOutput(updatedExpert, ctx);
 
       // ✅ background index to Algolia
+      // setTimeout(async () => {
+      //   await strapi
+      //     .service('api::upload-experts.upload-experts')
+      //     .indexExpertsToAlgolia();
+      //   strapi.log.info('Background task completed.');
+      // }, 0);
+
       setTimeout(async () => {
+      try {
         await strapi
           .service('api::upload-experts.upload-experts')
-          .indexExpertsToAlgolia();
-        strapi.log.info('Background task completed.');
-      }, 0);
+          .indexSingleExpert(sanitizedExpert.documentId);
+
+        strapi.log.info('Background indexing completed');
+      } catch (err) {
+        strapi.log.error('Background indexing failed', err);
+      }
+    }, 0);
 
       return ctx.send(sanitizedExpert);
     } catch (err) {

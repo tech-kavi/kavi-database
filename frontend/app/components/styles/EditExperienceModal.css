@@ -48,12 +48,19 @@
   color: #333;
 }
 
-.modal-content input {
+.modal-content input:not([type="checkbox"]) {
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.25rem;
   border: 1px solid #ddd;
   border-radius: 6px;
+}
+
+.modal-content input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
 }
 
 .modal-actions {
@@ -100,4 +107,26 @@
   background-color: #f5f5f5;
   color: #555;
   cursor: not-allowed;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.checkbox-row label {
+  display: inline;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
 }

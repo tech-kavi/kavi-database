@@ -500,6 +500,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
     bank_details: Schema.Attribute.Text;
     companies: Schema.Attribute.Relation<'manyToMany', 'api::company.company'>;
     compliance: Schema.Attribute.String;
+    confidential: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -680,6 +681,7 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
       'api::project.project'
     > &
       Schema.Attribute.Private;
+    notes: Schema.Attribute.Text;
     pan: Schema.Attribute.String;
     pro_slug: Schema.Attribute.UID<'code'> & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;

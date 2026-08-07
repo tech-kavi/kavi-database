@@ -42,6 +42,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     tags: expert.tags ||[],
     credits: expert.credits || 0,
     compliance: expert.compliance || '',
+    confidential: expert.confidential ?? false,
   });
 
 
@@ -106,6 +107,18 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               onChange={(e) => handleChange('name', e.target.value)}
             />
           </div> */}
+           <div className="checkbox-row">
+            <input
+              id="confidential"
+              type="checkbox"
+              checked={formData.confidential}
+              onChange={(e) => handleChange("confidential", e.target.checked)}
+            />
+            <label htmlFor="confidential" className="m-0">
+              Confidential
+            </label>
+          </div>
+
           <div>
             <label>Email</label>
             <input

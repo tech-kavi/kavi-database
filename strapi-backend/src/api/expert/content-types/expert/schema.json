@@ -106,6 +106,10 @@
     },
     "email": {
       "type": "string"
+    },
+    "confidential": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

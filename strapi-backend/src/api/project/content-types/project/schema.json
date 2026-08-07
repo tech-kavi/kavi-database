@@ -73,6 +73,9 @@
     },
     "accountnumber": {
       "type": "string"
+    },
+    "notes": {
+      "type": "text"
     }
   }
 }
