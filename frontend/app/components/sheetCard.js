@@ -84,7 +84,7 @@ const saveExpertData = (expertId, data) =>{
 
 
 
-export default function sheetCard({ hits, sheetKey, onSelectSlug }) {
+export default function SheetCard({ hits, sheetKey, onSelectSlug }) {
   const { status } = useInstantSearch();
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, slug: null });
   const menuRef = useRef();
