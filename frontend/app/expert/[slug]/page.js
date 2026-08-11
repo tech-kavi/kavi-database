@@ -231,8 +231,17 @@ export default function ExpertPage() {
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     
 
-    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Contact & Status</h2>
+    <div className={`p-6 rounded-xl shadow-md space-y-4 ${
+    expert?.confidential
+      ? 'bg-red-50 border border-red-200'
+      : 'bg-white'
+  }`}>
+      <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-2">Contact & Status 
+        {expert.confidential && (
+                  <span className="shrink-0 rounded bg-red-100 ml-2 px-1.5 py-0.5 text-[14px] font-semibold text-red-800">
+                    🔒
+                  </span>
+          )}</h2>
       <div className="space-y-2">
         <p className="text-gray-400">Email</p>
         <p className="font-semibold">{expert.email || '-'}</p>

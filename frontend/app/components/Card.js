@@ -138,7 +138,7 @@ useEffect(() => {
                   )}
 
                   {hit.confidential && (
-                  <span className="shrink-0 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-700">
+                  <span className="shrink-0 rounded bg-red-100 px-1.5 py-0.5 text-[12px] font-semibold text-red-800">
                     🔒
                   </span>
                 )}
