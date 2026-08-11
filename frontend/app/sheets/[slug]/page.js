@@ -17,7 +17,7 @@ import {
   ToggleRefinement,
 } from 'react-instantsearch-hooks-web';
 
-import Card from '../../components/Card';
+import SheetCard from '../../components/sheetCard';
 import ExpertSidePanel from '../../components/ExpertSidePanel';
 
 
@@ -672,8 +672,9 @@ export default function UploadFileDetailsPage({params}) {
         </div>
 
 
-        <Card
+        <SheetCard
           hits={hits}
+          sheetKey={selectedFile}
           onSelectSlug={setSelectedSlug}
           refreshHits={refreshHits}
         />
