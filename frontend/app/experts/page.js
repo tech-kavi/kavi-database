@@ -3,12 +3,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements, ToggleRefinement } from 'react-instantsearch-hooks-web';
+import { SearchBox, SortBy, RefinementList, useRange, useNumericMenu, Configure, useHits, useStats, Index , Pagination, useInstantSearch, ClearRefinements, useClearRefinements, ToggleRefinement, useRefinementList } from 'react-instantsearch-hooks-web';
 import Card from '../components/Card';
 import ExpertSidePanel from '../components/ExpertSidePanel';
 import Head from 'next/head';
 import { useIndex } from '../components/Providers';
 import { ChevronDown } from "lucide-react";
+import { useSearchParams } from 'next/navigation';
 
 const ATTRIBUTE_OPTIONS = [
   { label: "All", value: null },
@@ -360,8 +361,7 @@ function DropdownFilters({ open, setOpen,setSelectedSlug }) {
                 count: 'text-gray-500 text-xs ml-2',
               }}
             />
-         
-
+        
           {/* Date Filters */}
           <CustomRangeInput attribute="start_date_ts" />
 
@@ -460,8 +460,22 @@ export default function Search() {
  
   const { refine: clearAllRefinements } = useClearRefinements();
 
+  
 
+  //const [selectedFile,setSelectedFile]  = useState(null);
 
+  const searchParams = useSearchParams();
+
+ let selectedFile = null;
+
+  for (const [key, value] of searchParams.entries()) {
+    if (
+      key.includes('[refinementList][upload_file_details]')
+    ) {
+      selectedFile = value;
+      break;
+    }
+  }
 
   //const { switchIndex } = useIndex();
 
@@ -528,8 +542,8 @@ export default function Search() {
           <SortBy
             items={[
               { label: 'Latest', value: 'development_api::expert.expert' },
-              { label: 'Original Quote (1-*)', value: 'experts_by_original_quote' },
-              { label: 'End Date(*-0)', value: 'expert_by_enddate' },
+              // { label: 'Original Quote (1-*)', value: 'experts_by_original_quote' },
+              // { label: 'End Date(*-0)', value: 'expert_by_enddate' },
             ]}
             defaultValue="development_api::expert.expert"
             classNames={{ select: 'border px-2 py-1 rounded text-sm' }}
@@ -540,7 +554,9 @@ export default function Search() {
           <div className="flex gap-2">
 
             <button
-            onClick={() => clearAllRefinements()}
+            onClick={() => {
+              clearAllRefinements();
+            }}
             className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium cursor-pointer"
           >
             Clear All Filters
@@ -557,6 +573,26 @@ export default function Search() {
       <div className="flex-1">
         <div className="flex justify-between items-center mb-4">
           <StatsHeader />
+
+        {/* {selectedFile && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">
+              {selectedFile}
+            </span>
+
+            <button
+              onClick={() => {
+                window.open(
+                  `/sheets/${encodeURIComponent(selectedFile)}`,
+                  '_blank'
+                );
+              }}
+              className="text-blue-600 hover:underline text-sm cursor-pointer"
+            >
+              Open
+            </button>
+          </div>
+        )} */}
         </div>
 
         <Card hits={hits} onSelectSlug={setSelectedSlug}   refreshHits={refreshHits}/>

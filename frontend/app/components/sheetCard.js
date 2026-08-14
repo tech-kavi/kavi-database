@@ -22,7 +22,7 @@ const formatDate = (dateStr) => {
 };
 
 const STORAGE_KEY = 'expert_temp_data'; 
-const EXPIRY_DAYS = 30; 
+const EXPIRY_DAYS = 15; 
 const EXPIRY_MS = EXPIRY_DAYS * 24 * 60 * 60 * 1000;
 
 
@@ -203,6 +203,8 @@ useEffect(() => {
             <th className="px-2 py-3 text-center w-[80px]">Quote ₹</th>
             <th className="px-2 py-3 text-center w-[150px]">Project Status</th>
             <th className="px-2 py-3 text-center w-[150px]">Key Status</th>
+            {/* <th className="px-2 py-3 text-center w-[120px]">priority</th>
+            <th className="px-2 py-3 text-center w-[180px]">Notes</th> */}
             {/* <th className="px-4 py-3 w-[180px]">Last Update</th> */}
           </tr>
         </thead>
@@ -314,8 +316,8 @@ useEffect(() => {
                   <Badge label={hit.expert_status} options={ENGAGEMENT_COLORS} truncate={true} />
                 </td>
 
-               {/* PRIORITY */}
-                <td className="px-2 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+               {/* PRIORITY
+                <td className="px-2 py-3 text-center " onClick={(e) => e.stopPropagation()}>
                 {" "}
                 <select
                     value={expertTempData.priority || ""}
@@ -327,21 +329,30 @@ useEffect(() => {
                     <option value="Medium"> Medium </option>{" "}
                     <option value="Low"> Low </option>{" "}
                 </select>{" "}
-                </td>
+                </td> */}
 
 
                 {/* NOTES */}
-                <td className="px-2 py-2 min-w-[220px]" onClick={(e) => e.stopPropagation()}>
-                    {" "}
-                    <input
-                        type="text"
-                        value={expertTempData.notes || ""}
-                        onChange={(e) => handleNotesChange(e, storageId)}
+
+                {/* <td
+                    className="pr-2 min-w-[220px]"
+                    onClick={(e) => e.stopPropagation()}
+                    >
+                    <textarea
+                        defaultValue={expertTempData.notes || ""}
+                        onChange={(e) => {
+                        // Only update the textarea while typing.
+                        // Don't update the entire table state.
+                        }}
+                        onBlur={(e) => {
+                        handleNotesChange(e, storageId);
+                        }}
                         onKeyDown={(e) => e.stopPropagation()}
                         placeholder="Add note..."
-                        className=" w-full border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 "
-                    />{" "}
-                    </td>
+                        rows={2}
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y"
+                    />
+                    </td> */}
 
                 {/* <td className="px-4 py-3 text-xs text-gray-500 break-words max-w-[200px] text-center">
                   {hit?.last_update
