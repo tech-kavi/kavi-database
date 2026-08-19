@@ -1213,7 +1213,86 @@ module.exports = ({ strapi }) => ({
         throw err;
       }
 
-      //const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
+
+      const industriesArray = Array.from(new Set(data.map(r => r.industry?.trim()).filter(Boolean)));
+      const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
+        fields: ['id', 'name'],
+        filters: { name: { $in: industriesArray } },
+      });
+      const industryMap = new Map(allindustries.map(c => [c.name.trim(), c]));
+      const missingIndustries = industriesArray.filter(name => !industryMap.has(name));
+      // if (missingIndustries.length > 0) {
+      //   await strapi.plugin('email').service('email').send({
+      //     to: uploaderEmail,
+      //     subject: 'Upload Failed - Missing Industries',
+      //     html: `<h2>Upload Failed</h2><p>Missing industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
+      //   });
+      //   const err = new Error('Missing Industries');
+      //   err.alreadyNotified = true;
+      //   throw err;
+      // }
+
+      const companyNamesArray = Array.from(new Set(data.map(r => r.TargetCompany?.trim()).filter(Boolean)));
+      const allCompanies = await strapi.entityService.findMany('api::company.company', {
+        fields: ['id', 'name','documentId'],
+        filters: { name: { $in: companyNamesArray } },
+      });
+      const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
+      const missingCompanies = companyNamesArray.filter(name => !companyMap.has(name));
+
+      //stop everything if even one company/topic is missing
+      // if (missingCompanies.length > 0) {
+      //   await strapi.plugin('email').service('email').send({
+      //     to: uploaderEmail,
+      //     subject: 'Upload Failed - Missing Topic',
+      //     html: `<h2>Upload Failed</h2><p>Missing Topic:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
+      //   });
+      //   const err = new Error('Missing Topic');
+      //   err.alreadyNotified = true;
+      //   throw err;
+      // }
+
+      if (missingIndustries.length || missingCompanies.length) {
+          let html = `
+            <h2>Upload Failed</h2>
+            <p>The following values were not found:</p>
+          `;
+
+          if (missingIndustries.length) {
+            html += `
+              <h3>Missing Industries</h3>
+              <ul>
+                ${missingIndustries
+                  .map(item => `<li>${item}</li>`)
+                  .join("")}
+              </ul>
+            `;
+          }
+
+          if (missingCompanies.length) {
+            html += `
+              <h3>Missing Topics</h3>
+              <ul>
+                ${missingCompanies
+                  .map(item => `<li>${item}</li>`)
+                  .join("")}
+              </ul>
+            `;
+          }
+
+          await strapi.plugin("email").service("email").send({
+            to: uploaderEmail,
+            subject: "Upload Failed - Missing Data",
+            html
+          });
+
+          const err = new Error("Missing industries or topics");
+          err.alreadyNotified = true;
+
+          throw err;
+        }
+
+         //const linkedinKeys = data.map(row => normalizeLinkedIn(row.LinkedIn)).filter(Boolean);
       const linkedinKeys = data
         .map(row => row.LinkedIn ? normalizeLinkedIn(row.LinkedIn) : null)
         .filter(Boolean);
@@ -1229,44 +1308,6 @@ module.exports = ({ strapi }) => ({
         limit: linkedinKeys.length,
       });
       const expertMap = new Map(allExperts.map(e => [normalizeLinkedIn(e.linkedin), e]));
-
-      const industriesArray = Array.from(new Set(data.map(r => r.industry?.trim()).filter(Boolean)));
-      const allindustries = await strapi.entityService.findMany('api::sub-industry.sub-industry', {
-        fields: ['id', 'name'],
-        filters: { name: { $in: industriesArray } },
-      });
-      const industryMap = new Map(allindustries.map(c => [c.name.trim(), c]));
-      const missingIndustries = industriesArray.filter(name => !industryMap.has(name));
-      if (missingIndustries.length > 0) {
-        await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Upload Failed - Missing Industries',
-          html: `<h2>Upload Failed</h2><p>Missing industries:</p><ul>${missingIndustries.map(c => `<li>${c}</li>`).join('')}</ul>`
-        });
-        const err = new Error('Missing Industries');
-        err.alreadyNotified = true;
-        throw err;
-      }
-
-      const companyNamesArray = Array.from(new Set(data.map(r => r.TargetCompany?.trim()).filter(Boolean)));
-      const allCompanies = await strapi.entityService.findMany('api::company.company', {
-        fields: ['id', 'name','documentId'],
-        filters: { name: { $in: companyNamesArray } },
-      });
-      const companyMap = new Map(allCompanies.map(c => [c.name.trim(), c]));
-      const missingCompanies = companyNamesArray.filter(name => !companyMap.has(name));
-
-      //stop everything if even one company/topic is missing
-      if (missingCompanies.length > 0) {
-        await strapi.plugin('email').service('email').send({
-          to: uploaderEmail,
-          subject: 'Upload Failed - Missing Topic',
-          html: `<h2>Upload Failed</h2><p>Missing Topic:</p><ul>${missingCompanies.map(c => `<li>${c}</li>`).join('')}</ul>`
-        });
-        const err = new Error('Missing Topic');
-        err.alreadyNotified = true;
-        throw err;
-      }
 
       const slugify = str => str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
       let created = 0, updated = 0;
