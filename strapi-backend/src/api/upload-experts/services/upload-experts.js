@@ -103,7 +103,8 @@ function getExperienceSlug({ LinkedIn, Designation, CompanyName, Start }) {
   const username = getLinkedInUsername(LinkedIn);
   const timePart = Start ? new Date(Start).getTime() : Date.now();
 
-  const base = username || `${Designation || 'expert'}-${CompanyName || 'company'}`;
+ // const base = username || `${Designation || 'expert'}-${CompanyName || 'company'}`;
+  const base = `${Designation || 'expert'}-${CompanyName || 'company'}`;
 
   // Append a random 4-digit number for extra uniqueness
   const randomPart = Math.floor(1000 + Math.random() * 9000); // 1000-9999
@@ -1395,7 +1396,8 @@ module.exports = ({ strapi }) => ({
 
               updated++;
             } else {
-              const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
+              //const slug = getLinkedInUsername(LinkedIn) || slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
+              const slug = slugify(`${Name}-${CompanyName}-${Designation || 'expert'}-${Date.now()}`);
               const newExpert = await strapi.entityService.create('api::expert.expert', {
                 data: {
                   name: Name.trim(),
