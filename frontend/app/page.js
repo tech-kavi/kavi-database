@@ -13,13 +13,96 @@ import { TYPE_COLORS } from './constants/options';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+function DashboardSkeleton() {
+  return (
+    <div className="mx-auto p-2 lg:p-6 sm:px-6 lg:px-8 w-full max-w-[95vw] space-y-8 animate-pulse">
+
+      {/* Header Skeleton */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+        <div>
+          <div className="h-9 w-64 bg-gray-200 rounded-lg"></div>
+          <div className="h-4 w-80 bg-gray-200 rounded mt-3"></div>
+        </div>
+
+        <div className="h-12 w-32 bg-gray-200 rounded-xl"></div>
+      </div>
+
+      {/* Global Stats Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {[1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="bg-white rounded-2xl p-6 h-[140px]"
+          >
+            <div className="h-4 w-28 bg-gray-300 rounded"></div>
+            <div className="h-9 w-32 bg-gray-300 rounded mt-3"></div>
+            <div className="h-4 w-36 bg-gray-300 rounded mt-3"></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Call Metrics Skeleton */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div>
+            <div className="h-6 w-36 bg-gray-200 rounded"></div>
+            <div className="h-4 w-64 bg-gray-200 rounded mt-2"></div>
+          </div>
+
+          <div className="h-10 w-40 bg-gray-200 rounded-xl"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl bg-gray-200 p-6 h-[145px]"
+            >
+              <div className="flex justify-between">
+                <div>
+                  <div className="h-4 w-32 bg-gray-300 rounded"></div>
+                  <div className="h-9 w-28 bg-gray-300 rounded mt-3"></div>
+                </div>
+
+                <div className="h-6 w-16 bg-gray-300 rounded-full"></div>
+              </div>
+
+              <div className="h-4 w-28 bg-gray-300 rounded mt-5"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Expert Distribution Skeleton */}
+      <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center">
+        <div className="h-7 w-72 bg-gray-200 rounded mb-8"></div>
+
+        <div className="w-[280px] h-[280px] rounded-full border-[45px] border-gray-200"></div>
+
+        <div className="flex flex-wrap justify-center gap-5 mt-8">
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <div key={item} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+              <div className="h-3 w-16 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const [dashboard, setDashboard] = useState(null);
   const [period, setPeriod] = useState('week');
-  const [loading, setLoading] = useState(true);
   const [reIndex,setreIndex] = useState(false);
   const [projectType, setProjectType] = useState("all");
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [recentLoading, setRecentLoading] = useState(false);
+  
 
   const {user}=useAuth();
 
@@ -45,19 +128,70 @@ export default function Dashboard() {
     }
   };
 
-  const fetchDashboard = async () => {
-   // setLoading(true);
-    try {
-          const [resStats, resRecent] = await Promise.all([
+  // const fetchDashboard = async () => {
+  //  // setLoading(true);
+  //   try {
+  //         const [resStats, resRecent] = await Promise.all([
+  //     axios.get(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/expert-details`,
+  //       {
+  //         params: projectType === "all" ? {} : {type: projectType},
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //         },
+  //       }
+  //     ),
+  //     axios.get(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recent-experts-count?period=${period}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //         },
+  //       }
+  //     ),
+  //   ]);
+  //     setDashboard({
+  //       ...resStats.data,
+  //       recentExpertsCount: resRecent?.data?.count,
+  //     });
+      
+  //   } catch (err) {
+  //       console.error(err);
+  //       if (err.response?.status === 401) {
+  //         toast.error('Session expired. Please log in again.');
+  //         localStorage.removeItem('token');
+  //         router.push('/login');
+  //       } else {
+  //         toast.error('Failed to fetch dashboard data');
+  //       }
+  //     }finally { 
+  //      // setLoading(false);
+  //      }
+  // };
+
+
+ const fetchDashboard = async () => {
+  // First load: full skeleton
+  if (!dashboard) {
+    setInitialLoading(true);
+  }
+
+  // Existing dashboard: don't hide the page
+  setStatsLoading(true);
+  setRecentLoading(true);
+
+  try {
+    const [resStats, resRecent] = await Promise.all([
       axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/expert-details`,
         {
-          params: projectType === "all" ? {} : {type: projectType},
+          params: projectType === "all" ? {} : { type: projectType },
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       ),
+
       axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recent-experts-count?period=${period}`,
         {
@@ -67,25 +201,30 @@ export default function Dashboard() {
         }
       ),
     ]);
-      setDashboard({
-        ...resStats.data,
-        recentExpertsCount: resRecent?.data?.count,
-      });
-      
-    } catch (err) {
-        console.error(err);
-        if (err.response?.status === 401) {
-          toast.error('Session expired. Please log in again.');
-          localStorage.removeItem('token');
-          router.push('/login');
-        } else {
-          toast.error('Failed to fetch dashboard data');
-        }
-      }finally { 
-       // setLoading(false);
-       }
-  };
 
+    setDashboard(prev => ({
+      ...(prev || {}),
+      ...resStats.data,
+      recentExpertsCount: resRecent?.data?.count,
+    }));
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.response?.status === 401) {
+      toast.error('Session expired. Please log in again.');
+      localStorage.removeItem('token');
+      router.push('/login');
+    } else {
+      toast.error('Failed to fetch dashboard data');
+    }
+
+  } finally {
+    setStatsLoading(false);
+    setRecentLoading(false);
+    setInitialLoading(false);
+  }
+};
 
   const typeLabels = dashboard ? Object.keys(dashboard?.typeCounts):[];
   const typeData = dashboard ? Object.values(dashboard?.typeCounts):[];
@@ -158,13 +297,18 @@ const filterLabel = {
 }[projectType];
 
   
-  if (!dashboard) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
-      </div>
-    );
-  }
+  // if (!dashboard) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+  //     </div>
+  //   );
+  // }
+
+if (initialLoading || !dashboard) {
+  return <DashboardSkeleton />;
+}
+
 
 
   return (

@@ -76,7 +76,7 @@ function getLinkedInUsername(link) {
   if (!link) return null; // no LinkedIn provided
 
   try {
-    const decoded = decodeURIComponent(url);
+    const decoded = decodeURIComponent(link);
     const handle = decoded.split('/in/')[1] || '';
     return handle
       .replace(/[^A-Za-z0-9-_.~]+/g, '-') // replace invalid chars
