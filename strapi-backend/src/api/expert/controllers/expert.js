@@ -19,6 +19,16 @@ function cleanData(body) {
   return cleanedData;
 }
 
+function normalizeLinkedIn(link) {
+  if (!link) return '';
+
+  return link
+    .trim()
+    .toLowerCase()
+    .replace(/\?.*$/, '') // remove query params
+    .replace(/\/+$/, ''); // remove trailing slashes
+}
+
 module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
 
   async create(ctx){
@@ -160,6 +170,10 @@ module.exports = createCoreController('api::expert.expert', ({ strapi }) => ({
           time: now.toISOString(),
           field: "Expert",   // track which fields were updated
         };
+
+        if (cleanedData.linkedin !== undefined && cleanedData.linkedin !== null) {
+          cleanedData.linkedin = normalizeLinkedIn(cleanedData.linkedin);
+        }
 
         const updatedExpert = await strapi.documents('api::expert.expert').update({
             documentId:expertDetails.documentId,
