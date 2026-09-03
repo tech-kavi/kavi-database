@@ -40,12 +40,23 @@ module.exports = createCoreService('api::upload-lock.upload-lock',({ strapi }) =
     return {isLocked:false,lock:lock};
   },
 
-  async releaseLock() {
-    await strapi.db
-      .query('api::upload-lock.upload-lock')
-      .updateMany({
-        where: { islocked: true },
-        data: { islocked: false },
+  async releaseLock(documentId) {
+      if (!documentId) {
+      throw new Error('Lock documentId is required');
+    }
+    // await strapi.db
+    //   .query('api::upload-lock.upload-lock')
+    //   .updateMany({
+    //     where: { islocked: true },
+    //     data: { islocked: false },
+    //   });
+    //   }
+      await strapi.documents('api::upload-lock.upload-lock').update({
+        documentId,
+        data: {
+          islocked: false,
+        },
+        status: 'published',
       });
-      }
+    }
 }));

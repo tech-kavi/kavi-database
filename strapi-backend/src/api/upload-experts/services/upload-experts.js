@@ -1540,7 +1540,7 @@ module.exports = ({ strapi }) => ({
         });
       }
     } finally {
-      await strapi.service('api::upload-lock.upload-lock').releaseLock();
+      await strapi.service('api::upload-lock.upload-lock').releaseLock(gotLock.documentId);
     }
   }
 

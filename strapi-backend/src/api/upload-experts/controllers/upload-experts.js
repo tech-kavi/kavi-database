@@ -4,11 +4,12 @@
 
 module.exports = {
   async uploadAndCreateExperts(ctx) {
+    let gotLock = null;
     try {
       const uploaderEmail = ctx.state.user?.email;
 
       // Try to acquire lock
-    const gotLock = await strapi.service('api::upload-lock.upload-lock').acquireLock(uploaderEmail);
+    gotLock = await strapi.service('api::upload-lock.upload-lock').acquireLock(uploaderEmail);
     //console.log(gotLock);
     if (gotLock?.isLocked) {
       return ctx.badRequest(`${gotLock.lockedBy}'s upload is already in progress. Please wait until it finishes.`);
@@ -53,7 +54,7 @@ module.exports = {
       const fileId = uploaded?.[0]?.id;
       if (!fileId) {
         console.log('inside file upload error');
-        await strapi.service('api::upload-lock.upload-lock').releaseLock();
+        await strapi.service('api::upload-lock.upload-lock').releaseLock(gotLock.lock.documentId);
         return ctx.internalServerError('File upload failed to generate URL.');
       }
 
@@ -71,7 +72,23 @@ module.exports = {
 
     } catch (error) {
       console.error('❌ Error:', error);
-      await strapi.service('api::upload-lock.upload-lock').releaseLock();
+       if (gotLock?.lock?.documentId) {
+      try {
+        await strapi
+          .service('api::upload-lock.upload-lock')
+          .releaseLock(gotLock.lock.documentId);
+
+        strapi.log.info(
+          `🔓 Released lock ${gotLock.lock.documentId} after upload error`
+        );
+      } catch (releaseError) {
+        strapi.log.error(
+          '❌ Failed to release upload lock:',
+          releaseError
+        );
+      }
+    }
+
       return ctx.internalServerError('Failed to upload and process file');
     }
   },
