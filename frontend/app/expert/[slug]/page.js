@@ -292,7 +292,7 @@ export default function ExpertPage() {
   {/* Summary */}
   <div className="bg-white p-6 rounded-xl shadow-md">
     <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Summary</h2>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
       <div>
         <p className="text-gray-400">Calls Completed</p>
         <p className="font-semibold text-lg">{expert.projects?.length || '-'}</p>
@@ -316,14 +316,41 @@ export default function ExpertPage() {
             : '-'} 
         </p>
       </div>
-      <div>
+      {/* <div>
         <p className="text-gray-400">Call Codes</p>
         <p className="font-semibold text-lg">
           {expert.projects?.length
             ? expert.projects.map(p => p.code).filter(Boolean).join(', ')
             : '-'}
         </p>
-      </div>
+      </div> */}
+
+      {/* Project Notes */}
+    <div className="col-span-2 md:col-span-4 text-left border-t pt-4">
+      <p className="text-gray-400 mb-2">Project Notes / Feedbacks</p>
+
+      {expert.projects?.some(p => p.notes != null) ? (
+        <div className="space-y-2">
+          {expert.projects
+            .filter(p => p.notes != null)
+            .map((p, index) => (
+              <div key={p.id || index} className="flex gap-2">
+                <span className="font-semibold text-gray-800">
+                  {p.code}:
+                </span>
+
+                <span className="text-gray-600">
+                  {p.notes}
+                </span>
+              </div>
+            ))}
+        </div>
+      ) : (
+        <p className="text-gray-500">-</p>
+      )}
+    </div>
+
+      
     </div>
   </div>
 
