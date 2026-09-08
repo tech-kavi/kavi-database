@@ -45,6 +45,7 @@ const columnMap = {
   expertrating: 'expertrating',
   fccallrating: 'fccallrating',
   fcexpertrating: 'fcexpertrating',
+  feedback: 'feedback',
 };
 
 function remapRow(row) {
@@ -957,6 +958,7 @@ const missing = excelLinkedins.filter(
             expertrating,
             fccallrating,
             fcexpertrating,
+            feedback,
           } = row;
 
           const slug = slugify(code);
@@ -1002,6 +1004,7 @@ const missing = excelLinkedins.filter(
               fc_call_rating: fccallrating || 0,
               fc_expert_rating: fcexpertrating || 0,
               quote: quote || 0,
+              notes: feedback || null,
               expert: expert.documentId,
             },
           });
