@@ -194,8 +194,8 @@ useEffect(() => {
         <thead className="bg-gray-50 text-gray-600 text-sm uppercase tracking-wide">
           <tr className="border-b">
             <th className="px-2 py-3 h-14 w-[150px]">Name</th>
-            <th className="px-2 py-3 w-[150px]">Company</th>
-            <th className="px-2 py-3 text-center w-[100px]">Type</th>
+            <th className="px-2 py-3 w-[120px]">Company</th>
+            <th className="px-2 py-3 text-center w-[150px]">Type</th>
             <th className="px-2 py-3 w-[180px]">Designation</th>
             <th className="px-2 py-3 w-[150px]">Topic</th>
             <th className="px-2 py-3 w-[80px] text-center">Start</th>
@@ -203,8 +203,8 @@ useEffect(() => {
             <th className="px-2 py-3 text-center w-[80px]">Quote ₹</th>
             <th className="px-2 py-3 text-center w-[150px]">Project Status</th>
             <th className="px-2 py-3 text-center w-[150px]">Key Status</th>
-            {/* <th className="px-2 py-3 text-center w-[120px]">priority</th>
-            <th className="px-2 py-3 text-center w-[180px]">Notes</th> */}
+            <th className="px-2 py-3 text-center w-[120px]">priority</th>
+            <th className="px-2 py-3 text-center w-[180px]">Notes</th>
             {/* <th className="px-4 py-3 w-[180px]">Last Update</th> */}
           </tr>
         </thead>
@@ -316,7 +316,7 @@ useEffect(() => {
                   <Badge label={hit.expert_status} options={ENGAGEMENT_COLORS} truncate={true} />
                 </td>
 
-               {/* PRIORITY
+               {/* PRIORITY */}
                 <td className="px-2 py-3 text-center " onClick={(e) => e.stopPropagation()}>
                 {" "}
                 <select
@@ -329,12 +329,12 @@ useEffect(() => {
                     <option value="Medium"> Medium </option>{" "}
                     <option value="Low"> Low </option>{" "}
                 </select>{" "}
-                </td> */}
+                </td>
 
 
                 {/* NOTES */}
 
-                {/* <td
+                <td
                     className="pr-2 min-w-[220px]"
                     onClick={(e) => e.stopPropagation()}
                     >
@@ -352,7 +352,7 @@ useEffect(() => {
                         rows={2}
                         className="w-full border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y"
                     />
-                    </td> */}
+                    </td>
 
                 {/* <td className="px-4 py-3 text-xs text-gray-500 break-words max-w-[200px] text-center">
                   {hit?.last_update
