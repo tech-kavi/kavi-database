@@ -394,23 +394,35 @@ export default function Search() {
  
   const { refine: clearAllRefinements } = useClearRefinements();
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === '/') {
-        e.preventDefault();
+   useEffect(() => {
+  const handleKeyDown = (e) => {
+    // Don't trigger search shortcut while typing
+    const tag = e.target.tagName;
 
-        const searchInput = document.querySelector('.ais-SearchBox-input');
+    if (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      tag === 'SELECT' ||
+      e.target.isContentEditable
+    ) {
+      return;
+    }
 
-        searchInput?.focus();
-      }
-    };
+    if (e.key === '/') {
+      e.preventDefault();
 
-    document.addEventListener('keydown', handleKeyDown);
+      const searchInput = document.querySelector('.ais-SearchBox-input');
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+      searchInput?.focus();
+    }
+  };
+
+  document.addEventListener('keydown', handleKeyDown);
+
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
+}, []);
 
   //const [selectedFile,setSelectedFile]  = useState(null);
 

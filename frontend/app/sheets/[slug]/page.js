@@ -507,6 +507,36 @@ export default function UploadFileDetailsPage({params}) {
   const { refine: clearAllRefinements } =
     useClearRefinements();
 
+  useEffect(() => {
+  const handleKeyDown = (e) => {
+    // Don't trigger search shortcut while typing
+    const tag = e.target.tagName;
+
+    if (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      tag === 'SELECT' ||
+      e.target.isContentEditable
+    ) {
+      return;
+    }
+
+    if (e.key === '/') {
+      e.preventDefault();
+
+      const searchInput = document.querySelector('.ais-SearchBox-input');
+
+      searchInput?.focus();
+    }
+  };
+
+  document.addEventListener('keydown', handleKeyDown);
+
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
+}, []);
+
   const { refresh } = useInstantSearch();
 
 
@@ -548,7 +578,7 @@ export default function UploadFileDetailsPage({params}) {
 
       {/* TOP BAR */}
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+      <div id="expert-search" className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
 
 
         {/* SEARCH */}
