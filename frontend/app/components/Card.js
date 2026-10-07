@@ -175,6 +175,12 @@ useEffect(() => {
                   {hit?.original_quote
                     ? `₹${Number(hit.original_quote).toLocaleString('en-IN')}`
                     : '-'}
+
+                    {hit.non_pro_rated && (
+                  <span className="shrink-0 rounded px-1.5 py-0.5 text-[12px] font-semibold text-red-800">
+                    🔒
+                  </span>
+                )}
                 </td>
 
                 <td className="px-2 py-3 text-center">

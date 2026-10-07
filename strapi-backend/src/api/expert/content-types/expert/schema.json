@@ -110,6 +110,10 @@
     "confidential": {
       "type": "boolean",
       "default": false
+    },
+    "non_pro_rated": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

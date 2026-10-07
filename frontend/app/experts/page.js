@@ -536,7 +536,7 @@ export default function Search() {
         <div className="flex justify-between items-center mb-4">
           <StatsHeader />
 
-        {/* {selectedFile && (
+        {selectedFile && (
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-700">
               {selectedFile}
@@ -554,7 +554,7 @@ export default function Search() {
               Open
             </button>
           </div>
-        )} */}
+        )}
         </div>
 
         <Card hits={hits} onSelectSlug={setSelectedSlug}   refreshHits={refreshHits}/>

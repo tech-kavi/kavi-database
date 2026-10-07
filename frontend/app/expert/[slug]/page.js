@@ -250,7 +250,11 @@ export default function ExpertPage() {
         <p className="font-semibold">{expert.phone || '-'}</p>
 
         <p className="text-gray-400">Original Quote</p>
-        <p className="font-semibold"> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}</p>
+        <p className="font-semibold"> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}{expert.non_pro_rated && (
+                  <span className="shrink-0 rounded px-1.5 py-0.5 text-[12px] font-semibold text-red-800">
+                    🔒
+                  </span>
+                )}</p>
 
         <p className="text-gray-400">Source Of Response</p>
         <p className="font-semibold">{expert?.source_of_response || '-'}</p>

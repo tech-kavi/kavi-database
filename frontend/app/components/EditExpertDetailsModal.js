@@ -43,6 +43,7 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
     credits: expert.credits || 0,
     compliance: expert.compliance || '',
     confidential: expert.confidential ?? false,
+    non_pro_rated: expert.non_pro_rated ?? false,
   });
 
 
@@ -107,6 +108,8 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
               onChange={(e) => handleChange('name', e.target.value)}
             />
           </div> */}
+
+          <div className='md:flex gap-5 justify-start'>
            <div className="checkbox-row">
             <input
               id="confidential"
@@ -117,6 +120,19 @@ export default function EditExpertDetailsModal({ expert, onClose, onSave }) {
             <label htmlFor="confidential" className="m-0">
               Confidential
             </label>
+          </div>
+
+           <div className="checkbox-row">
+            <input
+              id="non_pro_rated"
+              type="checkbox"
+              checked={formData.non_pro_rated}
+              onChange={(e) => handleChange("non_pro_rated", e.target.checked)}
+            />
+            <label htmlFor="non_pro_rated" className="m-0">
+              Non Pro-rated
+            </label>
+          </div>
           </div>
 
           <div>

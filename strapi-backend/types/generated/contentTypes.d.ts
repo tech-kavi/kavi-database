@@ -540,6 +540,7 @@ export interface ApiExpertExpert extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
+    non_pro_rated: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     notes: Schema.Attribute.Text;
     original_quote: Schema.Attribute.Integer;
     phone: Schema.Attribute.String;

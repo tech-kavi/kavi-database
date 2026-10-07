@@ -569,8 +569,10 @@ export default function UploadFileDetailsPage({params}) {
           Sheet
         </div>
 
-        <div className="text-lg font-semibold text-gray-800 break-all">
-          {selectedFile || 'No file selected'}
+        <div className="">
+          <p className='text-lg font-semibold text-gray-800 break-all'>{selectedFile || 'No file selected'}</p>
+
+          <p className='text-sm text-red-400'>Note: PRIORITY and NOTES are stored only in your current browser and will be automatically erased 15 days after your last edit.</p>
         </div>
 
       </div>

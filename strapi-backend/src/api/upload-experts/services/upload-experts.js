@@ -325,6 +325,7 @@ module.exports = ({ strapi }) => ({
         project: expert.projects,
         screening: expert.screening,
         confidential: expert.confidential,
+        non_pro_rated: expert.non_pro_rated,
         ...exp,
         company: exp.company,
         target_company: exp.target_company ? { id: exp.target_company.id, name: exp.target_company.name } : null,
@@ -423,6 +424,7 @@ module.exports = ({ strapi }) => ({
           project: expert.projects,
           screening: expert.screening,
           confidential: expert.confidential,
+          non_pro_rated: expert.non_pro_rated,
 
           // spread all fields from experience (so you keep createdAt, updatedAt, etc.)
           ...exp,
@@ -984,6 +986,7 @@ module.exports = ({ strapi }) => ({
           project: expert.projects,
           screening: expert.screening,
           confidential: expert.confidential,
+          non_pro_rated: expert.non_pro_rated,
 
           // spread all fields from experience (so you keep createdAt, updatedAt, etc.)
           ...exp,
