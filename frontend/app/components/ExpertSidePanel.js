@@ -188,6 +188,7 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
       );
       const updatedExpert = res.data;
       setExpert(updatedExpert);
+      refreshHits();
       console.log(updatedExpert);
       setShowEditDetailsModal(false);
 
@@ -328,7 +329,14 @@ const [isSavingScreening, setIsSavingScreening] = useState(false);
                   truncate={true}
                 />
               </div>
-            <p><span className='font-semibold'>Quote:</span> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}</p>
+            <p><span className='font-semibold'>Quote:</span> {expert?.original_quote != null ? "₹" + expert.original_quote : '-'}
+            {expert.non_pro_rated && (
+                  <span className="shrink-0 rounded px-1.5 py-0.5 text-[12px] font-semibold text-red-800">
+                    🔒
+                  </span>
+                )}
+            
+            </p>
            
           </div>
         </div>

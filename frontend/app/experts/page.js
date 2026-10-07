@@ -449,7 +449,7 @@ export default function Search() {
   // }, []);
 
     const { refresh, instantSearchInstance} = useInstantSearch();
-
+  
 
     function refreshHits(){
       console.log('refresh');
